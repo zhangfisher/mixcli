@@ -32,7 +32,6 @@ export function outputStr(str:string,vars?:Record<string,any> | any[]){
         const spaceCount = line.match(/^\s*/)?.[0].length || 0
         return Math.min(minCount,spaceCount)
     },9999)
-    console.log("minSpaceCount=",minSpaceCount)
     lines = lines.map(line=>line.substring(minSpaceCount))
     logsets.log(lines.join("\n"),vars)
 }

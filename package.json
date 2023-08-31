@@ -4,7 +4,7 @@
   "description": "Develop command line tool scaffolding for monorepo",
   "main": "index.js",
   "scripts": {
-    "build": "turbo build"
+    "build": "turbo build --filter cli"
   },
   "keywords": [],
   "author": "",

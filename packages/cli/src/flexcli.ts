@@ -70,11 +70,12 @@ export class FlexCli{
      * 注册一个命令
      * @param cmd 
      */
-    register(flexcmd:FlexCliCommand){
-        if(typeof(flexcmd)=="function"){
-            let cmd = flexcmd(this)
-            if(cmd instanceof Command){
-                this.root.addCommand(cmd)
+    register(cmd:FlexCliCommand){
+        if(typeof(cmd)=="function"){
+            let result = cmd(this)
+            if(result instanceof Command){
+                this.root.addCommand(result)
+                this.commands[result.name()] = result
             }
         }else{
             logsets.error("无效的FlexCliCommand")
