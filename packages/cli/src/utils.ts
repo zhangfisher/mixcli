@@ -1,0 +1,87 @@
+import artTemplate from "art-template"
+import fs from "fs-extra"
+import path  from "node:path"
+import { promisify }   from "flex-tools/func/promisify"
+import logsets from "logsets"
+
+/**
+ * 
+ * 在控制台输出一个字符串
+ * 本方法会将字符串中的每一行空格去掉
+ * 
+ * @remarks
+ * 
+ * outputStr(String.raw`
+ *     a
+ *       b`)
+ * 
+ * 会输出
+ * a
+ *   b
+ *
+ * 此功能可以用于输出多行字符串时，保持代码的缩进格式，而不会影响输出结果
+ * 
+ * @param str : 要输出的字符串
+ * @param vars : 用于替换字符串中的变量
+ * 
+ */
+export function outputStr(str:string,vars?:Record<string,any> | any[]){ 
+    let lines:string[] = str.split("\n")
+    let minSpaceCount = lines.reduce<number>((minCount,line,index)=>{
+        if(index==0) return minCount
+        const spaceCount = line.match(/^\s*/)?.[0].length || 0
+        return Math.min(minCount,spaceCount)
+    },9999)
+    console.log("minSpaceCount=",minSpaceCount)
+    lines = lines.map(line=>line.substring(minSpaceCount))
+    logsets.log(lines.join("\n"),vars)
+}
+
+
+export const fileExists = promisify(fs.exists,{
+    parseCallback:(results)=>{
+        return results[0]
+    }
+})
+export const readFile = promisify(fs.readFile)
+export const writeFile = promisify(fs.writeFile)
+export const mkdir = promisify(fs.mkdir)
+
+/**
+ * 基于artTemplate模板生成文件
+ * 
+ * @param {*} tmplFile 
+ * @param {*} vars 
+ */
+export async function createFile(targetFile:string,tmplFile:string,vars:Record<string,any>={}){
+    tmplFile=path.isAbsolute(tmplFile)? tmplFile : path.join(process.cwd(),tmplFile)
+    if(!fs.existsSync(tmplFile)){
+        throw new Error("模板文件不存在:"+tmplFile)
+    }
+    targetFile=path.isAbsolute(targetFile)? targetFile : path.join(process.cwd(),targetFile)
+    const outPath = path.dirname(targetFile)
+    if(!await fileExists(outPath)){
+        await mkdir(outPath,{recursive:true})
+    }    
+    const template = artTemplate(tmplFile,await readFile(tmplFile,{encoding:"utf-8"}));    
+    await writeFile(targetFile,template(vars),{encoding:"utf-8"})
+    return targetFile
+}
+
+/**  
+ * 创建目录  
+ * 
+ *  
+ * 
+ * @param {String[]} dirs 要创建的目录列表，类型为字符串数组  
+ * @param callback      创建目录过程中的回调函数，类型为异步函数，接收一个参数 dir，表示当前正在创建的目录  
+ * @returns 该函数返回一个 Promise 对象，表示创建目录的操作是否完成  
+ */
+export async function mkDirs(dirs:string[],{callback,base}:{callback?:Function,base?:string}){
+    if(!Array.isArray(dirs)) throw new Error("dirs参数必须为字符串数组")
+    for(let dir of dirs){
+        if(!path.isAbsolute(dir)) dir = path.join(base || process.cwd(),dir)
+        if(typeof(callback)=='function') callback(dir)
+        await mkdir(dir,{recursive:true})
+    }
+}
