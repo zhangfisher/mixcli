@@ -8,6 +8,9 @@ module.exports = (cli)=>{
     command
         .name('init')
         .description('初始化应用') 
+        .action(()=>{
+            console.log("init")
+        })
     return command
 }
 

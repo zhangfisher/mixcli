@@ -21,7 +21,7 @@ const cli = new FlexCli({
 })
 
 // cli.register(devCommand)
-cli.register(initCommand)
+cli.register(devCommand)
 // cli.register(startCommand)
 
 

@@ -1,3 +1,3 @@
 export * from "./flexcli"
 export * from "./utils"
-export * from "commander"
+export * from "./command"

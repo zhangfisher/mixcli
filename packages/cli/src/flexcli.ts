@@ -56,12 +56,12 @@ export class FlexCli{
     private createRootCommand(){
         this.root = new Command('root');
         this.root.name(this.name)
-            .option("-v, --version", "当前版本号")
             .helpOption('-h, --help', '显示帮助')     
             .version(require("../package.json").version,"-v, --version","当前版本号") 
             .action(()=>{
                 logsets.log("Voerka Cloud Command Line Interface")
                 logsets.log("版本号:{}",require("../package.json").version)
+                this.root.help()
             })
         if(this.options.before) this.root.hook('preAction',this.options.before)
         if(this.options.after) this.root.hook('postAction',this.options.after) 
