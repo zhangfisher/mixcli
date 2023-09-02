@@ -1,4 +1,4 @@
-import type { FlexCli } from './flexcli';
+import type { FlexCli } from './cli';
 /**
  * 
  * 在当前工程中查找符合FlexCli.prefix约定的命令 

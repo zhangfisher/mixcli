@@ -11,13 +11,15 @@ module.exports = (cli)=>{
     command
         .name('dev')
         .description('在开发模式下运行应用')
+        .argument('[name]','应用名称',"flexcli")
+        .argument('<version>','版本号')
         .option("-d,--debug" ,"调试模式",{ default:true,prompt:true })      
-        .action(async function (options,cmd){
-            console.log("run dev")
+        .action(async function (name,version,options,cmd){
+            console.log("run dev",name,version)
             console.log("options=",options) 
             // 如果有子命令
             if(cmd.commands.length>0){
-                await cmd.select()
+               // await cmd.selectCommands()
             }else{
                 cmd.help()
             }

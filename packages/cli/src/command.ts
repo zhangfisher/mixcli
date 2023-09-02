@@ -1,51 +1,12 @@
 import { Command,Option } from "commander";
 import prompts, { PromptObject }  from  "prompts"
+import { FlexOption,type OptionParams } from "./option";
+import  { isValidPromptType,promptTypeMap,InputPromptParam, PromptParamDefaultValue,supportedPromptTypes, PromptParam } from "./prompt";
 
 export type HookCommandListener = (thisCommand:FlexCommand,actionComand:FlexCommand)=>void | Promise<void>
 
-declare module "commander"{
-    // 对原始的Option接口进行扩展
-    interface Option{
-        _prompt: InputPromptParam           // 是否提示用户输入
-        _validate:(value: any) => boolean 
-    }
-}
-export type PromptType = "text" | "password" | "invisible" | "number"| "confirm"| "list"| "toggle"| "select" | "multiselect" | "autocomplete" | "date" | "autocompleteMultiselect"
 
-export type PromptParam = 'auto' | boolean | PromptType | PromptObject
-export type InputPromptParam = PromptParam | ((value:any)=>PromptParam)
-export type PromptParamDefaultValue = string | boolean | string[]  
 
-export interface OptionParams{
-    dataType?:string | number | boolean 
-    default?:PromptParamDefaultValue
-    defaultDescription?:string          // 默认值的描述
-    choices?:string[]              // 选项值的可选值
-    required?: boolean; // A value must be supplied when the option is specified.
-    optional?: boolean; // A value is optional when the option is specified.
-    conflicts?:string | string[]
-    env?:string
-    argParser?:<T>(value: string, previous: T) => T 
-    hideHelp?:boolean
-    mandatory?: boolean 
-    implies?:{[key:string]:any} 
-    prompt?: InputPromptParam
-    validate?: (value: any) => boolean 
-    
-}
-
-const promptTypeMap:Record<string,string> = {
-    boolean:"confirm",
-    string:"text",
-    number:"number",                        
-    array:"list",                        
-} 
-
-export const supportedPromptTypes = ["text","password","invisible", "number", "confirm" , "list", "toggle" , "select" , "multiselect" , "autocomplete" , "date" , "autocompleteMultiselect"]
-
-function isValidPromptType(type:any):boolean{
-    return supportedPromptTypes.includes(String(type))
-}
 export class FlexCommand extends Command{
     private _beforeHooks:Function[] = []
     private _afterHooks:Function[] = []
@@ -57,7 +18,7 @@ export class FlexCommand extends Command{
         const self = this
         this.addInlineOption()
         this.hook("preAction",async function(this:any){
-            self._optionValues = this.hookedCommand._optionValues            
+            self._optionValues = this.hookedCommand._optionValues        
             try{
                 // @ts-ignore
                 await self.preActionHook.apply(self,arguments)
@@ -89,6 +50,7 @@ export class FlexCommand extends Command{
      * 增加一些内置的辅助选项
      */
     private addInlineOption(){
+        if(!this.isRoot) return
         let option  = new Option("--$silent","禁用所有交互提示")
         option.hidden = true
         this.addOption( option)
@@ -97,7 +59,7 @@ export class FlexCommand extends Command{
     /**
      * 当命令具有多个子命令时，并且没有提供默认子命令时，需要提示用户选择一个子命令
      */
-    async select(){
+    async selectCommands(){
         const choices = this.commands.map(command=>({
             title:`${command.description()}(${command.name()})`,
             value:command.name()
@@ -109,9 +71,11 @@ export class FlexCommand extends Command{
             choices
         })
 
-        const command = this.commands.find(command=>command.name() === result.command)
+        this.args = [result.command]
 
-        await command?.parseAsync() 
+        const command = this.commands.find(command=>command.name() === result.command)
+    
+        await command?.parseAsync([result.command])
 
     }
     private async preActionHook(thisCommand:Command, actionCommand:Command){              
@@ -124,7 +88,7 @@ export class FlexCommand extends Command{
             ...this._promptQuestions            
         ]
         // 用户提示
-        if(questions.length > 0){
+        if(questions.length > 0) {
             const results = await prompts(questions)
             Object.entries(results).forEach(([key,value])=>{
                thisCommand.setOptionValue(key,value) 
@@ -275,30 +239,11 @@ export class FlexCommand extends Command{
             await listener(...arguments)
         }
     }
-    option(flags: string, description?: string | undefined,optsOrDefault?:any): this{
-        let params:OptionParams = {}
-        if(arguments.length==3 && typeof arguments[2] == "object"){
-            params = Object.assign({
-                prompt : 'auto'
-            },arguments[2])  
-        }else if(arguments.length==3){
-            params.default = arguments[2]
-            params.prompt = 'auto'
-        }else{
-            params.prompt = 'auto'
-        }        
-        let option  = new Option(flags,description)
-        if(params.default) option.default(params.default,params.defaultDescription)
-        if(params.choices) option.choices(params.choices)
-        if(params.conflicts) option.conflicts(params.conflicts)
-        if(params.env) option.env(params.env)
-        if(params.argParser) option.argParser(params.argParser)
-        if(params.hideHelp) option.hideHelp(params.hideHelp)
-        if(params.mandatory) option.makeOptionMandatory(params.mandatory)
-        if(params.implies) option.implies(params.implies) 
-        if(typeof(params.validate)=='function') option._validate = params.validate
-        option._prompt = params.prompt!
-        return this.addOption(option)         
+
+    option(flags: string, description?: string | undefined,defaultValue?:any ): this
+    option(flags: string, description?: string | undefined,options?:OptionParams ): this{
+        // @ts-ignore
+        return this.addOption(new FlexOption(...arguments))         
     }
     /**
      * 启用自动提示

@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "turbo build --filter flexcli && node ./src/index.js"
+    "dev": "turbo build --filter flexcli && node ./src/index.js",
+    "cli":"node ./src/index.js"
   },
   "bin":{
     "mycli":"./node_modules/flexcli/dist/index.js"
