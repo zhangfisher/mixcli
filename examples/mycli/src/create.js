@@ -11,6 +11,7 @@ module.exports = (cli)=>{
         command
             .name('app')
             .description('在开发模式下运行应用') 
+            
         devCommand.addCommand(command)
     }    
 
