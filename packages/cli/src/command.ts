@@ -151,11 +151,9 @@ export class FlexCommand extends Command{
             choices
         })
 
-        this.args = [result.command]
-
         const command = this.commands.find(command=>command.name() === result.command)
-    
-        await command?.parseAsync([result.command],{from:"user"})
+        this.parent?.args.push(result.command)
+        await command?.parseAsync()
 
     }
 }
