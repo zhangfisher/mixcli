@@ -14,29 +14,49 @@ export const promptTypeMap:Record<string,string> = {
 } 
 
 export const supportedPromptTypes = ["text","password","invisible", "number", "confirm" , "list", "toggle" , "select" , "multiselect" , "autocomplete" , "date" , "autocompleteMultiselect"]
+ 
 
-export function isValidPromptType(type:any):boolean{
-    return supportedPromptTypes.includes(String(type))
+/**
+ * 定义了FlexOption和FlexArgument的公共参数对象
+ * 供command.option()和command.argument()使用
+ */
+export interface IPromptableOptions{
+    required?: boolean;                         // A value must be supplied when the option is specified.
+    optional?: boolean;                         // A value is optional when the option is specified.
+    default?:PromptParamDefaultValue
+    choices?:string[]                           // 选项值的可选值
+    prompt?:InputPromptParam
+    validate?:(value: any) => boolean
 }
+
 
 export interface IPromptable{
-    name():string
-    argChoices?:string[]
-}
-
-export interface PromptableObject{
-    name?:string
+    name():string 
     description?:string
-    choices?:string[]
+    argChoices?:string[]
     variadic?:boolean
     defaultValue?:PromptParamDefaultValue
     input?:any    
-    validate?: (value: any) => boolean 
+    validate?: (value: any) => boolean  
+    getPrompt(inputValue?:any):PromptObject | undefined 
 }
 
+/**
+ * 供command.option()使用的参数对象
+ */
+export interface PromptableObject{
+   
+
+}
+
+
+/**
+ * 负责生成prompt对象
+ * 
+ */
 export class PromptManager{
     private _args:InputPromptParam
-    private _promptable:IPromptable 
+    private _promptable:IPromptable                 // 对应的FlexOption或FlexArgument
     constructor(promptable:IPromptable,promptArgs?:InputPromptParam){ 
         this._promptable = promptable
         this._args= promptArgs || 'auto'
@@ -51,7 +71,8 @@ export class PromptManager{
         return  supportedPromptTypes.includes(String(type))
     }
     /**
-     * 是否需要提示
+     * 推断是否需要提示
+     * 
      */
     isNeed(input:any,defaultValue?:any){
     
@@ -82,24 +103,29 @@ export class PromptManager{
     }
     /**
      * 返回生成prompt对象
+     * 
+     * @param inputValue   从命令行输入的值
      */
-    getPrompt({name,description,choices,validate,variadic,defaultValue,input}:PromptableObject){
-        let promptType = this.infer({choices,variadic,defaultValue,input})
+    get(inputValue?:any){
+        const {description,argChoices,validate,variadic,defaultValue} = this._promptable
+        let input = inputValue || defaultValue
+        // 判断是否需要输入提示
+        if(!this.isNeed(input,defaultValue)) return
+        // 推断prompt类型
+        let promptType = this.infer(inputValue)
         const prompt = {
             type:promptType,                        
-            name,
+            name:this._promptable.name(),
             message:description,
             initial: input,
             ...typeof(this._args) == 'object' ? this._args : {}
         } as PromptObject
         // 指定了验证函数，用来验证输入值是否有效
-        if(typeof(validate)=='function'){
-            prompt.validate = validate
-        }
+        prompt.validate = validate
         if(promptType=='multiselect') prompt.instructions=false
         // 选项值的可选值
-        if(Array.isArray(choices)) {
-            prompt.choices =choices.map(choice=>{
+        if(Array.isArray(argChoices)) {
+            prompt.choices =argChoices.map(choice=>{
                 if(typeof(choice)=='string'){
                     return {
                         title:choice,
@@ -115,19 +141,21 @@ export class PromptManager{
     /**
      * 推断prompt类型
      * 
-     * promptable.infer()
-     * 
+     * @param inputValue   从命令行输入的值
      */
-    infer({choices,variadic,defaultValue,input}:PromptableObject){
+    infer(inputValue?:any){
+        const {argChoices,variadic,defaultValue} = this._promptable
+        let input = inputValue || defaultValue
+
         let promptType = 'text'
         let promptArg = this._args
-        if(isValidPromptType(promptArg)){   // 显式指定了prompt类型
+        if(this.isValid(promptArg)){   // 显式指定了prompt类型
             promptType = promptArg as string
         }else{          // 未显式指定prompt类型，需要按一定规则推断类型
             if(typeof(promptArg)=='object'){
                 promptType = promptArg.type as string
             }else{
-                if(choices){  // 提供多个可选值时
+                if(argChoices){  // 提供多个可选值时
                     promptType = variadic ? 'multiselect' : 'select'
                 }else{
                     const datatype:string = Array.isArray(input) ? 'array' : typeof(input)                              

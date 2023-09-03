@@ -3,14 +3,7 @@ import prompts, { PromptObject }  from  "prompts"
 import type { FlexCommand } from "./command";
 
 export type HookCommandListener = (thisCommand:FlexCommand,actionComand:FlexCommand)=>void | Promise<void>
-
-declare module "commander"{
-    // 对原始的Option接口进行扩展
-    interface Option{
-        _prompt: InputPromptParam           // 是否提示用户输入
-        _validate:(value: any) => boolean 
-    }
-}
+ 
 export type PromptType = "text" | "password" | "invisible" | "number"| "confirm"| "list"| "toggle"| "select" | "multiselect" | "autocomplete" | "date" | "autocompleteMultiselect"
 
 export type PromptParam = 'auto' | boolean | PromptType | PromptObject

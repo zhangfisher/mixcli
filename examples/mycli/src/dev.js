@@ -6,20 +6,16 @@ const { FlexCommand } = require('flexcli');
  */
 module.exports = (cli)=>{        
     
-    const command = new FlexCommand();
+    const devCommand = new FlexCommand();
 
-    command
+    devCommand
         .name('dev')
         .description('在开发模式下运行应用')
-        .argument('[name]','应用名称',"flexcli")
-        .argument('<version>','版本号')
         .option("-d,--debug" ,"调试模式",{ default:true,prompt:true })      
-        .action(async function (name,version,options,cmd){
-            console.log("run dev",name,version)
-            console.log("options=",options) 
+        .action(async function (options,cmd){
             // 如果有子命令
             if(cmd.commands.length>0){
-               // await cmd.selectCommands()
+               await cmd.selectCommands()
             }else{
                 cmd.help()
             }
@@ -28,6 +24,12 @@ module.exports = (cli)=>{
     const appCommand = new FlexCommand();
     appCommand.name("app")
         .description("以开发模式启动应用")      // 未指定默认值,自动使用text类型提供
+        .before(()=>{
+            console.log("app before")
+        })
+        .after(()=>{
+            console.log("app after")
+        })
         .option("--color <value...>","显示颜色",{choices:["src","test","debug"],prompt:"multiselect"})  
         // 未指定默认值,使用自动完成，可以输入任意值
         .option("--filter <value>","文件过滤",{choices:["src","test","debug"],prompt:"autocomplete"})    
@@ -59,12 +61,12 @@ module.exports = (cli)=>{
             console.log("dev app",options)
         })
 
-    command.addCommand(appCommand)
+    devCommand.addCommand(appCommand)
 
     const libCommand = new FlexCommand();
     libCommand.name("lib")
         .description("以开发模式启动库")      // 未指定默认值,自动使用text类型提供
-    command.addCommand(libCommand)
+    devCommand.addCommand(libCommand)
 
-    return command
+    return devCommand
 } 
