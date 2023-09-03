@@ -5,6 +5,7 @@ import logsets  from "logsets"
 // @ts-ignore
 import replaceAll  from 'string.prototype.replaceall'
 import { assignObject } from "flex-tools/object/assignObject"
+import { FlexCommand } from "./command"
 replaceAll.shim() 
 
 
@@ -12,10 +13,11 @@ export interface FlexCliOptions{
     name:string,
     title?:string,
     version?:string
+    logo?:(thisCommand:Command,actionCommand:Command)=>void,
     // 在根命令执行前执行==commander的preAction
-    before?:()=>void,
+    before?:(thisCommand:Command,actionCommand:Command)=>void,
     // 在根命令执行后执行==commander的postAction
-    after?:()=>void, 
+    after?:(thisCommand:Command,actionCommand:Command)=>void, 
     // flexcli运行时会在当前工程的package.json的依赖中查找以prefix/开头的包，然后自动加载其cli目录下的命令
     // 例如：prefix=myapp，则会自动加载flex-cli-xxx包中的cli目录下的命令
     // 如prefix=myapp, cliPath="cmds",则会自动加载flex-cli-xxx包中的cmds目录下的命令
@@ -63,9 +65,17 @@ export class FlexCli{
                 logsets.log("版本号:{}",require("../package.json").version)
                 this.root.help()
             })
-        if(this.options.before) this.root.hook('preAction',this.options.before)
+        if(this.options.before) this.root.hook('preAction',(thisCommand,actionCommand)=>this.rootBeforeHook.call(this,thisCommand,actionCommand))
         if(this.options.after) this.root.hook('postAction',this.options.after) 
     } 
+
+    private rootBeforeHook(thisCommand:Command,actionComand:Command){
+        if(actionComand.parent==null){
+            if(this.options.logo) this.options.logo(thisCommand,actionComand)
+        }
+        if(this.options.before) this.options.before(thisCommand,actionComand)
+    }
+
     /**
      * 注册一个命令
      * @param cmd 

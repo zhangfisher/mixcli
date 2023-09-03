@@ -11,8 +11,14 @@ module.exports = (cli)=>{
     devCommand
         .name('dev')
         .description('在开发模式下运行应用')
-        .option("-d,--debug" ,"调试模式",{ default:true,prompt:true })      
+        .before(()=>{
+            console.log("  dev before")
+        })
+        .after(()=>{
+            console.log("  dev after")
+        })
         .action(async function (options,cmd){
+            console.log("    run dev")
             // 如果有子命令
             if(cmd.commands.length>0){
                await cmd.selectCommands()
@@ -25,12 +31,12 @@ module.exports = (cli)=>{
     appCommand.name("app")
         .description("以开发模式启动应用")      // 未指定默认值,自动使用text类型提供
         .before(()=>{
-            console.log("app before")
+            console.log("      dev app before")
         })
         .after(()=>{
-            console.log("app after")
+            console.log("      dev app after")
         })
-        .option("--color <value...>","显示颜色",{choices:["src","test","debug"],prompt:"multiselect"})  
+        .option("--color <value...>","显示颜色",{choices:["red","yellow","blue"],prompt:"multiselect"})  
         // 未指定默认值,使用自动完成，可以输入任意值
         .option("--filter <value>","文件过滤",{choices:["src","test","debug"],prompt:"autocomplete"})    
         // 未指定默认值,自动使用text类型提供
@@ -57,7 +63,7 @@ module.exports = (cli)=>{
             message:"是否自动打开浏览器？",
         }})
         .action((options)=>{            
-            console.log("run dev app")
+            console.log("        run dev app")
             console.log("dev app",options)
         })
 

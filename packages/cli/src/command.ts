@@ -28,7 +28,7 @@ export class FlexCommand extends Command{
      * 是否是根命令
      */
     get isRoot(){
-        return this.parent === undefined
+        return !!!this.parent
     }
     action(fn: (...args: any[]) => void | Promise<void>): this {
         return super.action(async function(){
@@ -52,8 +52,8 @@ export class FlexCommand extends Command{
      * 
      */
     private addInlineOptions(){
-        if(!this.isRoot) return
-        let option  = new Option("--no-prompts","禁用所有交互提示")
+        //if(!this.isRoot) return
+        let option  = new FlexOption("--no-prompts","禁用所有交互提示")
         option.hidden = true
         this.addOption(option)
     }
@@ -90,6 +90,7 @@ export class FlexCommand extends Command{
     private generateAutoPrompts():PromptObject[]{ 
         const options = this.options as FlexOption[]
         const optionPromports = options
+                    .filter(option=>!option.hidden)
                     .map(option=>option.getPrompt(this._optionValues[option.name()]))
                     .filter(prompt=>prompt) as PromptObject[]
         return optionPromports
@@ -150,10 +151,9 @@ export class FlexCommand extends Command{
             message:"请选择命令:",
             choices
         })
-
-        const command = this.commands.find(command=>command.name() === result.command)
-        this.parent?.args.push(result.command)
-        await command?.parseAsync()
+        // 重新解析命令行参数标志,        
+        const command = this.commands.find(command=>command.name() === result.command)        
+        await command?.parseAsync((this.parent as any).rawArgs)
 
     }
 }
