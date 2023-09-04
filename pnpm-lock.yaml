@@ -43,14 +43,14 @@ importers:
         specifier: workspace:^
         version: link:../lib2
       flexcli:
-        specifier: link:../../
-        version: link:../..
+        specifier: workspace:^
+        version: link:../../packages/cli
 
   examples/lib2:
     dependencies:
       flexcli:
-        specifier: link:../../
-        version: link:../..
+        specifier: workspace:^
+        version: link:../../packages/cli
 
   examples/mycli:
     dependencies:
