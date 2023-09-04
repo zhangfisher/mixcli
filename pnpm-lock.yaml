@@ -48,6 +48,15 @@ importers:
 
   examples/lib2:
     dependencies:
+      '@flex/lib3':
+        specifier: workspace:^
+        version: link:../lib3
+      flexcli:
+        specifier: workspace:^
+        version: link:../../packages/cli
+
+  examples/lib3:
+    dependencies:
       flexcli:
         specifier: workspace:^
         version: link:../../packages/cli

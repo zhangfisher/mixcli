@@ -37,6 +37,7 @@ export interface IPromptable{
     variadic?:boolean
     defaultValue?:PromptParamDefaultValue
     input?:any        
+    required?:boolean
     validate?: (value: any) => boolean  
     getPrompt(inputValue?:any):PromptObject | undefined 
 }
@@ -147,7 +148,7 @@ export class PromptManager{
         const {argChoices,variadic,defaultValue} = this._promptable
         let input = inputValue || defaultValue
 
-        let promptType = 'text'
+        let promptType = this._promptable.required ? 'text' : 'confirm'
         let promptArg = this._args
         if(this.isValid(promptArg)){   // 显式指定了prompt类型
             promptType = promptArg as string

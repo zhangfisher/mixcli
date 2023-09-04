@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import "flex-tools/string"
+import { LiteEvent, LiteEventListener, LiteEventSubscriber } from "flex-tools/events/liteEvent"
 import { Command } from "commander"
 import logsets  from "logsets"
 // @ts-ignore
@@ -44,11 +45,14 @@ const configs:FlexCliOptions ={
 export type FlexCliCommand = (cli:FlexCli)=>FlexCommand | FlexCommand[] | void
 
 
-export class FlexCli{
-    commands:Record<string,Command> = {}
+export type FlexCliEvents = 
+    "register"              // 当命令注册时触发
+
+export class FlexCli extends LiteEvent<any,FlexCliEvents>{
     options:FlexCliOptions 
     root!:Command                       
     constructor(options?:FlexCliOptions){
+        super()
         this.options= assignObject({
             name:"root",
             package:null,
@@ -56,7 +60,7 @@ export class FlexCli{
         },options)   
         this.createRootCommand()
         this.addLogo()
-        findCommands(this)        
+        this.installExtendCommands()        
     } 
     get name(){return this.options.name}
     /**
@@ -67,12 +71,28 @@ export class FlexCli{
         this.addHelp(text,{pos})
     }
     /**
+     * 扫描当前工程的依赖，加载匹配include的依赖下的命令
+     */
+    private installExtendCommands(){
+        const cmders = findCommands(this)
+        for(let cmder of cmders){
+            try{
+                if(typeof(cmder)==="function"){
+                    let cmds = cmder(this)
+                    cmds =cmds ?  (Array.isArray(cmds) ? cmds : [cmds]) : []
+                    this.register(()=>cmds) 
+                }
+            }catch(e:any){
+            }
+        }
+    } 
+    /**
      * 创建根命令
      * 
      */
     private createRootCommand(){
-        this.root = new Command('root');
-        this.root.name(this.name)
+        this.root = new Command();
+        this.root.name('root')
             .helpOption('-h, --help', '显示帮助')     
             .version(require("../package.json").version,"-v, --version","当前版本号") 
             .action(()=>{
@@ -107,10 +127,10 @@ export class FlexCli{
             let cmds = result instanceof Array ? result : (result==undefined ? [] :  [result])
             for(let cmd of cmds){
                 if(cmd instanceof FlexCommand){
-                    this.root.addCommand(cmd)
-                    this.commands[cmd.name()] = cmd
+                    this.root.addCommand(cmd) 
+                    this.emit("register",cmd.fullname,true)
                 }
-            }
+            }                        
         }else{
             logsets.error("无效的FlexCliCommand")
         }        
@@ -126,19 +146,30 @@ export class FlexCli{
      * 
      * @param name 
      */
-    get(name:string,command?:Command):Command | undefined{
+    get(name:string):FlexCommand | undefined{
         const names=name.split(".")
-        let curCmd:Command = command || this.root
-        let resultCmd:Command | undefined
+        let curCmd:Command = this.root
+        let resultCmd:FlexCommand | undefined
         while(names.length>0){
             const topName = names.shift()
-            const r = curCmd.commands.find(c=>c.name()==topName)  as Command
+            const r = curCmd.commands.find(c=>c.name()==topName)  as FlexCommand
             if(r && names.length==0){
                 resultCmd = r
             }
             curCmd = r
-        }    
+        }     
         return resultCmd    
+    }
+    find(name:string):Promise<FlexCommand | undefined>{
+        return new Promise<FlexCommand | undefined>((resolve)=>{
+            let listener:LiteEventSubscriber
+            listener = this.on("register",(fullname:string)=>{
+                if(fullname==name){
+                    listener.off()
+                    resolve(this.get(name))
+                }
+            },{objectify:true}) as LiteEventSubscriber
+        })
     }
     /**
      * 判断命令是否存在
@@ -147,7 +178,7 @@ export class FlexCli{
      * @returns 
      */
     exists(name:string):boolean{
-        if(name in this.commands){
+        if(name in this.root.commands){
             return true
         }else{
             return this.get(name) != undefined

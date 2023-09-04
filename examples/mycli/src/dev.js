@@ -13,7 +13,7 @@ module.exports = (cli)=>{
     devCommand
         .name('dev')
         .description('在开发模式下运行应用')
-        .argument("[name]","名称",{validate:(value)=>value.length>0})
+        .argument("[name]","名称")
         .argument("[port]","端口")
         .before(()=>{
             console.log("  dev before")

@@ -30,6 +30,17 @@ export class FlexCommand extends Command{
     get isRoot(){
         return !!!this.parent
     }
+    get fullname(){
+        let names = [this.name()]
+        let parent = this.parent
+        while(parent){
+            if(parent.name()!=="root"){
+                names.unshift(parent.name())
+            }            
+            parent = parent.parent
+        }
+        return names.join(".")
+    }
     /**
      * 返回根命令
      */

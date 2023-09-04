@@ -13,5 +13,5 @@ const { FlexCommand } = require('flexcli');
         .action(()=>{
             console.log("pause app")
         })
-    
+    return pauseCommand
  }
