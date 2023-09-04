@@ -6,19 +6,23 @@ const { FlexCommand } = require('flexcli');
  */
 module.exports = (cli)=>{        
     
+    
+
     const devCommand = new FlexCommand();
 
     devCommand
         .name('dev')
         .description('在开发模式下运行应用')
+        .argument("[name]","名称",{validate:(value)=>value.length>0})
+        .argument("[port]","端口")
         .before(()=>{
             console.log("  dev before")
         })
         .after(()=>{
             console.log("  dev after")
         })
-        .action(async function (options,cmd){
-            console.log("    run dev")
+        .action(async function (name,port,options,cmd){
+            console.log("    run dev(name=",name,"port=",port)
             // 如果有子命令
             if(cmd.commands.length>0){
                await cmd.selectCommands()
@@ -70,8 +74,14 @@ module.exports = (cli)=>{
     devCommand.addCommand(appCommand)
 
     const libCommand = new FlexCommand();
-    libCommand.name("lib")
+    libCommand
+        .name("lib")
         .description("以开发模式启动库")      // 未指定默认值,自动使用text类型提供
+        .option("-m, --module <value>","模块类型",{choices:["esm","commonjs","umd"]})  
+        .action((options)=>{            
+            console.log("        run dev lib")
+            console.log("dev app",options)
+        })
     devCommand.addCommand(libCommand)
 
     return devCommand

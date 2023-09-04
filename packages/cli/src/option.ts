@@ -39,7 +39,7 @@ export class FlexOption extends Option implements IPromptable{
         if(params.hideHelp) this.hideHelp(params.hideHelp)
         if(params.mandatory) this.makeOptionMandatory(params.mandatory)
         if(params.implies) this.implies(params.implies) 
-        if(typeof(params.validate)=='function') this._validate = params.validate
+        if(typeof(params.validate)=='function') this._validate = params.validate.bind(this)
         this.prompt = new PromptManager(this as IPromptable,params.prompt)
     }  
     validate(value: any): boolean {

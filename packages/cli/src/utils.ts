@@ -26,16 +26,28 @@ import logsets from "logsets"
  * 
  */
 export function outputStr(str:string,vars?:Record<string,any> | any[]){ 
-    let lines:string[] = str.split("\n")
+    logsets.log(fixIndent(str),vars)
+}
+
+/**
+ * 修正多行字符串的缩进
+ * 
+ * @param text 
+ * @param indent 
+ * @returns 
+ */
+export function fixIndent(text:string,indent?:boolean | number):string{
+    let indentValue = (indent==undefined || indent===true) ? 0 : (typeof(indent)=='number' ? indent : -1)
+    if(indentValue==-1) return text // 不修正缩进
+    let lines:string[] = text.split("\n")
     let minSpaceCount = lines.reduce<number>((minCount,line,index)=>{
         if(index==0) return minCount
         const spaceCount = line.match(/^\s*/)?.[0].length || 0
         return Math.min(minCount,spaceCount)
     },9999)
     lines = lines.map(line=>line.substring(minSpaceCount))
-    logsets.log(lines.join("\n"),vars)
+    return lines.join("\n")
 }
-
 
 export const fileExists = promisify(fs.exists,{
     parseCallback:(results)=>{

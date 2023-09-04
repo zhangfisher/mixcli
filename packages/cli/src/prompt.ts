@@ -36,7 +36,7 @@ export interface IPromptable{
     argChoices?:string[]
     variadic?:boolean
     defaultValue?:PromptParamDefaultValue
-    input?:any    
+    input?:any        
     validate?: (value: any) => boolean  
     getPrompt(inputValue?:any):PromptObject | undefined 
 }
@@ -107,7 +107,7 @@ export class PromptManager{
      * @param inputValue   从命令行输入的值
      */
     get(inputValue?:any){
-        const {description,argChoices,validate,variadic,defaultValue} = this._promptable
+        const {description,argChoices,validate,defaultValue} = this._promptable
         let input = inputValue || defaultValue
         // 判断是否需要输入提示
         if(!this.isNeed(input,defaultValue)) return
@@ -121,7 +121,7 @@ export class PromptManager{
             ...typeof(this._args) == 'object' ? this._args : {}
         } as PromptObject
         // 指定了验证函数，用来验证输入值是否有效
-        prompt.validate = validate
+        prompt.validate = validate?.bind(this._promptable)
         if(promptType=='multiselect') prompt.instructions=false
         // 选项值的可选值
         if(Array.isArray(argChoices)) {
