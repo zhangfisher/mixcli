@@ -1,10 +1,14 @@
 {
   "name": "flexclirepos",
   "version": "1.0.0",
-  "description": "Develop command line tool scaffolding for monorepo",
+  "description": "Create CommandLine Application with Interactive prompts",
   "main": "index.js",
+  "type": "module",
   "scripts": {
-    "build": "turbo build --filter cli"
+    "build": "turbo build --filter cli",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs"
   },
   "keywords": [],
   "author": "",
@@ -20,6 +24,7 @@
     "@types/fs-extra": "^11.0.1",
     "@types/node": "^20.5.7",
     "tsup": "^7.2.0",
-    "typescript": "^5.2.2"
+    "typescript": "^5.2.2",
+    "vitepress": "1.0.0-rc.10"
   }
 }

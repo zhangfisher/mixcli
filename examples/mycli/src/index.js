@@ -7,6 +7,7 @@ const startCommand = require("./start")
 
 const cli = new FlexCli({
     name: "flexcli",
+    title: "Flexcli commandline tool",
     version: "1.0.0",
     description: "flexcli is a cli tool for creating cli tools",
     include: /^\@flex\//, 
@@ -18,9 +19,9 @@ const cli = new FlexCli({
           \     (  <_> )  ___/|  | \/    <  / __ \_
            \___/ \____/ \___  >__|  |__|_ \(____  /
                             \/           \/     \/`,
-    before:()=>{
-        console.log("root before")      
-    }
+    // before:()=>{
+    //     console.log("root before")      
+    // }
 })
 
 // cli.register(devCommand)

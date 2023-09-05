@@ -13,19 +13,21 @@ module.exports = (cli)=>{
     devCommand
         .name('dev')
         .description('在开发模式下运行应用')
-        .argument("[name]","名称")
-        .argument("[port]","端口")
-        .before(()=>{
-            console.log("  dev before")
-        })
-        .after(()=>{
-            console.log("  dev after")
-        })
-        .action(async function (name,port,options,cmd){
-            console.log("    run dev(name=",name,"port=",port)
+        .option("-p,--port <port>","指定端口号",3000)                      
+        .option("-d,--debug" ,"调试模式",{ default:true,prompt:true })      
+        .option("-h,--host <host>","指定主机名",{default:"localhost",prompt:true})                         
+        .option("-e,--env [value]","环境变量",{ prompt:false })                                   
+        .option("-m,--mode <mode>","指定模式",{choices:["development","production","test","debug"]})
+        .option("-f,--framework [value]","开发框架",{choices:[
+            {title:"vue",value:1},
+            {title:"react",value:2,description:"默认"},
+            {title:"angular",value:3}
+        ]})
+        .action(async function (options,cmd){
+            // console.log("    run dev(name=",name,"port=",port)
             // 如果有子命令
             if(cmd.commands.length>0){
-               await cmd.selectCommands()
+               //await cmd.selectCommands()
             }else{
                 cmd.help()
             }

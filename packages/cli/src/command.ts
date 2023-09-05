@@ -1,4 +1,4 @@
-import { Command } from "commander";
+import { Command,Option } from "commander";
 import prompts, { PromptObject }  from  "prompts"
 import { FlexOption,type FlexOptionParams } from "./option"; 
 
@@ -8,12 +8,11 @@ export class FlexCommand extends Command{
     private _beforeHooks:Function[] = []
     private _afterHooks:Function[] = []
     private _customPrompts:PromptObject[] = [] 
-    private _autoPrompt:boolean = true              // 根据参数自动生成提示    
     private _optionValues:Record<string,any> = {}   // 命令行输入的选项值
     constructor(){
         super()
         const self = this
-        this.addInlineOptions()        
+        this.addPresetOptions()
         this.hook("preAction",async function(this:any){
             self._optionValues = this.hookedCommand._optionValues        
             try{
@@ -64,36 +63,30 @@ export class FlexCommand extends Command{
         this._afterHooks.push(listener)
         return this
     }
-    /**
-     * 增加一些内置的辅助选项
-     * 
-     * --no-prompts 禁用所有交互提示
-     * --no-option-prompts 禁用选项的交互提示
-     * --no-argument-prompts 禁用参数的交互提示
-     * 
-     */
-    private addInlineOptions(){
-        let option  = new FlexOption("--no-prompts","禁用所有交互提示")
+    private addPresetOptions(){
+        let option  = new Option("--no-prompts","禁用所有交互提示")
         option.hidden = true
         this.addOption(option)
     }
 
     private async preActionHook(thisCommand:Command, actionCommand:Command){              
-        for(let listener of this._beforeHooks){
+        for(let listener of this._beforeHooks){ 
             await listener(...arguments)
         }
-        // 自动生成提示
-        const questions:PromptObject[] = [
-            ...this.generateAutoPrompts(),
-            ...this._customPrompts            
-        ]
-        const noPrompts = this.root().args.includes("--no-prompts")
-        // 用户提示
-        if(questions.length > 0 && !noPrompts) {
-            const results = await prompts(questions)
-            Object.entries(results).forEach(([key,value])=>{
-               thisCommand.setOptionValue(key,value) 
-            })
+        const noPrompts =this.isDisabledPrompts() 
+        if(!noPrompts){
+            // 自动生成提示
+            const questions:PromptObject[] = [
+                ...this.generateAutoPrompts(),
+                ...this._customPrompts            
+            ]            
+            // 用户提示
+            if(questions.length > 0) {
+                const results = await prompts(questions)
+                Object.entries(results).forEach(([key,value])=>{
+                    thisCommand.setOptionValue(key,value) 
+                })
+            }        
         }        
     }
 
@@ -126,23 +119,13 @@ export class FlexCommand extends Command{
     option(flags: string, description?: string | undefined,defaultValue?:any ): this
     option(flags: string, description?: string | undefined,options?:FlexOptionParams ): this{
         // @ts-ignore
-        return this.addOption(new FlexOption(...arguments))         
-    } 
-
-    /**
-     * 启用自动提示
-     * 
-     * @remarks
-     * 
-     * 启用后会根据用户输入的选项值来判断是否需要提示用户输入
-     * 
-     * @param auto 
-     * 
-     */
-    autoPrompt(value:boolean){
-        this._autoPrompt = value
-        return this
-    }
+        const option =new FlexOption(...arguments)
+        if(option.required && this.isDisabledPrompts()) option.mandatory = true
+        return this.addOption(option)         
+    }  
+    isDisabledPrompts(){
+        return this._optionValues.prompts===false
+    }    
     /**
      * 添加提示
      * 

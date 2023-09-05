@@ -44,3 +44,4 @@ packages/*/build
 packages/*/.next
 
 .turbo
+docs/.vitepress/cache 

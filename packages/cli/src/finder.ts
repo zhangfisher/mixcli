@@ -35,10 +35,24 @@ export function getMatchedDependencies(this:FlexCli,entry:string):string[]{
     return packageNames.filter(name=>name!=="@voerka/cli" && pacakgeMacher.test(name))
 }
 
+function isMatched(str:string,reg?:string | RegExp | string[] | RegExp[]):boolean{
+    // let regexps:RegExp[]=[]
+    const regexps = reg ? (Array.isArray(reg) ? reg : [reg]) : []
+    return regexps.some(regexp=>{
+        if(typeof regexp === "string"){
+            return (new RegExp(regexp)).test(str)
+        }else if(regexp instanceof RegExp){
+            return regexp.test(str)
+        }else{
+            return false
+        }
+    })
+}
 
 export function findCliPaths(this:FlexCli,packageName?:string ,entry?:string):string[]{
-    const pacakgeMacher = this.options.include
-    if(!(pacakgeMacher instanceof RegExp)) return []
+    const includeMacher = this.options.include
+    const excludeMacher = this.options.exclude
+    if(!includeMacher) return []
     const packageRoot = getPackageRootPath(entry || process.cwd())
     const packagePath = packageName ? path.dirname(require.resolve(packageName,{paths:[packageRoot as string]})) : packageName
 
@@ -48,7 +62,9 @@ export function findCliPaths(this:FlexCli,packageName?:string ,entry?:string):st
     const cliDirs:string[]=[]
     
     if(entry!==undefined) cliDirs.push(path.join(packagePath,this.options.cliDir))
-    packageNames.filter(name=>name!=="@voerka/cli" && pacakgeMacher.test(name))
+    packageNames.filter(name=>{
+            return  isMatched(name,includeMacher) && !isMatched(name,excludeMacher) 
+        })
         .forEach(packageName=>{
             try{
                 const packageEntry = path.dirname(require.resolve(packageName,{paths:packagePath ? [packagePath] : [process.cwd()]}))
@@ -66,16 +82,7 @@ export function findCliPaths(this:FlexCli,packageName?:string ,entry?:string):st
                 ///console.error(e.stack)
             }    
         })
-    return cliDirs
-    //
-    // cliPaths.forEach(cliPath=>{
-    //     const extendCommands = require(path.join(cliPath,"index.js"))
-    //     try{
-    //         extendCommands(cli)
-    //     }catch(e:any){
-    //         console.warn(`扩展<${cliPath}>命令出错:`,e.stack)
-    //     }
-    // })
+    return cliDirs 
 }
 
 /**

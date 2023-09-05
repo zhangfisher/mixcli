@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import "flex-tools/string"
-import { LiteEvent, LiteEventListener, LiteEventSubscriber } from "flex-tools/events/liteEvent"
-import { Command } from "commander"
+import { LiteEvent, LiteEventSubscriber } from "flex-tools/events/liteEvent"
+import { Command,Option } from "commander"
 import logsets  from "logsets"
 // @ts-ignore
 import replaceAll  from 'string.prototype.replaceall'
@@ -15,6 +15,7 @@ replaceAll.shim()
 export interface FlexCliOptions{
     name:string,
     title?:string,
+    description?:string,
     version?:string
     // 定义显示帮助信息
     logo?:string | [ 'beforeAll'|'afterAll'|'before'|'after',string],
@@ -25,8 +26,9 @@ export interface FlexCliOptions{
     // flexcli运行时会在当前工程的package.json的依赖中查找以prefix/开头的包，然后自动加载其cli目录下的命令
     // 例如：prefix=myapp，则会自动加载flex-cli-xxx包中的cli目录下的命令
     // 如prefix=myapp, cliPath="cmds",则会自动加载flex-cli-xxx包中的cmds目录下的命令
-    include?:RegExp,
-    exclude?:RegExp,
+    include?:string | RegExp | string[] | RegExp[],
+    // 忽略查找正则表达式
+    exclude?:string | RegExp | string[] | RegExp[],
     // flexcli会在当前工程的以prefix/开头下查找命令声明
     // / pattern默认值是cli，即会在当前工程的以prefix/开头的包下查找cli目录下的命令
     // 指定cli所在的目录,默认值是cli,要遍历该目录下的所有js文件作为命令导出
@@ -34,11 +36,6 @@ export interface FlexCliOptions{
     context?:Record<string,any>             // 传递给命令的上下文，当使用        
 }
 
-const configs:FlexCliOptions ={
-    name:"FlexCli",
-    include:/^flexcli/,      
-    cliDir:"cli",
-}
  
   
 
@@ -54,7 +51,7 @@ export class FlexCli extends LiteEvent<any,FlexCliEvents>{
     constructor(options?:FlexCliOptions){
         super()
         this.options= assignObject({
-            name:"root",
+            name:"flexcli",
             package:null,
             cliDir:"cli",
         },options)   
@@ -64,12 +61,18 @@ export class FlexCli extends LiteEvent<any,FlexCliEvents>{
     } 
     get name(){return this.options.name}
     /**
+     * 是否禁用了所有的交互提示
+     */
+    get isDisabledPrompts(){
+        return(this.root as any).rawArgs.includes("--no-prompts")    
+    }    
+    /**
      * 显示在logo
      */
     private addLogo(){
         const [pos,text] = Array.isArray(this.options.logo) ?this.options.logo : ["beforeAll",this.options.logo] as [ 'beforeAll'|'afterAll'|'before'|'after',string]
         this.addHelp(text,{pos})
-    }
+    } 
     /**
      * 扫描当前工程的依赖，加载匹配include的依赖下的命令
      */
@@ -92,13 +95,13 @@ export class FlexCli extends LiteEvent<any,FlexCliEvents>{
      */
     private createRootCommand(){
         this.root = new Command();
-        this.root.name('root')
+        this.root.name(this.name)
             .helpOption('-h, --help', '显示帮助')     
             .version(require("../package.json").version,"-v, --version","当前版本号") 
-            .action(()=>{
-                logsets.log("Voerka Cloud Command Line Interface")
+            .action(()=>{                
+                if(this.options.title) logsets.log(this.options.title)
                 logsets.log("版本号:{}",require("../package.json").version)
-                this.root.help()
+                this.root.help()                
             })
         if(this.options.before) this.root.hook('preAction',this.options.before)
         if(this.options.after) this.root.hook('postAction',this.options.after) 
@@ -160,6 +163,16 @@ export class FlexCli extends LiteEvent<any,FlexCliEvents>{
         }     
         return resultCmd    
     }
+    /**
+     * 查找一个命令
+     * 
+     * 如果命令不存在，则等待命令注册后再返回
+     * 
+     * 在多包场景下，如果命令在其他包中注册并且该包中的命令还没注册，则会等待命令注册后再返回
+     * 
+     * @param name 
+     * @returns 
+     */
     find(name:string):Promise<FlexCommand | undefined>{
         return new Promise<FlexCommand | undefined>((resolve)=>{
             let listener:LiteEventSubscriber
@@ -183,7 +196,8 @@ export class FlexCli extends LiteEvent<any,FlexCliEvents>{
         }else{
             return this.get(name) != undefined
         }
-    } 
+    }     
+
     /**
      * 运行命令行程序
      */
