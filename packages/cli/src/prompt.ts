@@ -14,17 +14,21 @@ export const promptTypeMap:Record<string,string> = {
 } 
 
 export const supportedPromptTypes = ["text","password","invisible", "number", "confirm" , "list", "toggle" , "select" , "multiselect" , "autocomplete" , "date" , "autocompleteMultiselect"]
- 
+export interface PromptChoice {
+    title: string;
+    value?: any;
+    disabled?: boolean | undefined;
+    selected?: boolean | undefined;
+    description?: string | undefined;
+}
 
-/**
- * 定义了FlexOption和FlexArgument的公共参数对象
- * 供command.option()和command.argument()使用
- */
+
+
 export interface IPromptableOptions{
     required?: boolean;                         // A value must be supplied when the option is specified.
     optional?: boolean;                         // A value is optional when the option is specified.
     default?:PromptParamDefaultValue
-    choices?:string[]                           // 选项值的可选值
+    choices?:(PromptChoice | any)[]                           // 选项值的可选值
     prompt?:InputPromptParam
     validate?:(value: any) => boolean
 }
@@ -33,6 +37,8 @@ export interface IPromptableOptions{
 export interface IPromptable{
     name():string 
     description?:string
+    flags:string
+    promptChoices?:PromptChoice[]
     argChoices?:string[]
     variadic?:boolean
     defaultValue?:PromptParamDefaultValue
@@ -108,7 +114,7 @@ export class PromptManager{
      * @param inputValue   从命令行输入的值
      */
     get(inputValue?:any){
-        const {description,argChoices,validate,defaultValue} = this._promptable
+        const {description,promptChoices,validate,defaultValue} = this._promptable
         let input = inputValue || defaultValue
         // 判断是否需要输入提示
         if(!this.isNeed(input,defaultValue)) return
@@ -125,17 +131,8 @@ export class PromptManager{
         prompt.validate = validate?.bind(this._promptable)
         if(promptType=='multiselect') prompt.instructions=false
         // 选项值的可选值
-        if(Array.isArray(argChoices)) {
-            prompt.choices =argChoices.map(choice=>{
-                if(typeof(choice)=='string'){
-                    return {
-                        title:choice,
-                        value:choice
-                    }
-                }else{
-                    return choice
-                }                        
-            })
+        if(Array.isArray(promptChoices)) {
+            prompt.choices =promptChoices
         }
         return prompt
     }
@@ -147,8 +144,8 @@ export class PromptManager{
     infer(inputValue?:any){
         const {argChoices,variadic,defaultValue} = this._promptable
         let input = inputValue || defaultValue
-
-        let promptType = this._promptable.required ? 'text' : 'confirm'
+        // 如果选择指定了"-p [value]或[value...]"，则使用text类型，如果没有要求输入值，则使用confirm类型
+        let promptType = /(\<[\w\.]+\>)|(\[[\w\.]+\])/.test(this._promptable.flags) ? 'text' : 'confirm'
         let promptArg = this._args
         if(this.isValid(promptArg)){   // 显式指定了prompt类型
             promptType = promptArg as string
@@ -159,12 +156,14 @@ export class PromptManager{
                 if(argChoices){  // 提供多个可选值时
                     promptType = variadic ? 'multiselect' : 'select'
                 }else{
-                    const datatype:string = Array.isArray(input) ? 'array' : typeof(input)                              
+                    const datatype:string = Array.isArray(defaultValue) ? 'array' : typeof(defaultValue)                              
                     // 如果输入值班是数组，则使用list类型,允许使用逗号分隔的多个值
                     if(Array.isArray(input) || variadic){
                         promptType = "list"
                     }else{
-                        promptType = datatype in promptTypeMap ? promptTypeMap[datatype] : 'text'
+                        if(datatype in promptTypeMap){
+                            promptType = promptTypeMap[datatype]
+                        }
                     }
                 }
             }

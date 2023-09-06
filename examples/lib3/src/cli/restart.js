@@ -12,6 +12,7 @@ const { FlexCommand } = require('flexcli');
     }).catch((err)=>{
         console.log("err=",err)
     })
+  
 
     const restartCommand = new FlexCommand();
     restartCommand

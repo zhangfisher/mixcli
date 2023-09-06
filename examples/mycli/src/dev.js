@@ -13,16 +13,6 @@ module.exports = (cli)=>{
     devCommand
         .name('dev')
         .description('在开发模式下运行应用')
-        .option("-p,--port <port>","指定端口号",3000)                      
-        .option("-d,--debug" ,"调试模式",{ default:true,prompt:true })      
-        .option("-h,--host <host>","指定主机名",{default:"localhost",prompt:true})                         
-        .option("-e,--env [value]","环境变量",{ prompt:false })                                   
-        .option("-m,--mode <mode>","指定模式",{choices:["development","production","test","debug"]})
-        .option("-f,--framework [value]","开发框架",{choices:[
-            {title:"vue",value:1},
-            {title:"react",value:2,description:"默认"},
-            {title:"angular",value:3}
-        ]})
         .action(async function (options,cmd){
             // console.log("    run dev(name=",name,"port=",port)
             // 如果有子命令
@@ -36,17 +26,28 @@ module.exports = (cli)=>{
     const appCommand = new FlexCommand();
     appCommand.name("app")
         .description("以开发模式启动应用")      // 未指定默认值,自动使用text类型提供
-        .before(()=>{
-            console.log("      dev app before")
-        })
-        .after(()=>{
-            console.log("      dev app after")
-        })
+        // .before(()=>{
+        //     console.log("      dev app before")
+        // })
+        // .after(()=>{
+        //     console.log("      dev app after")
+        // })
+        // 未指定默认值,自动使用text类型提供
+        .option("-t,--title <value>","标题",{
+            validate:(value)=>value.length>=5,
+            prompt:{
+                type:'text',  
+                warn: "不少于5个字符"
+            }}) 
         .option("--color <value...>","显示颜色",{choices:["red","yellow","blue"],prompt:"multiselect"})  
         // 未指定默认值,使用自动完成，可以输入任意值
         .option("--filter <value>","文件过滤",{choices:["src","test","debug"],prompt:"autocomplete"})    
-        // 未指定默认值,自动使用text类型提供
-        .option("-t,--title <value>","标题(不少于5个字符)",{validate:(value)=>value.length>=5})    
+  
+        .option("--custom <value>","描述",{
+                prompt:{
+                    type:'text',
+                    hint:'不少于5个字符'
+                }})  
         // 指定了默认值且强制提示
         .option("--count <value>","数量",{default:5,prompt:true})
         // 没有指定默认值，使用,分割多个值

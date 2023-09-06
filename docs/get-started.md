@@ -98,8 +98,8 @@ cli.run()
 
 `@flexapp/cli`仅仅是一个命令行的入口：
 
-- **重点：**`include: /^\@flexapp\// `的意思是告诉`flexcli`,当执行`flexapp`命令时，会在当前工程中搜索以`@flexapp/`开头的包，然后包中声明的命令合并到`flexapp`命令中。
-- `@flexapp/cli`中使用`cli.register(iniCommand)`，注册一个通用的`ini`命令，该命令的实现在`init.js`中。 一般可以在此工程提供一些通用命令,d而其他的命令声明逻辑在分别在`@flexapp/*`等包中实现。
+- **重点：**`include: /^\@flexapp\// `的意思是告诉`flexcli`,当执行`flexapp`命令时，会在当前工程中搜索以`@flexapp/`开头的包，然后包中声明在`cli`文件夹下的所有命令被合并到`flexapp`命令中。
+- `@flexapp/cli`中使用`cli.register(iniCommand)`，注册一个通用的`init`命令，该命令的实现在`init.js`中。 一般可以在此工程提供一些通用命令,d而其他的命令声明逻辑在分别在`@flexapp/*`等包中实现。
 
 
 ## 第3步: 创建命令

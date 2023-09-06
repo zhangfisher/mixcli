@@ -9,16 +9,17 @@ import { assignObject } from "flex-tools/object/assignObject"
 import { FlexCommand } from "./command"
 import { fixIndent } from './utils';
 import { findCommands } from "./finder"
+import { asyncSignal } from "flex-tools"
 replaceAll.shim() 
 
 
 export interface FlexCliOptions{
     name:string,
-    title?:string,
+    title?:string | (string | boolean | number)[],
     description?:string,
     version?:string
     // 定义显示帮助信息
-    logo?:string | [ 'beforeAll'|'afterAll'|'before'|'after',string],
+    logo?:string ,
     // 在根命令执行前执行==commander的preAction
     before?:(thisCommand:Command,actionCommand:Command)=>void,
     // 在根命令执行后执行==commander的postAction
@@ -47,7 +48,8 @@ export type FlexCliEvents =
 
 export class FlexCli extends LiteEvent<any,FlexCliEvents>{
     options:FlexCliOptions 
-    root!:Command                       
+    root!:Command           
+    private findSignals:any[]=[]
     constructor(options?:FlexCliOptions){
         super()
         this.options= assignObject({
@@ -55,8 +57,7 @@ export class FlexCli extends LiteEvent<any,FlexCliEvents>{
             package:null,
             cliDir:"cli",
         },options)   
-        this.createRootCommand()
-        this.addLogo()
+        this.createRootCommand() 
         this.installExtendCommands()        
     } 
     get name(){return this.options.name}
@@ -65,14 +66,7 @@ export class FlexCli extends LiteEvent<any,FlexCliEvents>{
      */
     get isDisabledPrompts(){
         return(this.root as any).rawArgs.includes("--no-prompts")    
-    }    
-    /**
-     * 显示在logo
-     */
-    private addLogo(){
-        const [pos,text] = Array.isArray(this.options.logo) ?this.options.logo : ["beforeAll",this.options.logo] as [ 'beforeAll'|'afterAll'|'before'|'after',string]
-        this.addHelp(text,{pos})
-    } 
+    }   
     /**
      * 扫描当前工程的依赖，加载匹配include的依赖下的命令
      */
@@ -99,8 +93,18 @@ export class FlexCli extends LiteEvent<any,FlexCliEvents>{
             .helpOption('-h, --help', '显示帮助')     
             .version(require("../package.json").version,"-v, --version","当前版本号") 
             .action(()=>{                
-                if(this.options.title) logsets.log(this.options.title)
-                logsets.log("版本号:{}",require("../package.json").version)
+                if(this.options.logo) logsets.log(fixIndent(this.options.logo,2))
+                console.log()
+                // 显示标题
+                let title = this.options.title|| this.options.name
+                if(Array.isArray(title)){
+                    logsets.log(String(title[0]),[...title.slice(1)])
+                }else{
+                    logsets.log(`${title}   Version: {}`,this.options.version)
+                }                
+                // @ts-ignore
+                if(this.options.description) logsets.log(logsets.colors.darkGray(this.options.description)) 
+                console.log()
                 this.root.help()                
             })
         if(this.options.before) this.root.hook('preAction',this.options.before)
@@ -119,7 +123,6 @@ export class FlexCli extends LiteEvent<any,FlexCliEvents>{
         this.root.addHelpText(pos,text)
     }
 
-
     /**
      * 注册一个命令
      * @param cmd 
@@ -130,7 +133,8 @@ export class FlexCli extends LiteEvent<any,FlexCliEvents>{
             let cmds = result instanceof Array ? result : (result==undefined ? [] :  [result])
             for(let cmd of cmds){
                 if(cmd instanceof FlexCommand){
-                    this.root.addCommand(cmd) 
+                    this.root.addCommand(cmd) ;
+                    (cmd as any)._cli = this
                     this.emit("register",cmd.fullname,true)
                 }
             }                        
@@ -174,11 +178,14 @@ export class FlexCli extends LiteEvent<any,FlexCliEvents>{
      * @returns 
      */
     find(name:string):Promise<FlexCommand | undefined>{
+        const signal = asyncSignal()
+        this.findSignals.push(signal)
         return new Promise<FlexCommand | undefined>((resolve)=>{
             let listener:LiteEventSubscriber
             listener = this.on("register",(fullname:string)=>{
-                if(fullname==name){
+                if(fullname==`${this.name}.${name}`){
                     listener.off()
+                    signal.resolve()
                     resolve(this.get(name))
                 }
             },{objectify:true}) as LiteEventSubscriber
@@ -197,12 +204,21 @@ export class FlexCli extends LiteEvent<any,FlexCliEvents>{
             return this.get(name) != undefined
         }
     }     
-
+    
     /**
      * 运行命令行程序
      */
     run(){ 
-        this.root.parseAsync(process.argv);              
+        // 为什么有findSignal这玩意，解决什么问题？
+        // 当我们要扩展command时，通过get("命令名称")来获取已经注册的命令的方式有个缺陷
+        // 就是如果对命令的注册顺序有严格的要求，比如调用get('dev')时要求dev命令必须已经存在
+        // 这对动态包的命令注册扩展开发体验不好
+        // 所以引入find("命令名称")来获取命令，该方法可以获取到后注册的命令
+        // 其副作用是，在run时，可能find还没有运行到，从而导致在帮助信息里面看不到扩展的信息(实际上是已经生效的)
+        // 所以我们在find里面注入一个异步信号来解决此问题
+        return Promise.all(this.findSignals.map(signal=>signal(5000))).then(()=>{
+            this.root.parseAsync(process.argv);              
+        })
     }
     /**
      * 创建一个命令

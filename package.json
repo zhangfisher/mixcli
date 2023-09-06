@@ -5,7 +5,8 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "build": "turbo build --filter cli",
+    "build": "build --filter cli",
+    "release":"cd packages/cli && npm version patch --commit-hooks=false && pnpm build && npm publish --access public && cd ../..",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs"

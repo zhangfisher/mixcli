@@ -1,6 +1,6 @@
 import { Option } from 'commander'
 import { PromptObject } from 'prompts'
-import { IPromptable, IPromptableOptions, PromptManager } from './prompt'
+import { IPromptable, IPromptableOptions, PromptChoice, PromptManager } from './prompt'
 
 
 export interface FlexOptionParams extends IPromptableOptions{
@@ -17,6 +17,7 @@ export interface FlexOptionParams extends IPromptableOptions{
 export class FlexOption extends Option implements IPromptable{
     // 是否提示用户输入
     prompt?: PromptManager     
+    promptChoices?:PromptChoice[]
     private _validate?: (value: any) => boolean       
     constructor(flags: string, description?: string | undefined,optsOrDefault?:any) {
         super(flags, description)
@@ -32,7 +33,16 @@ export class FlexOption extends Option implements IPromptable{
             params.prompt = 'auto'
         }        
         if(params.default) this.default(params.default,params.defaultDescription)
-        if(params.choices) this.choices(params.choices)
+        if(params.choices) {
+            this.promptChoices = params.choices.map(choice=>{
+                if(typeof(choice)=='object'){
+                    return choice
+                }else{
+                    return {title:choice,value:choice}                    
+                }
+            })
+            this.choices(this.promptChoices.map((item:any)=>item.value))
+        }
         if(params.conflicts) this.conflicts(params.conflicts)
         if(params.env) this.env(params.env)
         if(params.argParser) this.argParser(params.argParser)
