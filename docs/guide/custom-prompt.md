@@ -25,4 +25,4 @@ const { FlexCommand } = require('flexcli');
  }
 ```
 
-- `prompt`方法允许cqytf
+- `prompt`方法添加自定义的`prompt`，每个选项都是一个对象`PromptObject`，对象的属性请参阅[prompts](https://github.com/terkelg/prompts)

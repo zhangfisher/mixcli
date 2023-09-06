@@ -99,7 +99,7 @@ cli.run()
 `@flexapp/cli`仅仅是一个命令行的入口：
 
 - **重点：**`include: /^\@flexapp\// `的意思是告诉`flexcli`,当执行`flexapp`命令时，会在当前工程中搜索以`@flexapp/`开头的包，然后包中声明在`cli`文件夹下的所有命令被合并到`flexapp`命令中。
-- `@flexapp/cli`中使用`cli.register(iniCommand)`，注册一个通用的`init`命令，该命令的实现在`init.js`中。 一般可以在此工程提供一些通用命令,d而其他的命令声明逻辑在分别在`@flexapp/*`等包中实现。
+- `@flexapp/cli`中使用`cli.register(iniCommand)`，注册一个通用的`init`命令，该命令的实现在`init.js`中。 一般可以在此工程提供一些通用命令,而其他的命令声明逻辑在分别在`@flexapp/*/cli/*.js`等包中实现。
 
 
 ## 第3步: 创建命令
@@ -272,7 +272,7 @@ Commands:
 
 在上面`dev`命令中，共指定了`6`个选项，当执行`flexapp dev`命令时, 会根据配置自动交互引导用户输入选项，如下：
 
-![图片](./dev_cmd.png)
+![图片](/images/dev_cmd.png)
 
 - 命令行的交互体验与使用`commander`时完全一样
 - 仅当选项未指定默认值或满足一定条件时，才会根据一定的规则自动推断交互提示类型。详见[自动推断交互提示](./guide/infer-prompt.md)

@@ -167,4 +167,4 @@ const cli = new FlexCli({
 
 执行`flexcli`命令，显示如下：
  
-![图片](/cli_demo.png)
+![图片](/images/cli_demo.png)
