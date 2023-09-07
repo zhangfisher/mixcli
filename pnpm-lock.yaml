@@ -39,6 +39,9 @@ importers:
       vitepress:
         specifier: 1.0.0-rc.10
         version: 1.0.0-rc.10(@algolia/client-search@4.19.1)(@types/node@20.5.7)(search-insights@2.8.1)
+      vue:
+        specifier: ^3.3.4
+        version: 3.3.4
 
   examples/lib1:
     dependencies:
