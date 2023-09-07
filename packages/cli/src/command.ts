@@ -1,10 +1,10 @@
 import { Command,Option } from "commander";
 import prompts, { PromptObject }  from  "prompts"
-import { FlexOption,type FlexOptionParams } from "./option"; 
+import { MixedOption,type MixedOptionParams } from "./option"; 
 
-export type HookCommandListener = (thisCommand:FlexCommand,actionComand:FlexCommand)=>void | Promise<void>
+export type HookCommandListener = (thisCommand:MixedCommand,actionComand:MixedCommand)=>void | Promise<void>
 
-export class FlexCommand extends Command{
+export class MixedCommand extends Command{
     private _beforeHooks:Function[] = []
     private _afterHooks:Function[] = []
     private _customPrompts:PromptObject[] = [] 
@@ -44,9 +44,9 @@ export class FlexCommand extends Command{
      * 返回根命令
      */
     root(){
-        let root:FlexCommand | null | undefined = this
+        let root:MixedCommand | null | undefined = this
         while(root && root.parent!=null){
-            root = root.parent as FlexCommand
+            root = root.parent as MixedCommand
         }
         return root
     }
@@ -102,7 +102,7 @@ export class FlexCommand extends Command{
      * 
      */
     private generateAutoPrompts():PromptObject[]{ 
-        const options = this.options as FlexOption[]
+        const options = this.options as MixedOption[]
         const optionPromports = options
                     .filter(option=>!option.hidden)
                     .map(option=>option.getPrompt(this._optionValues[option.name()]))
@@ -117,9 +117,9 @@ export class FlexCommand extends Command{
     }
 
     option(flags: string, description?: string | undefined,defaultValue?:any ): this
-    option(flags: string, description?: string | undefined,options?:FlexOptionParams ): this{
+    option(flags: string, description?: string | undefined,options?:MixedOptionParams ): this{
         // @ts-ignore
-        const option =new FlexOption(...arguments)
+        const option =new MixedOption(...arguments)
         if(option.required && this.isDisabledPrompts()) option.mandatory = true
         return this.addOption(option)         
     }  

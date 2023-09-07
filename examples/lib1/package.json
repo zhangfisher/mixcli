@@ -10,7 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "flexcli": "workspace:^",
+    "mixed-cli": "workspace:^",
     "@flex/lib2": "workspace:^"
   }
 }

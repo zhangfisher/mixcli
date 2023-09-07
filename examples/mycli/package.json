@@ -9,13 +9,13 @@
     "cli":"node ./src/index.js"
   },
   "bin": {
-    "mycli": "./node_modules/flexcli/dist/index.js"
+    "mycli": "./node_modules/mixed-cli/dist/index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@flex/lib1": "workspace:^",
-    "flexcli": "workspace:^"
+    "mixed-cli": "workspace:^"
   }
 }

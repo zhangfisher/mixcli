@@ -6,7 +6,7 @@
 - 使用[prompts](https://github.com/terkelg/prompts)、[inquirer](https://github.com/SBoudrias/Inquirer.js),[enquirer](https://github.com/enquirer/enquirer)等库来提供交互输入提示。
 - 使用[chalk](https://github.com/chalk/chalk)来进行命令行输出的颜色控制。
 
-`FlexCli`基于`commander`、`prompts`和`logsets`，提供命令行解析、自动交互提示以及终端界面增强等功能。
+`MixedCli`基于`commander`、`prompts`和`logsets`，提供命令行解析、自动交互提示以及终端界面增强等功能。
 
 **主要特性：**
 
@@ -44,7 +44,7 @@ program.parse();
 
 总之，我们希望交互体验更加友好！
 
-而`FlexCli`的作用就是为**命令行应用的选项自动推断生成交互提示**，当用户没有指定`--host`和`--mode`选项时,按照一定的推断规则(根据选项的值、choices等)，会自动使用`prompts`提供的交互提示，提示引导用户输入`--host`和`--mode`选项的值。
+而`MixedCli`的作用就是为**命令行应用的选项自动推断生成交互提示**，当用户没有指定`--host`和`--mode`选项时,按照一定的推断规则(根据选项的值、choices等)，会自动使用`prompts`提供的交互提示，提示引导用户输入`--host`和`--mode`选项的值。
 
 ##  多包命令混合
 
@@ -79,7 +79,7 @@ program.parse();
 当一个应用安装了`@myapp/vue`后，就可以在命令行中使用`myapp x`命令了。
 当一个应用安装了`@myapp/react`后，就可以在命令行中使用`myapp y`命令了。
 
-`FlexCli`可以让您开发一个`cli`应用，当安装了`@myapp/cli`后，启动时可以自动搜索当前工程下符合条件的依赖下的命令进行混合，提供完整动态的命令行。
+`MixedCli`可以让您开发一个`cli`应用，当安装了`@myapp/cli`后，启动时可以自动搜索当前工程下符合条件的依赖下的命令进行混合，提供完整动态的命令行。
 
 
 

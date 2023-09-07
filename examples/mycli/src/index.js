@@ -1,15 +1,15 @@
-const { outputStr,FlexCli } = require("flexcli")
+const { outputStr,MixedCli } = require("mixed-cli")
 const devCommand = require("./dev")
 const initCommand = require("./init")
 const startCommand = require("./start")
 
  
 
-const cli = new FlexCli({
-    name: "flexcli",
-    title: ["Flexcli commandline tool      Version: {}","1.0.1"],
+const cli = new MixedCli({
+    name: "mixed-cli",
+    title: ["MixedCli commandline tool      Version: {}","1.0.1"],
     version: "1.0.0",
-    description: "flexcli is a cli tool for creating cli tools",
+    description: "mixed-cli is a cli tool for creating cli tools",
     include: /^\@flex\//, 
     // 显示logo
     logo: String.raw`

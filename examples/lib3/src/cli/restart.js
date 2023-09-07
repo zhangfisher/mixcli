@@ -1,8 +1,8 @@
 
-const { FlexCommand } = require('flexcli');
+const { MixedCommand } = require('mixed-cli');
 
 /**
- * @param {import('flexcli').FlexCli} cli
+ * @param {import('mixed-cli').MixedCli} cli
  */
  module.exports = (cli)=>{        
 
@@ -14,7 +14,7 @@ const { FlexCommand } = require('flexcli');
     })
   
 
-    const restartCommand = new FlexCommand();
+    const restartCommand = new MixedCommand();
     restartCommand
         .name("restart")
         .description("重启应用")

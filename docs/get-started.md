@@ -1,6 +1,6 @@
 # 快速入门
 
-`FlexCli`是一个命令行应用开发框架，其主要是对`commander`和`prompts`的封装，提供了更加友好的命令行开发体验。
+`MixedCli`是一个命令行应用开发框架，其主要是对`commander`和`prompts`的封装，提供了更加友好的命令行开发体验。
 
 
 ## 第1步：创建工程
@@ -31,15 +31,15 @@ flexapp
 ::: code-group
 
 ```bash [npm]
-npm install flexcli
+npm install mixed-cli
 ```
 
 ```bash [pnpm]
-pnpm add flexcli
+pnpm add mixed-cli
 ```
 
 ```bash [yarn]
-yarn add flexcli
+yarn add mixed-cli
 ```
 :::
 
@@ -63,10 +63,10 @@ flexapp
 ::: code-group
 
 ```ts [cli.js]
-const { outputStr,FlexCli } = require("flexcli") 
+const { outputStr,MixedCli } = require("mixed-cli") 
 const initCommand = require("./init")
 
-const cli = new FlexCli({
+const cli = new MixedCli({
     name: "flexapp",
     version: "1.0.0",
     include: /^\@flexapp\//, 
@@ -98,7 +98,7 @@ cli.run()
 
 `@flexapp/cli`仅仅是一个命令行的入口：
 
-- **重点：**`include: /^\@flexapp\// `的意思是告诉`flexcli`,当执行`flexapp`命令时，会在当前工程中搜索以`@flexapp/`开头的包，然后包中声明在`cli`文件夹下的所有命令被合并到`flexapp`命令中。
+- **重点：**`include: /^\@flexapp\// `的意思是告诉`mixed-cli`,当执行`flexapp`命令时，会在当前工程中搜索以`@flexapp/`开头的包，然后包中声明在`cli`文件夹下的所有命令被合并到`flexapp`命令中。
 - `@flexapp/cli`中使用`cli.register(iniCommand)`，注册一个通用的`init`命令，该命令的实现在`init.js`中。 一般可以在此工程提供一些通用命令,而其他的命令声明逻辑在分别在`@flexapp/*/cli/*.js`等包中实现。
 
 
@@ -130,14 +130,14 @@ flexapp
 
 ```js [vue/src/cli/dev.js]
 
-const { FlexCommand } = require('flexcli');
+const { MixedCommand } = require('mixed-cli');
 
 /**
- * @param {import('flexcli').FlexCli} cli
+ * @param {import('mixed-cli').MixedCli} cli
  */
 module.exports = (cli)=>{                
 
-    const devCommand = new FlexCommand();
+    const devCommand = new MixedCommand();
     devCommand
         .name('dev')
         .description("以开发模式启动应用")      // 未指定默认值,自动使用text类型提供                       
@@ -172,16 +172,16 @@ module.exports = (cli)=>{
   "version": "1.0.0",
   "main": "index.js",
   "dependencies": {
-    "flexcli": "^1.0.0"
+    "mixed-cli": "^1.0.0"
   }
 }
 ```
 :::
 
 
-- 在`src/cli`目录下创建`dev.js`文件，用于声明`dev`命令。`cli`目录下的所有`js`文件会被自动加载,每个文件均导出一个函数，该函数需要返回一个或多个`FlexCommand`实例。`cli`目录是一个默认的约定目录，可以通过`cli.cliDir`参数修改。
-- 创建`FlexCommand`实例，用于声明命令。`FlexCommand`继承自`commander`的`Command`类，因此可以使用`commander`的所有特性。
-- `package.json`只需要将`flexcli`添加为依赖即可。
+- 在`src/cli`目录下创建`dev.js`文件，用于声明`dev`命令。`cli`目录下的所有`js`文件会被自动加载,每个文件均导出一个函数，该函数需要返回一个或多个`MixedCommand`实例。`cli`目录是一个默认的约定目录，可以通过`cli.cliDir`参数修改。
+- 创建`MixedCommand`实例，用于声明命令。`MixedCommand`继承自`commander`的`Command`类，因此可以使用`commander`的所有特性。
+- `package.json`只需要将`mixed-cli`添加为依赖即可。
 - 同样地，我们可以在`@flexapp/react`,`@flexapp/app`等包中创建其他的命令。
 
 ## 第4步: 使用命令
@@ -276,11 +276,11 @@ Commands:
 
 - 命令行的交互体验与使用`commander`时完全一样
 - 仅当选项未指定默认值或满足一定条件时，才会根据一定的规则自动推断交互提示类型。详见[自动推断交互提示](./guide/infer-prompt.md)
-- `FlexCli`使用`prompts`来实现交互提示，因此支持`prompts`的所有交互类型特性。详见[prompts](https://github.com/terkelg/prompts)
+- `MixedCli`使用`prompts`来实现交互提示，因此支持`prompts`的所有交互类型特性。详见[prompts](https://github.com/terkelg/prompts)
 
 
 ## 小结
 
-- `FlexCli`是一个基于`commander`的命令行工具开发框架，提供了一套命令行开发的最佳实践。
-- `FlexCli`能对所有命令行选项自动推断交互提示类型，当用户没有输入选项时，会自动引导用户输入选项，提供友好的用户体验。
-- `FlexCli`可以在当前工程自动搜索满足条件的包下声明的命令进行合并，从而实现扩展命令的目的。此特性可以保持@flexapp/cli包的精简和稳定，给用户一致的体验。
+- `MixedCli`是一个基于`commander`的命令行工具开发框架，提供了一套命令行开发的最佳实践。
+- `MixedCli`能对所有命令行选项自动推断交互提示类型，当用户没有输入选项时，会自动引导用户输入选项，提供友好的用户体验。
+- `MixedCli`可以在当前工程自动搜索满足条件的包下声明的命令进行合并，从而实现扩展命令的目的。此特性可以保持@flexapp/cli包的精简和稳定，给用户一致的体验。

@@ -6,14 +6,14 @@ import logsets  from "logsets"
 // @ts-ignore
 import replaceAll  from 'string.prototype.replaceall'
 import { assignObject } from "flex-tools/object/assignObject"
-import { FlexCommand } from "./command"
+import { MixedCommand } from "./command"
 import { fixIndent } from './utils';
 import { findCommands } from "./finder"
 import { asyncSignal } from "flex-tools"
 replaceAll.shim() 
 
 
-export interface FlexCliOptions{
+export interface MixedCliOptions{
     name:string,
     title?:string | (string | boolean | number)[],
     description?:string,
@@ -40,20 +40,20 @@ export interface FlexCliOptions{
  
   
 
-export type FlexCliCommand = (cli:FlexCli)=>FlexCommand | FlexCommand[] | void
+export type MixedCliCommand = (cli:MixedCli)=>MixedCommand | MixedCommand[] | void
 
 
-export type FlexCliEvents = 
+export type MixedCliEvents = 
     "register"              // 当命令注册时触发
 
-export class FlexCli extends LiteEvent<any,FlexCliEvents>{
-    options:FlexCliOptions 
+export class MixedCli extends LiteEvent<any,MixedCliEvents>{
+    options:MixedCliOptions 
     root!:Command           
     private findSignals:any[]=[]
-    constructor(options?:FlexCliOptions){
+    constructor(options?:MixedCliOptions){
         super()
         this.options= assignObject({
-            name:"flexcli",
+            name:"mixed-cli",
             package:null,
             cliDir:"cli",
         },options)   
@@ -127,12 +127,12 @@ export class FlexCli extends LiteEvent<any,FlexCliEvents>{
      * 注册一个命令
      * @param cmd 
      */
-    register(cmd:FlexCliCommand){
+    register(cmd:MixedCliCommand){
         if(typeof(cmd)=="function"){
             let result = cmd(this)
             let cmds = result instanceof Array ? result : (result==undefined ? [] :  [result])
             for(let cmd of cmds){
-                if(cmd instanceof FlexCommand){
+                if(cmd instanceof MixedCommand){
                     this.root.addCommand(cmd) ;
                     (cmd as any)._cli = this
                     this.emit("register",cmd.fullname,true)
@@ -153,13 +153,13 @@ export class FlexCli extends LiteEvent<any,FlexCliEvents>{
      * 
      * @param name 
      */
-    get(name:string):FlexCommand | undefined{
+    get(name:string):MixedCommand | undefined{
         const names=name.split(".")
         let curCmd:Command = this.root
-        let resultCmd:FlexCommand | undefined
+        let resultCmd:MixedCommand | undefined
         while(names.length>0){
             const topName = names.shift()
-            const r = curCmd.commands.find(c=>c.name()==topName)  as FlexCommand
+            const r = curCmd.commands.find(c=>c.name()==topName)  as MixedCommand
             if(r && names.length==0){
                 resultCmd = r
             }
@@ -177,10 +177,10 @@ export class FlexCli extends LiteEvent<any,FlexCliEvents>{
      * @param name 
      * @returns 
      */
-    find(name:string):Promise<FlexCommand | undefined>{
+    find(name:string):Promise<MixedCommand | undefined>{
         const signal = asyncSignal()
         this.findSignals.push(signal)
-        return new Promise<FlexCommand | undefined>((resolve)=>{
+        return new Promise<MixedCommand | undefined>((resolve)=>{
             let listener:LiteEventSubscriber
             listener = this.on("register",(fullname:string)=>{
                 if(fullname==`${this.name}.${name}`){

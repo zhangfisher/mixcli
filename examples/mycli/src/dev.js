@@ -1,14 +1,14 @@
-const { FlexCommand } = require('flexcli');
+const { MixedCommand } = require('mixed-cli');
 
 
 /**
- * @param {import('flexcli').FlexCli} cli
+ * @param {import('mixed-cli').MixedCli} cli
  */
 module.exports = (cli)=>{        
     
     
 
-    const devCommand = new FlexCommand();
+    const devCommand = new MixedCommand();
 
     devCommand
         .name('dev')
@@ -23,7 +23,7 @@ module.exports = (cli)=>{
             }
         })
 
-    const appCommand = new FlexCommand();
+    const appCommand = new MixedCommand();
     appCommand.name("app")
         .description("以开发模式启动应用")      // 未指定默认值,自动使用text类型提供
         // .before(()=>{
@@ -76,7 +76,7 @@ module.exports = (cli)=>{
 
     devCommand.addCommand(appCommand)
 
-    const libCommand = new FlexCommand();
+    const libCommand = new MixedCommand();
     libCommand
         .name("lib")
         .description("以开发模式启动库")      // 未指定默认值,自动使用text类型提供

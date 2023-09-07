@@ -1,11 +1,11 @@
 
-const { FlexCommand } = require('flexcli');
+const { MixedCommand } = require('mixed-cli');
 
 /**
- * @param {import('flexcli').FlexCli} cli
+ * @param {import('mixed-cli').MixedCli} cli
  */
  module.exports = (cli)=>{        
-    const stopCommand = new FlexCommand();
+    const stopCommand = new MixedCommand();
     stopCommand
         .name("stop")
         .description("停止应用")

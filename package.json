@@ -1,11 +1,11 @@
 {
-  "name": "flexclirepos",
+  "name": "mixedclirepos",
   "version": "1.0.0",
   "description": "Create CommandLine Application with Interactive prompts",
   "main": "index.js",
   "type": "module",
   "scripts": { 
-    "build": "pnpm --filter flexcli build",    
+    "build": "pnpm --filter mixed-cli build",    
     "release":"cd packages/cli && npm version patch --commit-hooks=false && pnpm build && npm publish --access public && cd ../..",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",

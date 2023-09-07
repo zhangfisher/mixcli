@@ -11,6 +11,6 @@
   "license": "ISC",
   "dependencies": {
     "@flex/lib3": "workspace:^",
-    "flexcli": "workspace:^"
+    "mixed-cli": "workspace:^"
   }
 }

@@ -1,7 +1,7 @@
 const { Command } = require('commander');
 
 /**
- * @param {import('flexcli').FlexCli} cli
+ * @param {import('mixed-cli').MixedCli} cli
  */
 module.exports = (cli)=>{    
     const command = new Command();

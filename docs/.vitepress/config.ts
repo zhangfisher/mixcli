@@ -5,7 +5,7 @@ export default defineConfig({
   title: "FLexCli",
   description: "Create CommandLine Application with Interactive prompts",
   outDir: '../website',
-  base: '/flexcli/',
+  base: '/mixed-cli/',
   markdown: {
     toc: { level: [1, 2,3,4,5] }
   }, 
@@ -42,7 +42,7 @@ export default defineConfig({
       }
     ],
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/zhangfisher/flexcli' }
+      { icon: 'github', link: 'https://github.com/zhangfisher/mixed-cli' }
     ]
   }
 })

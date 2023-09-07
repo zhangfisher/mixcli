@@ -3,7 +3,7 @@ import { PromptObject } from 'prompts'
 import { IPromptable, IPromptableOptions, PromptChoice, PromptManager } from './prompt'
 
 
-export interface FlexOptionParams extends IPromptableOptions{
+export interface MixedOptionParams extends IPromptableOptions{
     defaultDescription?:string          // 默认值的描述    
     conflicts?:string | string[]
     env?:string
@@ -14,14 +14,14 @@ export interface FlexOptionParams extends IPromptableOptions{
 }
 
 
-export class FlexOption extends Option implements IPromptable{
+export class MixedOption extends Option implements IPromptable{
     // 是否提示用户输入
     prompt?: PromptManager     
     promptChoices?:PromptChoice[]
     private _validate?: (value: any) => boolean       
     constructor(flags: string, description?: string | undefined,optsOrDefault?:any) {
         super(flags, description)
-        let params:FlexOptionParams = {}
+        let params:MixedOptionParams = {}
         if(arguments.length==3 && typeof arguments[2] == "object"){
             params = Object.assign({
                 prompt : 'auto'

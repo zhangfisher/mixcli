@@ -1,8 +1,8 @@
 {
-  "name": "flexcli",
+  "name": "mixed-cli",
   "version": "1.0.0",
   "description": "Develop command line tool scaffolding for monorepo",
-  "repository":"https://github.com/zhangfisher/flexcli.git",
+  "repository":"https://github.com/zhangfisher/mixed-cli.git",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",

@@ -1,7 +1,7 @@
 import { getPackageRootPath } from 'flex-tools';
-import type { FlexCli } from './cli';
+import type { MixedCli } from './cli';
 import {  globSync } from 'glob'
-import { FlexCliCommand } from './cli';
+import { MixedCliCommand } from './cli';
 
 /**
  * 
@@ -19,7 +19,7 @@ const path = require("node:path")
 const { getPackageJson } = require("flex-tools/package/getPackageJson")
  
 
-export function getMatchedDependencies(this:FlexCli,entry:string):string[]{
+export function getMatchedDependencies(this:MixedCli,entry:string):string[]{
     const pacakgeMacher = this.options.include
     if(!(pacakgeMacher instanceof RegExp)) return  []
     
@@ -49,7 +49,7 @@ function isMatched(str:string,reg?:string | RegExp | string[] | RegExp[]):boolea
     })
 }
 
-export function findCliPaths(this:FlexCli,packageName?:string ,entry?:string):string[]{
+export function findCliPaths(this:MixedCli,packageName?:string ,entry?:string):string[]{
     const includeMacher = this.options.include
     const excludeMacher = this.options.exclude
     if(!includeMacher) return []
@@ -92,9 +92,9 @@ export function findCliPaths(this:FlexCli,packageName?:string ,entry?:string):st
  * @param cli 
  * 
  */
-export function findCommands(cli:FlexCli){ 
+export function findCommands(cli:MixedCli){ 
     const cliDirs =  findCliPaths.call(cli)
-    const commands:FlexCliCommand[] = []
+    const commands:MixedCliCommand[] = []
     cliDirs.forEach(dir=>{
         globSync("*.js",{
             cwd:dir,

@@ -12,7 +12,7 @@ hero:
       link: /guide/
     - theme: alt
       text: Github
-      link: https://github.com/zhangfisher/flexcli.git
+      link: https://github.com/zhangfisher/mixed-cli.git
 
 features:
   - title: 自动创建提示

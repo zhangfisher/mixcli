@@ -1,6 +1,6 @@
 # 推断提示类型
 
-`FlexCli`最核心的功能就是基于`prompts`为命令选项提供推断提示类型，自动为命令选项提供合适的提示类型。
+`MixedCli`最核心的功能就是基于`prompts`为命令选项提供推断提示类型，自动为命令选项提供合适的提示类型。
 
 ## 启用提示
 
@@ -92,7 +92,7 @@ interface PromptObject<T extends string = string> {
 
 ```js
 
- const appCommand = new FlexCommand();
+ const appCommand = new MixedCommand();
     appCommand.name("app")
         .description("以开发模式启动应用")      // 未指定默认值,自动使用text类型提供
         .option("--color <value...>","显示颜色",{choices:["red","yellow","blue"],prompt:"multiselect"})  
