@@ -3,9 +3,9 @@
 layout: home
 
 hero:
-  name: "FLexCli"
+  name: "MixedCli"
   text: "创建交互式命令行应用"
-  tagline: 简单,自动,高效
+  tagline: 自动生成交互式命令
   actions:
     - theme: brand
       text: 指南
