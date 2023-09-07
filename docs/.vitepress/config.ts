@@ -4,7 +4,7 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: "MixedCli",
   description: "Create CommandLine Application with Interactive prompts",
-  //outDir: '../website',
+  outDir: '../website',
   base: '/mixed-cli/',
   markdown: {
     toc: { level: [1, 2,3,4,5] }
