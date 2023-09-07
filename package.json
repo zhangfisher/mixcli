@@ -6,9 +6,9 @@
   "homepage": "https://zhangfisher.github.io/mixed-cli/",
   "main": "index.js",
   "type": "module",
-  "scripts": { 
-    "build": "pnpm --filter mixed-cli build",    
-    "release":"cd packages/cli && npm version patch --commit-hooks=false && pnpm build && npm publish --access public && cd ../..",
+  "scripts": {
+    "build": "pnpm --filter mixed-cli build",
+    "release": "cd packages/cli && npm version patch --commit-hooks=false && pnpm build && npm publish --access public && cd ../..",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs"
@@ -26,6 +26,7 @@
   "devDependencies": {
     "@types/fs-extra": "^11.0.1",
     "@types/node": "^20.5.7",
+    "@voerkai18n/cli": "^2.0.8",
     "tsup": "^7.2.0",
     "typescript": "^5.2.2",
     "vitepress": "1.0.0-rc.10"

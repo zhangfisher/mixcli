@@ -1,17 +1,19 @@
 #!/usr/bin/env node
 import "flex-tools/string"
 import { LiteEvent, LiteEventSubscriber } from "flex-tools/events/liteEvent"
-import { Command,Option } from "commander"
+import { Command } from "commander"
 import logsets  from "logsets"
-// @ts-ignore
-import replaceAll  from 'string.prototype.replaceall'
+
 import { assignObject } from "flex-tools/object/assignObject"
 import { MixedCommand } from "./command"
 import { fixIndent } from './utils';
 import { findCommands } from "./finder"
-import { asyncSignal } from "flex-tools"
-replaceAll.shim() 
+import { asyncSignal } from "flex-tools/async/asyncSignal"
+import { t } from "./languages"
 
+// @ts-ignore
+import replaceAll  from 'string.prototype.replaceall'
+replaceAll.shim() 
 
 export interface MixedCliOptions{
     name:string,
@@ -90,17 +92,17 @@ export class MixedCli extends LiteEvent<any,MixedCliEvents>{
     private createRootCommand(){
         this.root = new Command();
         this.root.name(this.name)
-            .helpOption('-h, --help', '显示帮助')     
-            .version(require("../package.json").version,"-v, --version","当前版本号") 
+            .helpOption('-h, --help', t('显示帮助'))     
+            .version(require("../package.json").version,"-v, --version",t("当前版本号")) 
             .action(()=>{                
                 if(this.options.logo) logsets.log(fixIndent(this.options.logo,2))
                 console.log()
                 // 显示标题
                 let title = this.options.title|| this.options.name
                 if(Array.isArray(title)){
-                    logsets.log(String(title[0]),[...title.slice(1)])
+                    logsets.log(String(title[0]).toUpperCase(),[...title.slice(1)])
                 }else{
-                    logsets.log(`${title}   Version: {}`,this.options.version)
+                    logsets.log(`${title.toUpperCase()}   Version: {}`,this.options.version)
                 }                
                 // @ts-ignore
                 if(this.options.description) logsets.log(logsets.colors.darkGray(this.options.description)) 
@@ -139,7 +141,7 @@ export class MixedCli extends LiteEvent<any,MixedCliEvents>{
                 }
             }                        
         }else{
-            logsets.error("无效的FlexCliCommand")
+            logsets.error(t("无效的命令注册,必须是一个MixedCliCommand函数"))
         }        
     }
     /**
