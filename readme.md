@@ -1,15 +1,12 @@
-
-提供了开发命令行应用的基础框架，可以快速开发命令行应用。
-
-[文档](https:/zhangfisher.github.io/flexcli/)
-
-# 主要特性：
-
-- 由[commander](https://github.com/tj/commander.js)提供命令行解析
-- 由[prompts](https://github.com/terkelg/prompts)提供交互提示
-- [logsets](https://github.com/terkelg/prompts)提供终端输出增强组件
-- 自动为命令行选项推断生成交互提示
-- 自动搜索当前依赖下符合条件的命令进行合并，适合于`monorepo`项目开发
+A toolkit for developing command line applications, based on `commander`, `prompts`, and `logsets`, providing functions such as command line parsing, automatic interactive prompts, and terminal interface enhancement.
 
 
+[Document](https:/zhangfisher.github.io/flexcli/)
 
+# Features:
+
+- [commander]（ https://github.com/tj/commander.js ）Provide command line parsing
+- [prompts]（ https://github.com/terkelg/prompts ）Provide interactive prompts
+- [logsets]（ https://github.com/terkelg/prompts ）Provide terminal output enhancement components
+- Automatically generate interactive prompts for command line option inference
+- Automatically search for commands that meet the conditions under the current dependency for merging, suitable for `monorepo` project development

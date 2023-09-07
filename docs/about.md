@@ -6,13 +6,19 @@
 - 使用[prompts](https://github.com/terkelg/prompts)、[inquirer](https://github.com/SBoudrias/Inquirer.js),[enquirer](https://github.com/enquirer/enquirer)等库来提供交互输入提示。
 - 使用[chalk](https://github.com/chalk/chalk)来进行命令行输出的颜色控制。
 
+`FlexCli`基于`commander`、`prompts`和`logsets`，提供命令行解析、自动交互提示以及终端界面增强等功能。
 
-`FlexCli`有机结合了`commander`和`prompts`，提供了更加简单友好的命令行应用开发体验。
+**主要特性：**
+
+- 由[commander](https://github.com/tj/commander.js)提供命令行解析
+- 由[prompts](https://github.com/terkelg/prompts)提供交互提示
+- [logsets](https://github.com/terkelg/prompts)提供终端输出增强组件
+- 自动为命令行选项推断生成交互提示
+- 自动搜索当前依赖下符合条件的命令进行合并，适合于`monorepo`项目开发
 
 ## 自动生成交互提示
 
-**为命令行应用的选项推断生成交互提示**
-
+**为命令行命令选项推断生成交互提示**
 
 当我们使用`commander`开始命令行时，一般会这样写：
 
@@ -40,9 +46,9 @@ program.parse();
 
 而`FlexCli`的作用就是为**命令行应用的选项自动推断生成交互提示**，当用户没有指定`--host`和`--mode`选项时,按照一定的推断规则(根据选项的值、choices等)，会自动使用`prompts`提供的交互提示，提示引导用户输入`--host`和`--mode`选项的值。
 
-##  命令混合
+##  多包命令混合
 
-**搜索当前依赖下符合条件的命令进行小合**
+**搜索当前依赖下符合条件包的命令进行混合**
 
 在开发基于`monorepo`的应用时，我们需要配套开发一个`cli`应用，一般我们会单独创建一个包位于`packages/cli`，然后在`package.json`中配置`bin`字段，然后在`bin`目录下创建一个`cli.js`文件，然后在`cli.js`中使用`commander`来编写命令行应用。
 
@@ -72,7 +78,6 @@ program.parse();
 
 当一个应用安装了`@myapp/vue`后，就可以在命令行中使用`myapp x`命令了。
 当一个应用安装了`@myapp/react`后，就可以在命令行中使用`myapp y`命令了。
-
 
 `FlexCli`可以让您开发一个`cli`应用，当安装了`@myapp/cli`后，启动时可以自动搜索当前工程下符合条件的依赖下的命令进行混合，提供完整动态的命令行。
 

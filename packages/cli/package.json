@@ -2,12 +2,14 @@
   "name": "flexcli",
   "version": "1.0.0",
   "description": "Develop command line tool scaffolding for monorepo",
+  "repository":"https://github.com/zhangfisher/flexcli.git",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "scripts": {
     "build": "tsup",
-    "build:watch": "tsup --watch"
+    "build:watch": "tsup --watch",
+    "release": "npm publish"
   },
   "files": [
     "dist",
