@@ -8,8 +8,8 @@ hero:
   tagline: 自动生成交互提示 / 多包命令合成 / 终端增强
   actions:
     - theme: brand
-      text: 指南
-      link: /guide/
+      text: 快速入门
+      link: /get-started
     - theme: alt
       text: Github
       link: https://github.com/zhangfisher/mixed-cli.git
