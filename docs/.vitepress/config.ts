@@ -17,9 +17,19 @@ export default defineConfig({
     // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: '首页', link: '/' },
-      { text: '指南', link: '/guide/' }
+      { text: '指南', link: '/guide/' },
+      {
+        text: '开源推荐',
+        items: [
+          { text: 'VoerkaI18n', link: 'https://zhangfisher.github.io/voerka-i18n/' },
+          { text: 'FlexDecorators', link: 'https://zhangfisher.github.io/flex-decorators/' },
+          { text: 'FlexTools', link: 'https://zhangfisher.github.io/flex-tools/' },
+          { text: 'FlexState', link: 'https://zhangfisher.github.io/flexstate/' },
+          { text: 'VoerkaLogger', link: 'https://zhangfisher.github.io/voerkalogger/' },
+          { text: 'Logsets', link: 'https://zhangfisher.github.io/logsets/' }          
+        ]
+      }
     ],
-
     sidebar: [
       {
         text: '',
