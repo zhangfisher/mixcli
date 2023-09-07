@@ -3,7 +3,7 @@
   "version": "1.0.1",
   "description": "Develop command line tool scaffolding for monorepo",
   "repository": "https://github.com/zhangfisher/mixed-cli.git",
-  "homepage": "http://zhangfisher.gitee.io/mixed-cli",
+  "homepage": "https://zhangfisher.github.io/mixed-cli/",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",

@@ -1,1 +1,0 @@
-import{_ as s,o,c as a,Q as n}from"./chunks/framework.d3b23cdb.js";const m=JSON.parse('{"title":"关于","description":"","frontmatter":{},"headers":[],"relativePath":"about.md","filePath":"about.md"}'),p={name:"about.md"},e=n("",25),l=[e];function c(t,r,d,E,y,i){return o(),a("div",null,l)}const q=s(p,[["render",c]]);export{m as __pageData,q as default};
