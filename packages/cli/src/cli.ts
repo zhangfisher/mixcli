@@ -9,8 +9,6 @@ import { MixedCommand } from "./command"
 import { fixIndent } from './utils';
 import { findCommands } from "./finder"
 import { asyncSignal } from "flex-tools/async/asyncSignal"
-import { t } from "./languages"
-
 // @ts-ignore
 import replaceAll  from 'string.prototype.replaceall'
 replaceAll.shim() 
@@ -92,8 +90,8 @@ export class MixedCli extends LiteEvent<any,MixedCliEvents>{
     private createRootCommand(){
         this.root = new Command();
         this.root.name(this.name)
-            .helpOption('-h, --help', t('显示帮助'))     
-            .version(require("../package.json").version,"-v, --version",t("当前版本号")) 
+            .helpOption('-h, --help')     
+            .version(require("../package.json").version,"-v, --version") 
             .action(()=>{                
                 if(this.options.logo) logsets.log(fixIndent(this.options.logo,2))
                 console.log()
@@ -141,7 +139,7 @@ export class MixedCli extends LiteEvent<any,MixedCliEvents>{
                 }
             }                        
         }else{
-            logsets.error(t("无效的命令注册,必须是一个MixedCliCommand函数"))
+            logsets.error("Invalid command")
         }        
     }
     /**

@@ -1,7 +1,6 @@
 import { Command,Option } from "commander";
 import prompts, { PromptObject }  from  "prompts"
-import { MixedOption,type MixedOptionParams } from "./option"; 
-import { t } from "./languages"
+import { MixedOption,type MixedOptionParams } from "./option";  
 
 
 export type HookCommandListener = (thisCommand:MixedCommand,actionComand:MixedCommand)=>void | Promise<void>
@@ -66,7 +65,7 @@ export class MixedCommand extends Command{
         return this
     }
     private addPresetOptions(){
-        let option  = new Option("--no-prompts",t("禁用所有交互提示"))
+        let option  = new Option("--no-prompts","禁用所有交互提示")
         option.hidden = true
         this.addOption(option)
     }
@@ -161,7 +160,7 @@ export class MixedCommand extends Command{
         const result = await prompts({
             type:"select",
             name:"command",
-            message:t("请选择命令:"),
+            message:"请选择命令:",
             choices
         })
         // 重新解析命令行参数标志,        
