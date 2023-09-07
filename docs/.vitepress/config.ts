@@ -2,9 +2,9 @@ import { defineConfig } from 'vitepress'
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
-  title: "FLexCli",
+  title: "MixedCli",
   description: "Create CommandLine Application with Interactive prompts",
-  outDir: '../website',
+  //outDir: '../website',
   base: '/mixed-cli/',
   markdown: {
     toc: { level: [1, 2,3,4,5] }

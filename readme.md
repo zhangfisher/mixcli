@@ -1,7 +1,7 @@
 A toolkit for developing command line applications, based on `commander`, `prompts`, and `logsets`, providing functions such as command line parsing, automatic interactive prompts, and terminal interface enhancement.
 
 
-[Document](https:/zhangfisher.github.io/mixed-cli/)
+[中文](https:/zhangfisher.github.io/mixed-cli/)
 
 # Features:
 
