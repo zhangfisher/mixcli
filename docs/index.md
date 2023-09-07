@@ -5,7 +5,7 @@ layout: home
 hero:
   name: "MixedCli"
   text: "创建交互式命令行应用"
-  tagline: 自动生成交互式命令
+  tagline: 自动生成交互提示 / 多包命令合成 / 终端增强
   actions:
     - theme: brand
       text: 指南
