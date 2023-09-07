@@ -11,7 +11,7 @@ export default defineConfig({
   }, 
   themeConfig: {
     outline:{
-      level:3,
+      level:[2,4],
       label: '目录',
     },
     // https://vitepress.dev/reference/default-theme-config
