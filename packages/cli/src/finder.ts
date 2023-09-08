@@ -3,7 +3,10 @@ import type { MixedCli } from './cli';
 import {  globSync } from 'glob'
 import { MixedCliCommand } from './cli';
 import { hasDebugCliOption } from "./utils"
-import logsets from 'logsets';
+import logsets from 'logsets'; 
+import fs from "node:fs"
+import path from "node:path"
+import { getPackageJson } from  "flex-tools/package/getPackageJson"
 
 /**
  * 
@@ -15,10 +18,6 @@ import logsets from 'logsets';
  * - 加载加载这样命令
  * 
  */
-
-const fs = require("node:fs")
-const path = require("node:path")
-const { getPackageJson } = require("flex-tools/package/getPackageJson")
 
 const isDebugCli = hasDebugCliOption()
 
@@ -58,7 +57,7 @@ export function findCliPaths(this:MixedCli,packageName?:string ,entry?:string):s
     const excludeMacher = this.options.exclude
     if(!includeMacher) return []
     const packageRoot = getPackageRootPath(entry || process.cwd())
-    const packagePath = packageName ? path.dirname(require.resolve(packageName,{paths:[packageRoot as string]})) : packageName
+    const packagePath = packageName ? path.dirname(require.resolve(packageName,{paths:[packageRoot as string]})) : packageName!
 
     // 找出当前包的所有依赖
     const packageNames = getMatchedDependencies.call(this,packagePath)
@@ -71,17 +70,18 @@ export function findCliPaths(this:MixedCli,packageName?:string ,entry?:string):s
         })
         .forEach(name=>{
             if(isDebugCli){
-                logsets.log("发现匹配Cli包:{}",`${packageName ? packageName+":"+name : name}`)
+                logsets.log("[MixedCli] 匹配包:{}",`${packageName ? packageName+"->"+name : name}`)
             }
             try{
                 const packageEntry = path.dirname(require.resolve(name,{paths:packagePath ? [packagePath] : [process.cwd()]}))
-                const packageCliDir =path.join(packageEntry,this.options.cliDir)
+                const packageCliDir =path.join(packageEntry,this.options.cliDir!)
                 if(fs.existsSync(packageCliDir)){
                     cliDirs.push(packageCliDir)
                 }
                 // 查找当前包的所属工程的依赖
                 let dependencies = getMatchedDependencies.call(this,packageEntry)
                 cliDirs.push(...dependencies.reduce<string[]>((result,dependencie)=>{
+                    if(isDebugCli) logsets.log("[MixedCli] 匹配包:{}",`${name}->${dependencie}`)
                     result.push(...findCliPaths.call(this,dependencie,packageEntry))
                     return result
                 },[]))
@@ -109,12 +109,12 @@ export function findCommands(cli:MixedCli){
         }).forEach((file:string)=>{
             try{
                 if(isDebugCli){
-                    logsets.log("导入Cli命令:{}",path)
+                    logsets.log("[MixedCli] 导入命令:{}",file)
                 }
                 commands.push(require(file))
             }catch(e:any){
                 if(isDebugCli){
-                    logsets.log("导入Cli命令<>出错:{}",e.stack)
+                    logsets.log("[MixedCli] 导入命令<>出错:{}",e.stack)
                 }else{
                     console.error(e)
                 }                

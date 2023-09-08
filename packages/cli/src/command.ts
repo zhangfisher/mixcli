@@ -1,6 +1,7 @@
 import { Command,Option } from "commander";
 import prompts, { PromptObject }  from  "prompts"
 import { MixedOption,type MixedOptionParams } from "./option";  
+import { addPresetOptions } from "./utils";
 
 
 export type HookCommandListener = (thisCommand:MixedCommand,actionComand:MixedCommand)=>void | Promise<void>
@@ -13,7 +14,7 @@ export class MixedCommand extends Command{
     constructor(){
         super()
         const self = this
-        this.addPresetOptions()
+        addPresetOptions(this)
         this.hook("preAction",async function(this:any){
             self._optionValues = this.hookedCommand._optionValues        
             try{
@@ -63,15 +64,7 @@ export class MixedCommand extends Command{
     after(listener:HookCommandListener){
         this._afterHooks.push(listener)
         return this
-    }
-    private addPresetOptions(){
-        let option  = new Option("--no-prompts","禁用所有交互提示")
-        option.hidden = true
-        this.addOption(option)
-        option  = new Option("--debug-cli")
-        option.hidden = true
-        this.addOption(option)
-    }
+    } 
 
     private async preActionHook(thisCommand:Command, actionCommand:Command){              
         for(let listener of this._beforeHooks){ 

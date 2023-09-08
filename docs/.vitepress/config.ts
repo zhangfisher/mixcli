@@ -45,6 +45,7 @@ export default defineConfig({
               { text: '推断提示类型', link: '/guide/infer-prompt' },
               { text: '定制提示类型', link: '/guide/custom-prompt' },
               { text: '终端增强组件', link: '/guide/term-ui' },
+              { text: '内置选项', link: '/guide/inline-options' },
               { text: '国际化', link: '/guide/i18n' },
               { text: '实用工具函数', link: '/guide/utils' }              
             ]

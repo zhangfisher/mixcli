@@ -1,4 +1,8 @@
 import { PromptObject } from "prompts"
+import { hasDebugCliOption } from "./utils"
+import logsets from "logsets"
+
+const isDebugCli = hasDebugCliOption()
 
 export type PromptType = "text" | "password" | "invisible" | "number"| "confirm"| "list"| "toggle"| "select" | "multiselect" | "autocomplete" | "date" | "autocompleteMultiselect"
 
@@ -104,8 +108,7 @@ export class PromptManager{
         // 4. 判断输入是否有效，则显示提示
         if(this._promptable.argChoices && this._promptable.argChoices.indexOf(inputValue) == -1){
             return true
-        }
-
+        } 
         return !hasInput
     }
     /**
@@ -168,6 +171,7 @@ export class PromptManager{
                 }
             }
         }
+        if(isDebugCli) logsets.log("[MixedCli] 选项{} -> 提示类型{}",[this._promptable.name(),promptType])
         return promptType
     }
 

@@ -3,7 +3,7 @@ import fs from "fs-extra"
 import path  from "node:path"
 import { promisify }   from "flex-tools/func/promisify"
 import logsets from "logsets"
-
+import { Option } from "commander"
 /**
  * 
  * 在控制台输出一个字符串
@@ -48,6 +48,16 @@ export function fixIndent(text:string,indent?:boolean | number):string{
     lines = lines.map(line=>line.substring(minSpaceCount))
     return lines.join("\n")
 }
+
+export function addPresetOptions(command:any){
+    let option  = new Option("--no-prompts","禁用所有交互提示")
+    option.hidden = true
+    command.addOption(option)
+    option  = new Option("--debug-cli","显示调试信息")
+    option.hidden = true
+    command.addOption(option)
+}
+
 
 /**
  * 是否命令行中包含了--debug-cli选项

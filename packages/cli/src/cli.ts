@@ -6,7 +6,7 @@ import logsets  from "logsets"
 
 import { assignObject } from "flex-tools/object/assignObject"
 import { MixedCommand } from "./command"
-import { fixIndent } from './utils';
+import { addPresetOptions, fixIndent } from './utils';
 import { findCommands } from "./finder"
 import { asyncSignal } from "flex-tools/async/asyncSignal"
 // @ts-ignore
@@ -47,7 +47,7 @@ export type MixedCliEvents =
     "register"              // 当命令注册时触发
 
 export class MixedCli extends LiteEvent<any,MixedCliEvents>{
-    options:MixedCliOptions 
+    options:Required<MixedCliOptions> 
     root!:Command           
     private findSignals:any[]=[]
     constructor(options?:MixedCliOptions){
@@ -106,7 +106,8 @@ export class MixedCli extends LiteEvent<any,MixedCliEvents>{
                 if(this.options.description) logsets.log(logsets.colors.darkGray(this.options.description)) 
                 console.log()
                 this.root.help()                
-            })
+            })            
+        addPresetOptions(this.root )
         if(this.options.before) this.root.hook('preAction',this.options.before)
         if(this.options.after) this.root.hook('postAction',this.options.after) 
     } 
@@ -186,6 +187,7 @@ export class MixedCli extends LiteEvent<any,MixedCliEvents>{
                 if(fullname==`${this.name}.${name}`){
                     listener.off()
                     signal.resolve()
+                    this.findSignals = this.findSignals.filter(s=>s!=signal)
                     resolve(this.get(name))
                 }
             },{objectify:true}) as LiteEventSubscriber
@@ -216,7 +218,7 @@ export class MixedCli extends LiteEvent<any,MixedCliEvents>{
         // 所以引入find("命令名称")来获取命令，该方法可以获取到后注册的命令
         // 其副作用是，在run时，可能find还没有运行到，从而导致在帮助信息里面看不到扩展的信息(实际上是已经生效的)
         // 所以我们在find里面注入一个异步信号来解决此问题
-        return Promise.all(this.findSignals.map(signal=>signal(5000))).then(()=>{
+        return Promise.all(this.findSignals.map(signal=>signal(10000))).then(()=>{
             this.root.parseAsync(process.argv);              
         })
     }
