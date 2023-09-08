@@ -68,6 +68,9 @@ export class MixedCommand extends Command{
         let option  = new Option("--no-prompts","禁用所有交互提示")
         option.hidden = true
         this.addOption(option)
+        option  = new Option("--debug-cli")
+        option.hidden = true
+        this.addOption(option)
     }
 
     private async preActionHook(thisCommand:Command, actionCommand:Command){              

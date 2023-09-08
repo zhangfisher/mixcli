@@ -49,6 +49,13 @@ export function fixIndent(text:string,indent?:boolean | number):string{
     return lines.join("\n")
 }
 
+/**
+ * 是否命令行中包含了--debug-cli选项
+ */
+export function hasDebugCliOption(){
+    return process.argv.includes("--debug-cli")
+}
+
 export const fileExists = promisify(fs.exists,{
     parseCallback:(results)=>{
         return results[0]

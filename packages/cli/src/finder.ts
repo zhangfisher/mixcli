@@ -2,6 +2,8 @@ import { getPackageRootPath } from 'flex-tools';
 import type { MixedCli } from './cli';
 import {  globSync } from 'glob'
 import { MixedCliCommand } from './cli';
+import { hasDebugCliOption } from "./utils"
+import logsets from 'logsets';
 
 /**
  * 
@@ -17,7 +19,9 @@ import { MixedCliCommand } from './cli';
 const fs = require("node:fs")
 const path = require("node:path")
 const { getPackageJson } = require("flex-tools/package/getPackageJson")
- 
+
+const isDebugCli = hasDebugCliOption()
+
 
 export function getMatchedDependencies(this:MixedCli,entry:string):string[]{
     const pacakgeMacher = this.options.include
@@ -65,9 +69,12 @@ export function findCliPaths(this:MixedCli,packageName?:string ,entry?:string):s
     packageNames.filter(name=>{
             return  isMatched(name,includeMacher) && !isMatched(name,excludeMacher) 
         })
-        .forEach(packageName=>{
+        .forEach(name=>{
+            if(isDebugCli){
+                logsets.log("发现匹配Cli包:{}",`${packageName ? packageName+":"+name : name}`)
+            }
             try{
-                const packageEntry = path.dirname(require.resolve(packageName,{paths:packagePath ? [packagePath] : [process.cwd()]}))
+                const packageEntry = path.dirname(require.resolve(name,{paths:packagePath ? [packagePath] : [process.cwd()]}))
                 const packageCliDir =path.join(packageEntry,this.options.cliDir)
                 if(fs.existsSync(packageCliDir)){
                     cliDirs.push(packageCliDir)
@@ -101,9 +108,16 @@ export function findCommands(cli:MixedCli){
             absolute :true
         }).forEach((file:string)=>{
             try{
+                if(isDebugCli){
+                    logsets.log("导入Cli命令:{}",path)
+                }
                 commands.push(require(file))
             }catch(e:any){
-                console.error(e)
+                if(isDebugCli){
+                    logsets.log("导入Cli命令<>出错:{}",e.stack)
+                }else{
+                    console.error(e)
+                }                
             }
         })        
     })
