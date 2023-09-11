@@ -11,7 +11,8 @@
     "release": "cd packages/cli && npm version patch --commit-hooks=false && pnpm build && npm publish --access public && cd ../..",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
-    "docs:preview": "vitepress preview docs"
+    "docs:preview": "vitepress preview docs",
+    "sync":"cnpm sync mixed-cli"
   },
   "keywords": [],
   "author": "",
