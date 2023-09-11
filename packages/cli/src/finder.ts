@@ -84,7 +84,7 @@ export function findCliPaths(this:MixedCli,packageName?:string ,entry?:string):s
                     if(isDebugCli) logsets.log("[MixedCli] 匹配包:{}",`${name}->${dependencie}`)
                     result.push(...findCliPaths.call(this,dependencie,packageEntry))
                     return result
-                },[]))
+                },[])) 
             }catch(e:any){
                 ///console.error(e.stack)
             }    
@@ -103,10 +103,13 @@ export function findCommands(cli:MixedCli){
     const cliDirs =  findCliPaths.call(cli)
     const commands:MixedCliCommand[] = []
     cliDirs.forEach(dir=>{
-        globSync("*.js",{
+        globSync("*",{
             cwd:dir,
-            absolute :true
+            absolute :true 
         }).forEach((file:string)=>{
+            
+            if(!(file.endsWith(".js") || fs.statSync(file).isDirectory())) return 
+
             try{
                 if(isDebugCli){
                     logsets.log("[MixedCli] 导入命令:{}",file)
