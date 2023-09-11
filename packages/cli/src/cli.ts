@@ -98,9 +98,9 @@ export class MixedCli extends LiteEvent<any,MixedCliEvents>{
                 // 显示标题
                 let title = this.options.title|| this.options.name
                 if(Array.isArray(title)){
-                    logsets.log(String(title[0]).toUpperCase(),[...title.slice(1)])
+                    logsets.log(String(title[0]).firstUpper(),[...title.slice(1)])
                 }else{
-                    logsets.log(`${title.toUpperCase()}   Version: {}`,this.options.version)
+                    logsets.log(`${title.firstUpper()}       Version: {}`,this.options.version)
                 }                
                 // @ts-ignore
                 if(this.options.description) logsets.log(logsets.colors.darkGray(this.options.description)) 
