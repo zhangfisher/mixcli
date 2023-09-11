@@ -26,6 +26,7 @@ const cli = new MixedCli({
 
 // cli.register(devCommand)
 cli.register(devCommand)
+cli.register(initCommand)
 // cli.register(startCommand)
 
 

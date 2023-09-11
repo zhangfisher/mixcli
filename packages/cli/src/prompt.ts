@@ -66,11 +66,11 @@ export interface PromptableObject{
  * 
  */
 export class PromptManager{
-    private _args:InputPromptParam
+    args:InputPromptParam                           
     private _promptable:IPromptable                 // 对应的FlexOption或FlexArgument
     constructor(promptable:IPromptable,promptArgs?:InputPromptParam){ 
         this._promptable = promptable
-        this._args= promptArgs || 'auto'
+        this.args= promptArgs || 'auto'
     }
 
     /**
@@ -87,7 +87,7 @@ export class PromptManager{
      */
     isNeed(input:any,defaultValue?:any){
     
-        const promptArg = this._args
+        const promptArg = this.args
         const inputValue = input || defaultValue
         // 是否有输入值，即在命令行输入了值
         const hasInput = !(inputValue === undefined)
@@ -128,7 +128,7 @@ export class PromptManager{
             name:this._promptable.name(),
             message:description,
             initial: input,
-            ...typeof(this._args) == 'object' ? this._args : {}
+            ...typeof(this.args) == 'object' ? this.args : {}
         } as PromptObject
         // 指定了验证函数，用来验证输入值是否有效
         prompt.validate = validate?.bind(this._promptable)
@@ -149,7 +149,7 @@ export class PromptManager{
         let input = inputValue || defaultValue
         // 如果选择指定了"-p [value]或[value...]"，则使用text类型，如果没有要求输入值，则使用confirm类型
         let promptType = /(\<[\w\.]+\>)|(\[[\w\.]+\])/.test(this._promptable.flags) ? 'text' : 'confirm'
-        let promptArg = this._args
+        let promptArg = this.args
         if(this.isValid(promptArg)){   // 显式指定了prompt类型
             promptType = promptArg as string
         }else{          // 未显式指定prompt类型，需要按一定规则推断类型

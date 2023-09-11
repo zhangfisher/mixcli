@@ -33,16 +33,7 @@ export class MixedOption extends Option implements IPromptable{
             params.prompt = 'auto'
         }        
         if(params.default) this.default(params.default,params.defaultDescription)
-        if(params.choices) {
-            this.promptChoices = params.choices.map(choice=>{
-                if(typeof(choice)=='object'){
-                    return choice
-                }else{
-                    return {title:choice,value:choice}                    
-                }
-            })
-            this.choices(this.promptChoices.map((item:any)=>item.value))
-        }
+        if(params.choices) this.choices(params.choices)
         if(params.conflicts) this.conflicts(params.conflicts)
         if(params.env) this.env(params.env)
         if(params.argParser) this.argParser(params.argParser)
@@ -51,13 +42,24 @@ export class MixedOption extends Option implements IPromptable{
         if(params.implies) this.implies(params.implies) 
         if(typeof(params.validate)=='function') this._validate = params.validate.bind(this)
         this.prompt = new PromptManager(this as IPromptable,params.prompt)
-    }  
+    } 
     validate(value: any): boolean {
         if(typeof(this._validate)=='function'){
             return this._validate(value)
         }else{
             return true
         }
+    }
+    // @ts-ignore
+    choices(values:(PromptChoice | string)[]){
+        this.promptChoices = values.map(choice=>{
+            if(typeof(choice)=='object'){
+                return choice
+            }else{
+                return {title:choice,value:choice}                    
+            }
+        })
+        super.choices(this.promptChoices.map((item:any)=>item.value))    
     }
     /**
      * 返回选项的提示对象

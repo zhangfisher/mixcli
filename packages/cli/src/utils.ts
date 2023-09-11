@@ -81,7 +81,7 @@ export const mkdir = promisify(fs.mkdir)
  * @param {*} tmplFile 
  * @param {*} vars 
  */
-export async function createFile(targetFile:string,tmplFile:string,vars:Record<string,any>={}){
+export async function createFileByTemplate(targetFile:string,tmplFile:string,vars:Record<string,any>={}){
     tmplFile=path.isAbsolute(tmplFile)? tmplFile : path.join(process.cwd(),tmplFile)
     if(!fs.existsSync(tmplFile)){
         throw new Error("模板文件不存在:"+tmplFile)

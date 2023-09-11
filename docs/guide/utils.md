@@ -2,12 +2,12 @@
 
 `MixedCli`提供了一个实用的工具函数.
 
-## createFile
+## createFileByTemplate
 
 基于模板[artTemplate](https://github.com/lhywork/artTemplate)创建文件.
 
 ```ts
-async function createFile(targetFile:string,tmplFile:string,vars:Record<string,any>={})
+async function createFileByTemplate(targetFile:string,tmplFile:string,vars:Record<string,any>={})
 ```
 
 ## mkDirs

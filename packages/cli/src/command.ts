@@ -99,7 +99,7 @@ export class MixedCommand extends Command{
      * 
      */
     private generateAutoPrompts():PromptObject[]{ 
-        const options = this.options as MixedOption[]
+        const options = this.options as unknown as MixedOption[]
         const optionPromports = options
                     .filter(option=>!option.hidden)
                     .map(option=>option.getPrompt(this._optionValues[option.name()]))
@@ -118,12 +118,12 @@ export class MixedCommand extends Command{
         // @ts-ignore
         const option =new MixedOption(...arguments)
         if(option.required && this.isDisabledPrompts()) option.mandatory = true
-        return this.addOption(option)         
+        return this.addOption(option as unknown as Option)         
     }  
     isDisabledPrompts(){
         return this._optionValues.prompts===false
     }    
-    /**
+    /** 
      * 添加提示
      * 
      * @remarks
