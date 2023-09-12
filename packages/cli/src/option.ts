@@ -42,6 +42,7 @@ export class MixedOption extends Option implements IPromptable{
         if(params.implies) this.implies(params.implies) 
         if(typeof(params.validate)=='function') this._validate = params.validate.bind(this)
         this.prompt = new PromptManager(this as IPromptable,params.prompt)
+        
     } 
     validate(value: any): boolean {
         if(typeof(this._validate)=='function'){
@@ -60,7 +61,9 @@ export class MixedOption extends Option implements IPromptable{
             }
         })
         super.choices(this.promptChoices.map((item:any)=>item.value))    
-    }
+    }    
+
+    
     /**
      * 返回选项的提示对象
      * 
