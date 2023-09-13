@@ -4,6 +4,7 @@ import { IPromptable, IPromptableOptions, PromptChoice, PromptManager } from './
 
 
 export interface MixedOptionParams extends IPromptableOptions{
+    hidden?:boolean
     defaultDescription?:string          // 默认值的描述    
     conflicts?:string | string[]
     env?:string
@@ -38,6 +39,7 @@ export class MixedOption extends Option implements IPromptable{
         if(params.env) this.env(params.env)
         if(params.argParser) this.argParser(params.argParser)
         if(params.hideHelp) this.hideHelp(params.hideHelp)
+        if(params.hidden) this.hidden = params.hidden
         if(params.mandatory) this.makeOptionMandatory(params.mandatory)
         if(params.implies) this.implies(params.implies) 
         if(typeof(params.validate)=='function') this._validate = params.validate.bind(this)
@@ -63,7 +65,25 @@ export class MixedOption extends Option implements IPromptable{
         super.choices(this.promptChoices.map((item:any)=>item.value))    
     }    
 
-    
+    private resetChoices(){
+        super.choices(this.promptChoices!.map((item:any)=>item.value))    
+    }
+
+    addChoice(value:PromptChoice | string){
+        if(!this.promptChoices || !Array.isArray(this.promptChoices)) this.promptChoices = []
+        this.promptChoices!.push(typeof(value)=='string' ? {title:value,value} : value)
+        this.resetChoices()
+    }
+    removeChoice(value:any){
+        this.promptChoices =this.promptChoices?.filter(choice=>choice.value!==value)
+        this.resetChoices()
+    }
+    clearChoice(){
+        this.promptChoices = []
+        this.resetChoices()
+    }
+
+        
     /**
      * 返回选项的提示对象
      * 

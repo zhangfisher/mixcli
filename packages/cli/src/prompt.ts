@@ -1,8 +1,6 @@
-import { PromptObject } from "prompts"
-import { hasDebugCliOption } from "./utils"
-import logsets from "logsets"
+import { PromptObject } from "prompts" 
+import { outputDebug } from "./utils"
 
-const isDebugCli = hasDebugCliOption()
 
 export type PromptType = "text" | "password" | "invisible" | "number"| "confirm"| "list"| "toggle"| "select" | "multiselect" | "autocomplete" | "date" | "autocompleteMultiselect"
 
@@ -171,7 +169,7 @@ export class PromptManager{
                 }
             }
         }
-        if(isDebugCli) logsets.log("[MixedCli] 选项{} -> 提示类型{}",[this._promptable.name(),promptType])
+        outputDebug("选项<{}> -> 提示类型<{}>",[this._promptable.name(),promptType])
         return promptType
     }
 

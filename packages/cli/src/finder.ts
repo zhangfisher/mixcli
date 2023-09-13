@@ -2,8 +2,7 @@ import { getPackageRootPath } from 'flex-tools';
 import type { MixedCli } from './cli';
 import {  globSync } from 'glob'
 import { MixedCliCommand } from './cli';
-import { hasDebugCliOption } from "./utils"
-import logsets from 'logsets'; 
+import { isDebug, outputDebug } from './utils';
 import fs from "node:fs"
 import path from "node:path"
 import { getPackageJson } from  "flex-tools/package/getPackageJson"
@@ -18,9 +17,7 @@ import { getPackageJson } from  "flex-tools/package/getPackageJson"
  * - 加载加载这样命令
  * 
  */
-
-const isDebugCli = hasDebugCliOption()
-
+ 
 
 export function getMatchedDependencies(this:MixedCli,entry:string):string[]{
     const pacakgeMacher = this.options.include
@@ -69,9 +66,7 @@ export function findCliPaths(this:MixedCli,packageName?:string ,entry?:string):s
             return  isMatched(name,includeMacher) && !isMatched(name,excludeMacher) 
         })
         .forEach(name=>{
-            if(isDebugCli){
-                logsets.log("[MixedCli] 匹配包:{}",`${packageName ? packageName+"->"+name : name}`)
-            }
+            outputDebug("匹配包:{}",`${packageName ? packageName+"->"+name : name}`)
             try{
                 const packageEntry = path.dirname(require.resolve(name,{paths:packagePath ? [packagePath] : [process.cwd()]}))
                 const packageCliDir =path.join(packageEntry,this.options.cliDir!)
@@ -81,7 +76,7 @@ export function findCliPaths(this:MixedCli,packageName?:string ,entry?:string):s
                 // 查找当前包的所属工程的依赖
                 let dependencies = getMatchedDependencies.call(this,packageEntry)
                 cliDirs.push(...dependencies.reduce<string[]>((result,dependencie)=>{
-                    if(isDebugCli) logsets.log("[MixedCli] 匹配包:{}",`${name}->${dependencie}`)
+                    outputDebug("匹配包:{}",`${name}->${dependencie}`)
                     result.push(...findCliPaths.call(this,dependencie,packageEntry))
                     return result
                 },[])) 
@@ -111,13 +106,11 @@ export function findCommands(cli:MixedCli){
             if(!(file.endsWith(".js") || fs.statSync(file).isDirectory())) return 
 
             try{
-                if(isDebugCli){
-                    logsets.log("[MixedCli] 导入命令:{}",file)
-                }
+                outputDebug("导入命令:{}",file)
                 commands.push(require(file))
             }catch(e:any){
-                if(isDebugCli){
-                    logsets.log("[MixedCli] 导入命令<>出错:{}",e.stack)
+                if(isDebug()){
+                    outputDebug("导入命令<>出错:{}",e.stack)
                 }else{
                     console.error(e)
                 }                

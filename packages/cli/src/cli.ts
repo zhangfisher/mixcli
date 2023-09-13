@@ -34,7 +34,7 @@ export interface MixedCliOptions{
     // / pattern默认值是cli，即会在当前工程的以prefix/开头的包下查找cli目录下的命令
     // 指定cli所在的目录,默认值是cli,要遍历该目录下的所有js文件作为命令导出
     cliDir?:string            
-    context?:Record<string,any>             // 传递给命令的上下文，当使用        
+    context?:Record<string,any>             // 传递给命令的共享上下文，所有命令均可要使用        
 }
 
  
@@ -60,6 +60,7 @@ export class MixedCli extends LiteEvent<any,MixedCliEvents>{
         this.createRootCommand() 
         this.installExtendCommands()        
     } 
+    get context(){return this.options.context}
     get name(){return this.options.name}
     /**
      * 是否禁用了所有的交互提示
@@ -107,7 +108,7 @@ export class MixedCli extends LiteEvent<any,MixedCliEvents>{
                 console.log()
                 this.root.help()                
             })            
-        addPresetOptions(this.root )
+        addPresetOptions(this.root)
         if(this.options.before) this.root.hook('preAction',this.options.before)
         if(this.options.after) this.root.hook('postAction',this.options.after) 
     } 

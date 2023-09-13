@@ -1,7 +1,10 @@
 import { Command,Option } from "commander";
 import prompts, { PromptObject }  from  "prompts"
 import { MixedOption,type MixedOptionParams } from "./option";  
-import { addPresetOptions } from "./utils";
+import { addPresetOptions, isDebug, outputDebug } from "./utils";
+import path from "node:path"
+import logsets from 'logsets';
+import fs from "node:fs"
 
 
 export type HookCommandListener = (thisCommand:MixedCommand,actionComand:MixedCommand)=>void | Promise<void>
@@ -11,12 +14,13 @@ export class MixedCommand extends Command{
     private _afterHooks:Function[] = []
     private _customPrompts:PromptObject[] = [] 
     private _optionValues:Record<string,any> = {}   // 命令行输入的选项值
+    private _actions:Function[] =[]                 // 允许多个action
     constructor(){
         super()
         const self = this
         addPresetOptions(this)
         this.hook("preAction",async function(this:any){
-            self._optionValues = this.hookedCommand._optionValues        
+            self._optionValues = Object.assign({},self.root()._optionValues,this.hookedCommand._optionValues)
             try{
                 // @ts-ignore
                 await self.preActionHook.apply(self,arguments)
@@ -52,11 +56,47 @@ export class MixedCommand extends Command{
         }
         return root
     }
-    action(fn: (...args: any[]) => void | Promise<void>): this {
-        return super.action(async function(){
-            await fn(...arguments);        
+    action(fn: (...args: any[]) => void | Promise<void>): this {        
+        const self = this
+        return super.action(async function(this:any){
+            let workDirs = this._optionValues.workDirs
+            if(workDirs){
+                await self.handleActionWithWorkDirs(workDirs,async ()=>await fn(...arguments))
+            }else{
+                await fn(...arguments);        
+            }             
         })
     } 
+    /**
+     * 当传入--work-dirs时用来处理工作目录
+     */
+    private async handleActionWithWorkDirs(workDirs:any,fn:Function){        
+        if(!Array.isArray(workDirs)) workDirs = workDirs.split(",")
+        workDirs  = workDirs.reduce((dirs:any[],dir:string)=>{
+            if(typeof(dir)=='string') dirs.push(...dir.split(","))
+            return dirs
+        },[])
+        for(let workDir of workDirs){
+            const cwd = process.cwd()
+            try{
+                if(!path.isAbsolute(workDir)) workDir = path.join(cwd,workDir)
+                if(fs.existsSync(workDir) && fs.statSync(workDir).isDirectory()){
+                    outputDebug("切换到工作目录:{}",workDir)
+                    process.chdir(workDir)          // 切换
+                    await fn();       
+                }else{
+                    outputDebug("无效的切换到工作目录:{}",workDir)
+                }                
+            }catch(e){
+                throw e
+            }finally{
+                process.chdir(cwd)
+            } 
+        }
+    }
+    getOption(name:string):MixedOption{
+        return this.options.find(option => option.name() == name) as unknown as MixedOption
+    }
     before(listener:HookCommandListener){        
         this._beforeHooks.push(listener)
         return this
@@ -101,9 +141,10 @@ export class MixedCommand extends Command{
     private generateAutoPrompts():PromptObject[]{ 
         const options = this.options as unknown as MixedOption[]
         const optionPromports = options
-                    .filter(option=>!option.hidden)
+                    .filter(option=>!option.hidden && (option instanceof MixedOption))
                     .map(option=>option.getPrompt(this._optionValues[option.name()]))
                     .filter(prompt=>prompt) as PromptObject[] 
+        outputDebug("[MixedCli] 命令<{}>自动生成{}个选项提示:{}",[this.name(),optionPromports.length,optionPromports.map(prompt=>`${prompt.name}(${prompt.type})`).join(",")])        
         return optionPromports
     }
 
@@ -120,6 +161,9 @@ export class MixedCommand extends Command{
         if(option.required && this.isDisabledPrompts()) option.mandatory = true
         return this.addOption(option as unknown as Option)         
     }  
+
+  
+
     isDisabledPrompts(){
         return this._optionValues.prompts===false
     }    

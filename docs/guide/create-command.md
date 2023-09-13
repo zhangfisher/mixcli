@@ -3,8 +3,7 @@
 `MixedCli`基于`commander`，因此可以使用`commander`的所有功能，在`commander`的基础上作了增强，提供了更加友好的命令行开发体验。
 
 
-## 编写命令
-
+## 创建命令
 
 每一个`MixedCli`命令原则上建议一个命令对应一个`js`文件,且该`js`文件导出一个返回`MixedCommand`或`MixedCommand[]`的函数，如下所示：
 
@@ -98,73 +97,16 @@ export interface FlexOptionParams extends IPromptableOptions{
 
 ## 扩展命令
 
-在开发命令行应用，除了可以新增加命令外，还可以扩展已有的命令，比如：
+在开发命令行应用，除了可以新增加命令外，还可以**扩展已存有的命令**。
 
-### 修改命令选项
+### 查找命令
 
-```js{5}
-const {MixedCommand} = require("mixed-cli");
-module.exports = (cli)=>{    
-    cli.find("dev").then((devCommand)=>{   
-        // 获取到当前命令的选项
-        const option = devCommand.options.find((option)=>option.name() === "mode");
-        // 修改命令选项
-        option.required = true;
-        option.choices = ["development","production","test","debug"];
-    }) 
-}
-
-```
-
-
-
-### 增加命令选项
-
-
-```js{4}
-const {MixedCommand} = require("mixed-cli");
-module.exports = (cli)=>{    
-    cli.find("dev").then((devCommand)=>{   
-       devCommand.option("-p,--port <port>","指定端口号",3000)         
-    }) 
-}
-
-```
-
-### 增加子命令
-
-```js
-
-const {MixedCommand} = require("mixed-cli");
-module.exports = (cli)=>{    
-    // 1. 获取已经存在的命令
-    cli.find("dev").then((devCommand)=>{ 
-        const appCommand = new MixedCommand();
-        appCommand
-            .name("app")
-            .arguments("<name>","项目名称")
-            .option("-p,--port <port>","指定端口号",3000)
-            .action(async (name,options)=>{
-                // 此处是命令的具体实现
-            })        
-        devCommand.addCommand(appCommand);
-    })
- 
-}
-
-```
-
-## 获取命令
-
-在进行命令扩展时，需要获取已经存在的命令，`MixedCli`提供了两种方式来获取命令：
+在进行命令扩展时，道德需要查找存在的命令，`MixedCli`提供了两种方式来查找命令：
 
 - `MixedCli.find(命令名称)`：以异步的方式来获取命令。
 - `MixedCli.get(命令名称)`：以同步命令名称来获取命令，如果命令不存在，则抛出`undefined`。
 
-
-### 命令名称
-
-`MixedCli.find(命令名称)`或`MixedCli.get(命令名称)`中的命令名称支持获取到子命令。
+`MixedCli.find(命令名称)`或`MixedCli.get(命令名称)`中的支持获取到子命令。
 
 比如，有如下命令：
 
@@ -180,6 +122,151 @@ module.exports = (cli)=>{
 
 - `find`是异步方法，返回一个`Promise`,而`get`是同步方法
 - 当`MixedCli`在检索`include`参数指定的扩展包并加裁时，由于扩展包加载顺序的问题，`get`方法获取命令时要求命令必须是已经前置加载的。而`find`方法则不受此限制。所以大部份情况下，建议采用`find`方法来获取命令。
+
+
+
+### 修改命令选项
+
+可以修改已存在的命令选项。
+
+```js{5}
+const {MixedCommand} = require("mixed-cli");
+module.exports = (cli)=>{    
+    cli.find("dev").then((devCommand)=>{   
+        // 获取到当前命令的选项
+        const option = devCommand.options.find((option)=>option.name() === "mode");
+        // 修改命令选项
+        option.required = true;
+        // 新选取
+        option.choices(["development","production","test","debug"])
+        option.choices([
+            { title:"开发",value:"development"},
+            { title:"生产",value:"production"},
+            { title:"测试",value:"test"},
+            { title:"调试",value:"debug"}])
+        option.addChoice("development")
+        option.addChoice({title:'测试',value:"test"})
+        option.clearChoice()
+        option.removeChoice("test")
+    }) 
+}
+```
+
+更多说明见[这里](./change-option.md)
+
+### 增加命令选项
+
+为已存在的命令增加命令选项。
+
+```js{4}
+const {MixedCommand} = require("mixed-cli");
+module.exports = (cli)=>{    
+    cli.find("dev").then((devCommand)=>{   
+       devCommand.option("-p,--port <port>","指定端口号",3000)         
+    }) 
+}
+
+```
+
+### 增加子命令
+
+为已存在的命令增加子命令。
+
+```js
+
+const {MixedCommand} = require("mixed-cli");
+module.exports = (cli)=>{    
+    // 1. 获取已经存在的命令
+    cli.find("dev").then((devCommand)=>{ 
+        const appCommand = new MixedCommand();
+        appCommand
+            .name("app")
+            .arguments("<name>","项目名称")
+            .option("-p,--port <port>","指定端口号",3000)
+            .option("-t,--template <value>","开发模板"})  
+            .action(async (name,options)=>{
+                // 此处是命令的具体实现
+            })        
+        devCommand.addCommand(appCommand);
+    })
+ 
+}
+
+```
+
+
+### 命令处理函数
+
+当为已经存在的命令增加了选项时，一般需要增加相应的处理函数。
+
+如果是新增加最子命令，比较简单，只需要指定`.action(fn)`即可。
+
+如果是新增加了**命令选项**,则一般会涉及要对已有的命令的`action`进行扩展。
+
+比如上例中，我们为`dev`增加了一个选项`-p,--port <port>`，一般情况下，我们需要为原有的`dev`命令增加相应的处理逻辑。
+
+
+- **方法1：增加`before/after`函数**
+
+在`dev`命令中增加`before`和`after`两个`hook`函数，分别在执行`dev`的`action`函数之前和之后执行。
+
+```js
+const {MixedCommand} = require("mixed-cli");
+module.exports = (cli)=>{    
+    cli.find("dev").then((devCommand)=>{   
+       devCommand.option("-p,--port <port>","指定端口号",3000)   
+       devCommand.before(()=>{
+       })
+       devCommand.after(()=>{
+       })
+    }) 
+}
+
+
+
+```
+
+
+- **方法2：扩展`action`函数**
+
+
+
+```js
+
+const {MixedCommand} = require("mixed-cli");
+module.exports = (cli)=>{    
+    cli.find("dev").then((devCommand)=>{   
+       
+       // 1. 在原有template命令选项添加一个选择项
+       const opt = devCommand.getOption("template")   
+       opt.addChoice('vue')
+
+       // 2. 为dev命令增加一个action函数用来处理vue选项
+       
+       devCommand.action(({args,options,next})=>{
+            if(options.template==''){
+            
+            
+            }
+            if(options.port){
+                               
+            }else{
+                await action()
+            }
+            return next()       // 执行下一个action函数
+       },'replace')
+        // 扩展
+       devCommand.replaceAction((action)=>{
+            return 'next'
+       })
+
+    }) 
+}
+
+
+```
+
+
 
 
 

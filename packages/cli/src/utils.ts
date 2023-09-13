@@ -2,8 +2,7 @@ import artTemplate from "art-template"
 import fs from "fs-extra"
 import path  from "node:path"
 import { promisify }   from "flex-tools/func/promisify"
-import logsets from "logsets"
-import { Option } from "commander"
+import logsets from "logsets" 
 /**
  * 
  * 在控制台输出一个字符串
@@ -49,21 +48,27 @@ export function fixIndent(text:string,indent?:boolean | number):string{
     return lines.join("\n")
 }
 
-export function addPresetOptions(command:any){
-    let option  = new Option("--no-prompts","禁用所有交互提示")
-    option.hidden = true
-    command.addOption(option)
-    option  = new Option("--debug-cli","显示调试信息")
-    option.hidden = true
-    command.addOption(option)
+export function addPresetOptions(command:any){    
+    command.option("--work-dirs <values...>","指定工作目录",{hidden:true})
+    command.option("--no-prompts","禁用所有交互提示",{hidden:true}) 
+    command.option("--debug-cli","显示调试信息",{hidden:true})
 }
 
 
 /**
  * 是否命令行中包含了--debug-cli选项
  */
-export function hasDebugCliOption(){
+export function isDebug(){
     return process.argv.includes("--debug-cli")
+}
+
+/**
+ * 打印调试信息
+ * @param message 
+ * @param args 
+ */
+export function outputDebug(message:string,...args:any[]){    
+    if(isDebug()) logsets.log(`[MixedCli] ${message}`,...args)
 }
 
 export const fileExists = promisify(fs.exists,{
