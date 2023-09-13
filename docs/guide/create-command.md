@@ -243,23 +243,11 @@ module.exports = (cli)=>{
 
        // 2. 为dev命令增加一个action函数用来处理vue选项
        
-       devCommand.action(({args,options,next})=>{
+       devCommand.action((options)=>{
             if(options.template==''){
-            
-            
+                return 'break'          // 中断后续任务的执行
             }
-            if(options.port){
-                               
-            }else{
-                await action()
-            }
-            return next()       // 执行下一个action函数
-       },'replace')
-        // 扩展
-       devCommand.replaceAction((action)=>{
-            return 'next'
        })
-
     }) 
 }
 
