@@ -233,7 +233,7 @@ module.exports = (cli)=>{
 
 ```js
 
-const {MixedCommand} = require("mixed-cli");
+const {MixedCommand,BREAK} = require("mixed-cli");
 module.exports = (cli)=>{    
     cli.find("dev").then((devCommand)=>{   
        
@@ -243,11 +243,22 @@ module.exports = (cli)=>{
 
        // 2. 为dev命令增加一个action函数用来处理vue选项
        
-       devCommand.action((options)=>{
-            if(options.template==''){
-                return 'break'          // 中断后续任务的执行
+       // 替换原有的action函数
+       devCommand.action((options))=>{
+            if(options.template=='vue'){
+                options.template = 'vue2'// 可以修改选项的值
+                return BREAK          // 执行中断后续任务的执行
+                return {}
             }
        })
+
+
+        devCommand.action((options)=>{
+            if(options.template==''){
+                return BREAK         // 中断后续任务的执行
+            }
+       })
+
     }) 
 }
 

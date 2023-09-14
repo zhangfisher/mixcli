@@ -1,4 +1,5 @@
 const { MixedCommand } = require('mixed-cli');
+const path = require("node:path")
 
 /**
  * @param {import('mixed-cli').MixedCli} cli
@@ -8,10 +9,18 @@ module.exports = (cli)=>{
     command
         .name('init')
         .description('初始化应用') 
-        .option("-t,--template","应用模板")
-        .action(()=>{
-            console.log("init")
+        .option("-t,--template <value...>","应用模板")
+        .action((options)=>{
+            console.log(`--------------init:${path.relative(__dirname,process.cwd())}--------------`)
+            console.log("init",options)
+            return 0
         })
+    const initVueCommand = new MixedCommand('vue');
+    initVueCommand.action((options)=>{
+        console.log("Run command: init vue",options)
+    })
+
+    command.addCommand(initVueCommand)
     return command
 }
 

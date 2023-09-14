@@ -47,7 +47,7 @@ export default defineConfig({
               { text: '修改选项', link: '/guide/change-option' },
               { text: '终端增强组件', link: '/guide/term-ui' },
               { text: '工作目录', link: '/guide/work-dirs' },       
-              { text: '内置选项', link: '/guide/inline-options' },              
+              { text: '内置选项', link: '/guide/builtin-options' },              
               { text: '共享上下文', link: '/guide/context' }, 
               { text: '国际化', link: '/guide/i18n' },                            
               { text: '实用工具函数', link: '/guide/utils' }              

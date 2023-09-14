@@ -6,7 +6,7 @@ import logsets  from "logsets"
 
 import { assignObject } from "flex-tools/object/assignObject"
 import { MixedCommand } from "./command"
-import { addPresetOptions, fixIndent } from './utils';
+import { addBuiltInOptions, fixIndent } from './utils';
 import { findCommands } from "./finder"
 import { asyncSignal } from "flex-tools/async/asyncSignal"
 // @ts-ignore
@@ -89,8 +89,8 @@ export class MixedCli extends LiteEvent<any,MixedCliEvents>{
      * 
      */
     private createRootCommand(){
-        this.root = new Command();
-        this.root.name(this.name)
+        this.root = new MixedCommand(this.name);
+        this.root 
             .helpOption('-h, --help')     
             .version(require("../package.json").version,"-v, --version") 
             .action(()=>{                
@@ -108,7 +108,7 @@ export class MixedCli extends LiteEvent<any,MixedCliEvents>{
                 console.log()
                 this.root.help()                
             })            
-        addPresetOptions(this.root)
+        addBuiltInOptions(this.root)
         if(this.options.before) this.root.hook('preAction',this.options.before)
         if(this.options.after) this.root.hook('postAction',this.options.after) 
     } 

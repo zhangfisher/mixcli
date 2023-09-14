@@ -1,26 +1,45 @@
 import { Command,Option } from "commander";
 import prompts, { PromptObject }  from  "prompts"
 import { MixedOption,type MixedOptionParams } from "./option";  
-import { addPresetOptions, isDebug, outputDebug } from "./utils";
+import { addBuiltInOptions,  isDisabledPrompts,  outputDebug } from "./utils";
 import path from "node:path"
-import logsets from 'logsets';
 import fs from "node:fs"
+import type { AsyncFunction } from "flex-tools";
 
 
 export type HookCommandListener = (thisCommand:MixedCommand,actionComand:MixedCommand)=>void | Promise<void>
+ 
+export interface ActionOptions{
+    id:string
+    at:'replace' | 'preappend' | 'append' | number     
+    // 函数签名类型，即采用原始的commander的action函数签名，还是mixed-cli的action函数签名
+    enhance:boolean
+}
+
+export interface ActionRegistry extends Omit<ActionOptions,"at">{    
+    fn:Function
+}
+
+// 原始的Action动作函数
+export type OriginalAction  = (...args: any[]) => void | Promise<void>
+// 增强的Action函数签名
+export type EnhanceAction = ({args,options,value,command}:{args: any[],options:Record<string,any>,value:any,command:MixedCommand}) => void | Promise<any> 
+
+// 执行action的返回结果
+export const BREAK = Symbol("BREAK_ACTION")             // 中止后续的action执行
 
 export class MixedCommand extends Command{
     private _beforeHooks:Function[] = []
     private _afterHooks:Function[] = []
     private _customPrompts:PromptObject[] = [] 
     private _optionValues:Record<string,any> = {}   // 命令行输入的选项值
-    private _actions:Function[] =[]                 // 允许多个action
-    constructor(){
-        super()
+    private _actions:ActionRegistry[] =[]                 // 允许多个action
+    constructor(name?:string){
+        super(name)
         const self = this
-        addPresetOptions(this)
+        if(!this.isRoot) addBuiltInOptions(this)
         this.hook("preAction",async function(this:any){
-            self._optionValues = Object.assign({},self.root()._optionValues,this.hookedCommand._optionValues)
+            self._optionValues = self.getOptionValues(this.hookedCommand)
             try{
                 // @ts-ignore
                 await self.preActionHook.apply(self,arguments)
@@ -32,9 +51,8 @@ export class MixedCommand extends Command{
     /**
      * 是否是根命令
      */
-    get isRoot(){
-        return !!!this.parent
-    }
+    get isRoot(){return !!!this.parent  }
+    get actions(){return this._actions}
     get fullname(){
         let names = [this.name()]
         let parent = this.parent
@@ -46,57 +64,144 @@ export class MixedCommand extends Command{
         }
         return names.join(".")
     }
+
     /**
      * 返回根命令
      */
     root(){
         let root:MixedCommand | null | undefined = this
         while(root && root.parent!=null){
-            root = root.parent as MixedCommand
+            root = root.parent as unknown as MixedCommand
         }
         return root
     }
-    action(fn: (...args: any[]) => void | Promise<void>): this {        
-        const self = this
-        return super.action(async function(this:any){
-            let workDirs = this._optionValues.workDirs
-            if(workDirs){
-                await self.handleActionWithWorkDirs(workDirs,async ()=>await fn(...arguments))
-            }else{
-                await fn(...arguments);        
-            }             
-        })
+    action(fn: EnhanceAction,options:ActionOptions): this        
+    action(fn: OriginalAction): this 
+    action(fn: OriginalAction): this {       
+        const actionFunc = arguments[0]
+        if(arguments.length == 1 && typeof(actionFunc)=='function'){ // 原始方式
+            this._actions.push({
+                id:Math.random().toString(36).substring(2),
+                enhance: false,
+                fn:actionFunc
+            })
+        }else if(arguments.length==2  && typeof(actionFunc)=='function' && typeof(arguments[1])=='object'){// 增强模式
+            const actionFn = arguments[0]
+            const actionOpts:ActionOptions =Object.assign({at:'append'},arguments[1])
+            if(actionOpts.at=='replace') this._actions=[]            
+            const actionItem = {
+                id:actionOpts.id || Math.random().toString(36).substring(2),
+                enhance: actionOpts.enhance==undefined ?  true : actionOpts.enhance,
+                fn:actionFn
+            } as const
+            if(actionOpts.at=='append'){
+                this._actions.push(actionItem)
+            }else if(actionOpts.at=='preappend'){
+                this._actions.splice(0,0,actionItem)
+            }else if(typeof(actionOpts.at)=='number'){
+                this._actions.splice(Number(actionOpts.at),0,actionItem)
+            }
+        }else{
+            console.log("action params error")               
+        }
+        return super.action(this.getWrapperedAction())
     } 
+
+    /**
+     * 读取命令配置值，包括父命令提供的配置选项
+     * @param command 
+     */
+    private getOptionValues(command:Command){
+        let opts = {}
+        let parent:Command | null= command
+        while(parent){
+            Object.assign(opts,(parent as MixedCommand)._optionValues)
+            parent = parent.parent
+        }
+        return opts
+    }
+    /**
+     * 本函数在运行时子类进行action生成该命令的action
+     */
+    private getWrapperedAction(){        
+        return this.wrapperWorkDirsAction(this.wrapperChainActions())
+    }
+    
+    /***
+     * 将所有actions包装成一个链式调用的函数
+     */
+    private wrapperChainActions(){
+        const self = this
+        return async function(this:any){
+            const args = Array.from(arguments) // 原始输入的参数
+            let preValue:any           // 保存上一个action的返回值
+            for(let action of self._actions){
+                
+                try{
+                    if(action.enhance){// 增强模式
+                        let actionOpts:Record<string,any>={},actionArgs:any[] =[],cmd:any
+                        if(args.length>=2){
+                            cmd=args[args.length-1]
+                            actionOpts = args[args.length-2]
+                            actionArgs = args.slice(0,args.length-2)                            
+                        }
+                        outputDebug("执行<{}>: args={}, options={}",()=>([self.name(),actionArgs,actionOpts]))
+                        preValue = await action.fn.call(this,{
+                            command:cmd,
+                            value:preValue,
+                            args:actionArgs,
+                            options:actionOpts
+                        })
+                    }else{   // 原始模式
+                        preValue = await action.fn.apply(this,args)                        
+                    }
+                    
+                    if(preValue===BREAK) break
+                }catch(e){
+                    outputDebug("命令{}的Action({})执行出错:{}",[self.name,action.id,e])
+                }
+            }            
+        }
+    }
     /**
      * 当传入--work-dirs时用来处理工作目录
      */
-    private async handleActionWithWorkDirs(workDirs:any,fn:Function){        
-        if(!Array.isArray(workDirs)) workDirs = workDirs.split(",")
-        workDirs  = workDirs.reduce((dirs:any[],dir:string)=>{
-            if(typeof(dir)=='string') dirs.push(...dir.split(","))
-            return dirs
-        },[])
-        for(let workDir of workDirs){
-            const cwd = process.cwd()
-            try{
-                if(!path.isAbsolute(workDir)) workDir = path.join(cwd,workDir)
-                if(fs.existsSync(workDir) && fs.statSync(workDir).isDirectory()){
-                    outputDebug("切换到工作目录:{}",workDir)
-                    process.chdir(workDir)          // 切换
-                    await fn();       
-                }else{
-                    outputDebug("无效的切换到工作目录:{}",workDir)
-                }                
-            }catch(e){
-                throw e
-            }finally{
-                process.chdir(cwd)
-            } 
+    private wrapperWorkDirsAction(fn:AsyncFunction){        
+        const self = this
+        return async function(this:any){           
+            let  workDirs = self._optionValues.workDirs
+            // 未指定工作目录参数
+            if(!workDirs) {
+                return await fn.apply(this,Array.from(arguments));   
+            }
+            if(!Array.isArray(workDirs)) workDirs = workDirs.split(",")
+            workDirs  = workDirs.reduce((dirs:any[],dir:string)=>{
+                if(typeof(dir)=='string') dirs.push(...dir.split(","))
+                return dirs
+            },[])
+            for(let workDir of workDirs){
+                const cwd = process.cwd()
+                try{
+                    if(!path.isAbsolute(workDir)) workDir = path.join(cwd,workDir)
+                    if(fs.existsSync(workDir) && fs.statSync(workDir).isDirectory()){
+                        outputDebug("切换到工作目录:{}",workDir)
+                        process.chdir(workDir)          // 切换
+                        await fn.apply(this,Array.from(arguments));       
+                    }else{
+                        outputDebug("无效的工作目录:{}",workDir)
+                    }                
+                }catch(e){
+                    throw e
+                }finally{
+                    process.chdir(cwd)
+                } 
+            }
         }
     }
     getOption(name:string):MixedOption{
         return this.options.find(option => option.name() == name) as unknown as MixedOption
     }
+
     before(listener:HookCommandListener){        
         this._beforeHooks.push(listener)
         return this
@@ -110,7 +215,7 @@ export class MixedCommand extends Command{
         for(let listener of this._beforeHooks){ 
             await listener(...arguments)
         }
-        const noPrompts =this.isDisabledPrompts() 
+        const noPrompts =isDisabledPrompts() 
         if(!noPrompts){
             // 自动生成提示
             const questions:PromptObject[] = [
@@ -158,15 +263,10 @@ export class MixedCommand extends Command{
     option(flags: string, description?: string | undefined,options?:MixedOptionParams ): this{
         // @ts-ignore
         const option =new MixedOption(...arguments)
-        if(option.required && this.isDisabledPrompts()) option.mandatory = true
+        if(option.required && isDisabledPrompts()) option.mandatory = true
         return this.addOption(option as unknown as Option)         
     }  
-
-  
-
-    isDisabledPrompts(){
-        return this._optionValues.prompts===false
-    }    
+   
     /** 
      * 添加提示
      * 

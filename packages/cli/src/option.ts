@@ -37,11 +37,13 @@ export class MixedOption extends Option implements IPromptable{
         if(params.choices) this.choices(params.choices)
         if(params.conflicts) this.conflicts(params.conflicts)
         if(params.env) this.env(params.env)
+        if(params.required) this.required = params.required
         if(params.argParser) this.argParser(params.argParser)
         if(params.hideHelp) this.hideHelp(params.hideHelp)
         if(params.hidden) this.hidden = params.hidden
         if(params.mandatory) this.makeOptionMandatory(params.mandatory)
         if(params.implies) this.implies(params.implies) 
+        if(params.optional) this.optional=params.optional
         if(typeof(params.validate)=='function') this._validate = params.validate.bind(this)
         this.prompt = new PromptManager(this as IPromptable,params.prompt)
         

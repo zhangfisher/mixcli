@@ -2,13 +2,16 @@
 
 `MixedCli`内置了一些隐藏选项：
 
-## --no-prompts
+## --disable-prompts
 
 禁用所有交互提示。
 
 ## --debug-cli
 
 打印些调试信息，当你遇到问题时，可以使用这个选项来显示诊断信息。
+
+![](../public/images/debug_cli.png)
+
 
 ## --work-dirs 
 

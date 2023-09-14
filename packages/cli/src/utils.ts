@@ -48,9 +48,13 @@ export function fixIndent(text:string,indent?:boolean | number):string{
     return lines.join("\n")
 }
 
-export function addPresetOptions(command:any){    
-    command.option("--work-dirs <values...>","指定工作目录",{hidden:true})
-    command.option("--no-prompts","禁用所有交互提示",{hidden:true}) 
+/**
+ * 增加内置选项
+ * @param command 
+ */
+export function addBuiltInOptions(command:any){    
+    command.option("--work-dirs <values...>","指定工作目录",{hidden:true,optional:true,required:true})
+    command.option("--disable-prompts","禁用所有交互提示",{hidden:true}) 
     command.option("--debug-cli","显示调试信息",{hidden:true})
 }
 
@@ -61,6 +65,9 @@ export function addPresetOptions(command:any){
 export function isDebug(){
     return process.argv.includes("--debug-cli")
 }
+export function isDisabledPrompts(){
+    return process.argv.includes("--disable-prompts")
+}
 
 /**
  * 打印调试信息
@@ -68,7 +75,8 @@ export function isDebug(){
  * @param args 
  */
 export function outputDebug(message:string,...args:any[]){    
-    if(isDebug()) logsets.log(`[MixedCli] ${message}`,...args)
+    let vars = (args.length == 1 && typeof(args[0])=='function') ? args[0]() : args
+    if(isDebug()) logsets.log(`[MixedCli] ${message}`,...vars)
 }
 
 export const fileExists = promisify(fs.exists,{
