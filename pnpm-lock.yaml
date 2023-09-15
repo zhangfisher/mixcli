@@ -43,6 +43,27 @@ importers:
         specifier: ^3.3.4
         version: 3.3.4
 
+  examples/flex:
+    dependencies:
+      '@flex/angular':
+        specifier: workspace:^
+        version: link:packages/angular
+      '@flex/react':
+        specifier: workspace:^
+        version: link:packages/react
+      '@flex/vue':
+        specifier: workspace:^
+        version: link:packages/vue
+      mixed-cli:
+        specifier: workspace:^
+        version: link:../../packages/cli
+
+  examples/flex/packages/angular: {}
+
+  examples/flex/packages/react: {}
+
+  examples/flex/packages/vue: {}
+
   examples/lib1:
     dependencies:
       '@flex/lib2':

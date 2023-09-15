@@ -77,8 +77,9 @@ export interface FlexOptionParams extends IPromptableOptions{
     optional?: boolean;                         // A value is optional when the option is specified.
     default?:PromptParamDefaultValue            // 默认值
     choices?:string[]                           // 选项值的可选值
-    prompt?:InputPromptParam                    // 交互提示信息配置
-    validate?:(value: any) => boolean
+    //交互提示信息配置  
+    prompt?:InputPromptParam                    //  [!code ++]    
+    validate?:(value: any) => boolean           //  [!code ++]
     defaultDescription?:string          // 默认值的描述    
     conflicts?:string | string[]
     env?:string
@@ -94,6 +95,107 @@ export interface FlexOptionParams extends IPromptableOptions{
 
 - 增加了参数`prompt`，用来**控制命令选项使用哪一种交互提示信息。**
 - 重载了`Command`的`option`方法，通过`FlexOptionParams`参数来声明所有命令选项的配置参数。
+
+
+## 命令函数
+
+`MixedCommand`继承自`commander.Command`，因此可以使用`commander`的所有功能,`MixedCommand.action`用来声明命令函数，其参数与`commander.Command.action`一致，但是`MixedCommand.action`扩展支持多个命令函数。
+
+### 基本使用
+
+可以像`commander/Command.action`一样通过`action`方法来声明命令函数，即支持同步函数，也支持异步函数。
+
+```ts
+
+const {MixedCommand} = require("mixed-cli");
+module.exports = (cli)=>{    
+    const myCommand = new MixedCommand("init");
+    myCommand
+        .option("-t,--template <value>","指定模板",
+            {choices:["react","vue","angular"]}
+        )
+        // 声明一个同步命令函数
+        .action((options)=>{
+            console.log("同步命令函数")
+        })
+        // 声明一个异步命令函数
+        .action(async (options)=>{
+            console.log("异步命令函数")
+        })    
+    })
+}
+```
+
+### 命令链路
+
+`MixedCommand.action`最大的增强在于，支持**声明多个命令函数**，形成执行链。
+
+- **命令列表**
+
+**`MixedCommand`内部维护了一个`action`函数数组(通过`MixedCommand.actions`可以访问)。**
+
+当每次执行`MixedCommand.action`时，会将`action`函数添加到数组中。然后当运行命令时，会按照数组中的顺序依次执行。
+
+这是`MixedCommand`与`commander.Command`最大的不同。
+
+因此基于此特性，在上面的`init`命令中，事实上是定义了两个`action`函数，当执行`mycli init`时分别执行了两个`action`函数。
+ 
+- **中断执行命令**
+
+多次执行`MixedCommand.action`时，会创建一个`action`函数数组,这些`action`会依次顺序执行。
+
+`action`函数可以显式返回`BREAK`来中断后续`action`的执行。
+
+```ts
+const {MixedCommand,BREAK} = require("mixed-cli");
+module.exports = (cli)=>{    
+    const myCommand = new MixedCommand("init");
+    myCommand
+        .option("-t,--template <value>","指定模板",
+            {choices:["react","vue","angular"]
+        }).action((options)=>{
+            return BREAK        // [!code ++]
+        })  
+        .action((options)=>{
+            // 此函数永远也会不得到执行，因此上一个action返回了BREAK
+        })  
+    })
+}
+```
+
+- **增强模式**
+
+除了`.action(async (arg1,arg2,options)=>{...})`的常规签名方式外，当也可以采用增强模式。
+
+```ts
+const { MixedCommand,BREAK } = require("mixed-cli");
+module.exports = (cli)=>{    
+    const myCommand = new MixedCommand("init");
+    myCommand
+        .option("-t,--template <value>","指定模板",
+            {choices:["react","vue","angular"]
+        })
+        .action(async ({args,options,value,command})=>{
+            // args: 命令行参数
+            // options: 命令选项
+            // value: 上一个命令执行的值
+            // command: 当前命令对象
+        })            
+        },{
+            at:'append' //'replace' | 'preappend' | 'append' | number  
+            enhance:true
+        })  
+    })
+}
+```
+
+- 当在`action`方法的第二个参数中传入`enhance=true`，此时代表采用增强方式来定义命令函数。
+- 增强模式下，命令函数签名为`({args,options,value,command})`,其中`args`是命令行参数数组，`options`为命令选项，`value`为上一个命令的返回值，`command`指向当前命令对象。
+- 启用增强模式后，可以通过`at`参数来指定创建的`action`函数在`actions`函数数组中的位置，这可以决定所声明的`action`函数的执行时机。`at`取值可以是：
+    - `append`: 默认值,追加到最后面
+    - `replace`: 替换所有已经注册的`action`函数
+    - `preappend`: 添加到数组最前面，这意味着该`action`函数会先执行。
+    - `number`: 代表该`action`函数注册到`actions`数组中的位置。
 
 ## 扩展命令
 
@@ -194,7 +296,6 @@ module.exports = (cli)=>{
 
 ```
 
-
 ### 命令处理函数
 
 当为已经存在的命令增加了选项时，一般需要增加相应的处理函数。
@@ -214,11 +315,14 @@ module.exports = (cli)=>{
 const {MixedCommand} = require("mixed-cli");
 module.exports = (cli)=>{    
     cli.find("dev").then((devCommand)=>{   
-       devCommand.option("-p,--port <port>","指定端口号",3000)   
-       devCommand.before(()=>{
-       })
-       devCommand.after(()=>{
-       })
+       devCommand
+        .option("-p,--port <port>","指定端口号",3000)   
+        .before(()=>{
+            // ...
+        })
+        .after(()=>{
+            // ...
+        })
     }) 
 }
 
@@ -229,41 +333,8 @@ module.exports = (cli)=>{
 
 - **方法2：扩展`action`函数**
 
+可以利用`命令链路`的特性实现同一个命令下的多个`action`函数的执行。
 
-
-```js
-
-const {MixedCommand,BREAK} = require("mixed-cli");
-module.exports = (cli)=>{    
-    cli.find("dev").then((devCommand)=>{   
-       
-       // 1. 在原有template命令选项添加一个选择项
-       const opt = devCommand.getOption("template")   
-       opt.addChoice('vue')
-
-       // 2. 为dev命令增加一个action函数用来处理vue选项
-       
-       // 替换原有的action函数
-       devCommand.action((options))=>{
-            if(options.template=='vue'){
-                options.template = 'vue2'// 可以修改选项的值
-                return BREAK          // 执行中断后续任务的执行
-                return {}
-            }
-       })
-
-
-        devCommand.action((options)=>{
-            if(options.template==''){
-                return BREAK         // 中断后续任务的执行
-            }
-       })
-
-    }) 
-}
-
-
-```
 
 
 
