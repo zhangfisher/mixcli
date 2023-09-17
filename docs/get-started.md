@@ -4,7 +4,7 @@
 
 以下我们将通过一个典型的`monorepo`工程，来介绍如何使用`MixedCli`开发命令行应用。
 
-拟开发一个名为`flex`多包应用，该应用提供了`@flex/cli`，需要达成以下效果：
+拟开发一个名为`flex`应用，该应用提供了`@flex/cli`，需要达成以下效果：
 
 - `@flex/cli`提供了名称为`flex`的命令
 - `flex init`用来初始化`vue`、`react`、`angular`应用
@@ -174,6 +174,8 @@ cli.run()
 
 在本例中，我们为`init`命令设计了`["vue","react","angular"]`三个选项。
 
+- **常规处理方式**
+
 常规情况下，我们会按照如下方式处理命令选项：
 
 ```js{9-15}
@@ -199,7 +201,9 @@ module.exports = (cli)=>{
 
 这种处理方式下，我们需要在`@flex/cli`中包含所有的`vue/react/angular`处理逻辑的代码，这样会导致`@flex/cli`包变得臃肿并且不易维护。
 
-更好的处理方式是，将`vue/react/angular`的处理逻辑分别放在`@flex/vue/cli/init.js`、`@flex/react/cli/init.js`、`@flex/angular/cli/init.js`中，然后在`@flex/cli/init.js`中根据用户的选择，调用对应的处理逻辑。
+更好的处理方式是，将处理逻辑分别放在`@flex/vue/cli/init.js`、`@flex/react/cli/init.js`、`@flex/angular/cli/init.js`中。
+
+- **分布式处理方式**
 
 **`MixedCli`提供了这样的分布式处理命令选择的能力。**
 
@@ -251,22 +255,17 @@ module.exports = (cli)=>{
     });        
 }     
 ```
-
 :::
-
-
-
-
-
-
-
 
 - 在`src/cli`目录下创建`init.js`文件，用于声明`init`命令。`cli`目录下的所有`js`文件会被自动加载,每个文件均导出一个函数，该函数需要返回一个或多个`MixedCommand`实例。`cli`目录是一个默认的约定目录，可以通过`cli.cliDir`参数修改。
 - 创建`MixedCommand`实例，用于声明命令。`MixedCommand`继承自`commander`的`Command`类，因此可以使用`commander`的所有特性。
 - `package.json`只需要将`mixed-cli`添加为依赖即可。
-- 同样地，我们可以在`@flex/react`,`@flex/app`等包中创建其他的命令。
 
-## 第4步: 使用命令
+
+
+
+
+## 第4步: 开发子命令
 
  我们在`flex`应用中开发。
 
