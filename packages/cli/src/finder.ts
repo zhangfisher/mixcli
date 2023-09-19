@@ -81,7 +81,7 @@ export function findCliPaths(this:MixedCli,packageName?:string ,entry?:string):s
                     return result
                 },[])) 
             }catch(e:any){
-                ///console.error(e.stack)
+                outputDebug("解析包<{}>路径出错：{}",[name,e.stack])
             }    
         })
     return cliDirs 

@@ -4,7 +4,7 @@ module.exports = (cli)=>{
       initCommand
           .action((options)=>{      
               if(options.type === "react"){     
-                console.log("Run init :",options.type)
+                console.log("[React] Run init :",options.type)
                 return BREAK
               }
           })

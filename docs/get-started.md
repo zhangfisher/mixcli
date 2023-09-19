@@ -109,6 +109,8 @@ cli.run()
 - `@flex/cli`中使用`cli.register(initCommand)`，注册一个通用的`init`命令，该命令的实现在`init.js`中。 一般可以在此工程提供一些通用命令,而其他的命令声明逻辑在分别在`@flex/*/cli/*.js`等包中实现。
 
 
+
+
 ## 第3步: 创建init命令
 
 接下来,我们在`@flex/cli`中创建一个`init`命令。
@@ -218,7 +220,7 @@ module.exports = (cli)=>{
       initCommand
           .action((options)=>{      
               if(options.type === "vue"){     
-                console.log("Run init :",options.type)
+                console.log("[vue] Run init :",options.type)
                 return BREAK
               }
           })
@@ -233,7 +235,7 @@ module.exports = (cli)=>{
       initCommand
           .action((options)=>{      
               if(options.type === "react"){     
-                console.log("Run init :",options.type)
+                console.log("[react] Run init :",options.type)
                 return BREAK
               }
           })
@@ -248,7 +250,7 @@ module.exports = (cli)=>{
       initCommand
           .action((options)=>{      
               if(options.type === "angular"){     
-                console.log("Run init :",options.type)
+                console.log("[angular] Run init :",options.type)
                 return BREAK
               }
           })
@@ -262,129 +264,73 @@ module.exports = (cli)=>{
 - `package.json`只需要将`mixed-cli`添加为依赖即可。
 
 
+![](./public/get-started/init_types.png)
 
+## 第5步: 开发子命令
 
+以上是分布式处理命令选项的方式，`MixedCli`也支持创建子命令。
 
-## 第4步: 开发子命令
+以下在`@flex/vue`中创建`init vue`子命令。
 
- 我们在`flex`应用中开发。
-
-- **安装`@flex/cli`包**
-
-::: code-group
-
-```shell [npm]
-npm install @flex/cli @flex/vue
-```
-
-```shell [pnpm]
-pnpm add @flex/cli @flex/vue
-```
-
-```shell [yarn]
-yarn add @flex/cli @flex/vue
-```
-:::
-
-安装`@flex/cli`包后，就可以在命令行中使用`flex`和`flex init`命令了。
-
-此时执行一下`flex`命令，会看到如下输出：
-
-```shell{15}
-____   ____                  __
-\   \ /   /___   ___________|  | _______
- \   Y   /  _ \_/ __ \_  __ \  |/ /\__  \
-  \     (  <_> )  ___/|  | \/    <  / __ \_
-   \___/ \____/ \___  >__|  |__|_ \(____  /
-                    \/           \/     \/
-版本号:1.0.0 
-Usage: flex [options] [command]
-
-Options:
-  -v, --version      当前版本号
-  -h, --help         显示帮助
-
-Commands:
-  init [options]    初始化应用  // 只有这个命令 
-```
-
-
-- **接下来我们安装`@flex/vue`**
-
-::: code-group
-
-```shell [npm]
-npm install @flex/vue @flex/vue
-```
-
-```shell [pnpm]
-pnpm add @flex/vue @flex/vue
-```
-
-```shell [yarn]
-yarn add @flex/vue @flex/vue
-```
-:::
  
-此时再执行一下`flex`命令，会看到如下输出：
+```js
+// @flex/vue/cli/create_vue.js
+const { MixedCommand } = require('mixed-cli'); 
+module.exports = (cli)=>{                
 
-```bash
-____   ____                  __
-\   \ /   /___   ___________|  | _______
- \   Y   /  _ \_/ __ \_  __ \  |/ /\__  \
-  \     (  <_> )  ___/|  | \/    <  / __ \_
-   \___/ \____/ \___  >__|  |__|_ \(____  /
-                    \/           \/     \/
-版本号:1.0.0 
-Usage: flex [options] [command]
-
-Options:
-  -v, --version      当前版本号
-  -h, --help         显示帮助
-
-Commands:
-  init [options]    初始化应用  
-  # dev命令是由@flex/vue包提供的
-  dev [options]     以开发模式启动应用  //   [!code ++]
+    cli.find("init").then((initCommand)=>{
+      const initVueCommand = new MixedCommand("vue");
+        initVueCommand
+          .description("创建Vue应用")  
+          .option("-a, --app <value>", "应用名称",{validate:(value)=>value.length>5})})                           
+          .action((options)=>{            
+              console.log("创建Vue应用:",options.app)
+          })
+      initCommand.addCommand(initVueCommand)  // [!code ++]
+    })    
+} 
 ```
 
+然后当执行`flex init vue`时，会看到如下输出：
 
-## 第5步: 自动推断交互提示
-
-在上面`dev`命令中，共指定了`6`个选项，当执行`flex dev`命令时, 会根据配置自动交互引导用户输入选项，如下：
-
-![图片](/images/dev_cmd.png)
-
-- 命令行的交互体验与使用`commander`时完全一样
-- 仅当选项未指定默认值或满足一定条件时，才会根据一定的规则自动推断交互提示类型。详见[自动推断交互提示](./guide/infer-prompt.md)
-- `MixedCli`使用`prompts`来实现交互提示，因此支持`prompts`的所有交互类型特性。详见[prompts](https://github.com/terkelg/prompts)
+![](./public/get-started/init_vue.gif)
 
 
-## 小结
-
-- `MixedCli`是一个基于`commander`的命令行工具开发框架，提供了一套命令行开发的最佳实践。
-- `MixedCli`能对所有命令行选项自动推断交互提示类型，当用户没有输入选项时，会自动引导用户输入选项，提供友好的用户体验。
-- `MixedCli`可以在当前工程自动搜索满足条件的包下声明的命令进行合并，从而实现扩展命令的目的。此特性可以保持@flex/cli包的精简和稳定，给用户一致的体验。
+此时执行`flex init --help`可以看到`vue`子命令的帮助信息：
 
 
+![](./public/get-started/init_vue-help.png)
+
+## 第6步: 自动推断交互提示
+
+接下来我们创建一个`dev`命令, 用于启动开发服务器，展示交互提示。
 
 
-```js [vue/src/cli/init.js]
+::: code-group
 
+```js [packages/cli/dev.js]
 const { MixedCommand } = require('mixed-cli');
 
 /**
  * @param {import('mixed-cli').MixedCli} cli
  */
 module.exports = (cli)=>{                
-
-    const devCommand = new MixedCommand();
+    const devCommand = new MixedCommand("dev");
     devCommand
-        .name('dev')
-        .description("以开发模式启动应用")      // 未指定默认值,自动使用text类型提供                       
+        .description("开发模式")          
+        // 指定了默认值且强制提示
+        .option("--count <value>","数量",{default:5,prompt:true})
+        // 没有指定默认值，使用,分割多个值
+        .option("-r,--routes <value...>","路由(多个值采用,分割)")                           
+        // 指定了默认值时不进行提示
         .option("-p,--port <port>","指定端口号",3000)                      
+        // 有默认值且强制显示提示
         .option("-d,--debug" ,"调试模式",{ default:true,prompt:true })      
-        .option("-h,--host <host>","指定主机名",{default:"localhost",prompt:true})                         
+        .option("--color <value...>","显示颜色",{choices:["red","yellow","blue"],prompt:"multiselect"})  
+        // 未指定默认值,使用自动完成，可以输入任意值
+        .option("--filter <value>","文件过滤",{choices:["src","test","debug"],prompt:"autocomplete"})    
+        .option("-h,--host <host>","指定主机名",{default:"localhost",prompt:true})                            // 自动提示（没有输入且无默认值时）
+        // 始终不进行提示取，取决env是可选还是必选
         .option("-e,--env [value]","环境变量",{ prompt:false })                                   
         .option("-m,--mode <mode>","指定模式",{choices:["development","production","test","debug"]})
         .option("-f,--framework [value]","开发框架",{choices:[
@@ -397,11 +343,150 @@ module.exports = (cli)=>{
             message:"是否自动打开浏览器？",
         }})
         .action((options)=>{            
-            console.log("run dev")
+            console.log("        run dev app")
+            console.log("dev app",options)
         })
-
     return devCommand
 } 
     
-   
 ```
+
+```js [packages/cli/index.js]
+const { MixedCli } = require("mixed-cli") 
+const initCommand = require("./init") 
+const devCommand = require("./dev")
+const cli = new MixedCli({
+    name: "flex",
+    version: "1.0.0",
+    include: /^\@flex\//,  
+
+})
+cli.register(initCommand)
+cli.register(devCommand)//  [!code ++]
+cli.run() 
+```
+:::
+
+当执行`flex dev`时，会看到如下输出：
+
+![图片](/public/get-started/dev.gif)
+
+- 命令行的交互体验与使用`commander`时完全一样
+- 仅当选项未指定默认值或满足一定条件时，才会根据一定的规则自动推断交互提示类型。详见[自动推断交互提示](./guide/infer-prompt.md)
+- `MixedCli`使用`prompts`来实现交互提示，因此支持`prompts`的所有交互类型特性。详见[prompts](https://github.com/terkelg/prompts)
+
+## 第7步: 开发命令
+
+最后就是开发命令了，此时轮到开源工具库`logsets`上场了。
+
+`logsets`是一个终端增强显示组件，用来在终端中显示表格、列表、树形结构等数据，提供更好友好的终端交互体验。
+
+以下是`logsets`的使用示例：
+
+```js
+const { MixedCommand } = require('mixed-cli');
+
+ 
+module.exports = (cli)=>{                
+    const devCommand = new MixedCommand("dev");
+    devCommand
+        .description("开发模式")          
+        .action(async ()=>{
+            const tasks = logsets.createTasks([
+              {
+                  title:"任务处理被停止",
+                  execute:async ()=>{
+                      await delay(100)
+                      return "abort"
+                  }
+              },
+              {
+                  title:"开始扫描文件",
+                  execute:async ()=>{await delay(100);return 1}            
+              },
+              {   title:"准备对文件进行预处理",
+                  execute:async ()=>{throw new Error("已安装")}, 
+              },
+              {   title:"准备对文件进行预处理",
+                  execute:async ()=>{
+                      await delay(100)
+                      return "已完成"
+                  }
+              },
+              {   title:"执行过程中显示进度",
+                  execute:async ({task})=>{
+                      for(let i=0;i<100;i++){
+                          await delay(100)
+                          task.note(i+"%")
+                      }
+                  }
+              },
+              {
+                  title:"读取文件并编译成exe文件",
+                  execute:async ()=>{
+                      await delay(100)
+                      return ['stop',"不干了"]
+                  }            
+              },        
+              {
+                  title:"任务处理被停止",
+                  execute:async ()=>{
+                      await delay(100)
+                      return ["abort",'真的不干了']
+                  }
+              },
+              "-",
+              {
+                  title:"任务执行失败",
+                  execute:async ()=>{throw new Error("TimeOut")},
+                  error:["ignore","忽略:{message}"]
+              },
+              {
+                  title:"任务待办状态",
+                  execute:async ()=>{throw new Error("TimeOut")},
+                  error:"出错了"
+              },    
+              "出错处理",
+              {
+                  title:["下载文件：{},大小:{}, 已下载{}","package.json",122,344],
+                  execute:async ()=>{throw new Error("TimeOut")},
+                  error:"出错了:{message}"
+              },
+              {
+                  title:["下载文件：{},大小:{}, 已下载{}",["package.json",122,344]],
+                  execute:async ()=>{throw new Error("TimeOut")},
+                  error:()=>"X"
+              },
+              {
+                  title:["下载文件：{},大小:{}, 已下载{}",["package.json",122,344]],
+                  execute:async ()=>{throw new Error("TimeOut")},
+                  error:()=>"skip"
+              },      
+          ],{ignoreErrors:true})
+          try{
+              let results = await tasks.run(["开始执行{}任务",5])
+              console.log(results)            
+          }catch(e){
+              console.error(e)
+          }
+    })
+```
+
+执行`flex dev`，会看到如下输出：
+
+
+
+
+![图片](/public/get-started/dev_tasks.gif)
+
+更多的`logsets`使用示例，请参考[logsets](https://zhangfisher.github.io/logsets/)
+
+
+## 小结
+
+- `MixedCli`是一个基于`commander`的命令行工具开发框架，提供了一套命令行开发的最佳实践。
+- `MixedCli`能对所有命令行选项自动推断交互提示类型，当用户没有输入选项时，会自动引导用户输入选项，提供友好的用户体验。
+- `MixedCli`可以在当前工程自动搜索满足条件的包下声明的命令进行合并，从而实现扩展命令的目的。此特性可以保持@flex/cli包的精简和稳定，给用户一致的体验。
+
+
+

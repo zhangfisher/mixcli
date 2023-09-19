@@ -4,7 +4,7 @@ module.exports = (cli)=>{
       initCommand
           .action((options)=>{      
               if(options.type === "angular"){     
-                console.log("Run init :",options.type)
+                console.log("[angular] Run init :",options.type)
                 return BREAK
               }
           })

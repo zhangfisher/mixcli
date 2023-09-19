@@ -1,5 +1,6 @@
 const { MixedCli } = require("mixed-cli") 
 const initCommand = require("./init") 
+const devCommand = require("./dev")
 const cli = new MixedCli({
     name: "flex",
     version: "1.0.0",
@@ -13,4 +14,6 @@ const cli = new MixedCli({
                             \/           \/     \/`, 
 })
 cli.register(initCommand)
+cli.register(devCommand)
+
 cli.run() 

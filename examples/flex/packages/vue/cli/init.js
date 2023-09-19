@@ -4,8 +4,8 @@ module.exports = (cli)=>{
       initCommand
           .action((options)=>{      
               if(options.type === "vue"){     
-                console.log("Run init :",options.type)
-                return BREAK
+                console.log("[vue] Run init :",options.type)
+                //return BREAK
               }
           })
     });        

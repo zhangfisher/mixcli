@@ -10,7 +10,7 @@ module.exports = (cli)=>{
         .description("创建应用")         
         .option("-t, --type <type>", "应用类型",{choices:["vue","react","angular"]})
         .action((options)=>{            
-            console.log("Run init:",options.type)
+            console.log("[cli] Run init:",options.type)
         })
     return initCommand
 } 
