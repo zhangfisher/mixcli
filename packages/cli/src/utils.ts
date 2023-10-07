@@ -53,9 +53,9 @@ export function fixIndent(text:string,indent?:boolean | number):string{
  * @param command 
  */
 export function addBuiltInOptions(command:any){    
-    command.option("--work-dirs <values...>","指定工作目录",{hidden:true,optional:true,required:true})
-    command.option("--disable-prompts","禁用所有交互提示",{hidden:true}) 
-    command.option("--debug-cli","显示调试信息",{hidden:true})
+    command.option("--work-dirs <values...>","指定工作目录",{hidden:true,optional:true,required:true,prompt:false})
+    command.option("--disable-prompts","禁用所有交互提示",{hidden:true,prompt:false}) 
+    command.option("--debug-cli","显示调试信息",{hidden:true,prompt:false})
 }
 
 

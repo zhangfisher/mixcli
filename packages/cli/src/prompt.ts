@@ -5,7 +5,7 @@ import { outputDebug } from "./utils"
 export type PromptType = "text" | "password" | "invisible" | "number"| "confirm"| "list"| "toggle"| "select" | "multiselect" | "autocomplete" | "date" | "autocompleteMultiselect"
 
 export type PromptParam = 'auto' | boolean | PromptType | PromptObject
-export type InputPromptParam = PromptParam | ((value:any)=>PromptParam)
+export type InputPromptParam = PromptParam | ((value:any)=>PromptParam) | boolean
 export type PromptParamDefaultValue = string | boolean | string[]  
 
 export const promptTypeMap:Record<string,string> = {
@@ -68,7 +68,7 @@ export class PromptManager{
     private _promptable:IPromptable                 // 对应的FlexOption或FlexArgument
     constructor(promptable:IPromptable,promptArgs?:InputPromptParam){ 
         this._promptable = promptable
-        this.args= promptArgs || 'auto'
+        this.args= promptArgs===undefined ? 'auto' : promptArgs
     }
 
     /**

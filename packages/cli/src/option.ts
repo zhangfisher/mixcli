@@ -46,7 +46,6 @@ export class MixedOption extends Option implements IPromptable{
         if(params.optional) this.optional=params.optional
         if(typeof(params.validate)=='function') this._validate = params.validate.bind(this)
         this.prompt = new PromptManager(this as IPromptable,params.prompt)
-        
     } 
     validate(value: any): boolean {
         if(typeof(this._validate)=='function'){

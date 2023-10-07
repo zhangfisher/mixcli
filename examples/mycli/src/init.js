@@ -15,7 +15,8 @@ module.exports = (cli)=>{
                 {title:"Reace/SPA",value:"react"},
                 {title:"全栈应用",value:"web"},
                 {title:"微服务应用",value:"microservice"}                
-            ]
+            ],
+            prompt:false
         })
         .action((options)=>{
             console.log(`--------------init:${path.relative(__dirname,process.cwd())}--------------`)

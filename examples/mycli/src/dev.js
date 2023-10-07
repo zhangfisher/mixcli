@@ -55,7 +55,7 @@ module.exports = (cli)=>{
         // 指定了默认值时不进行提示
         .option("-p,--port <port>","指定端口号",3000)                      
         // 有默认值且强制显示提示
-        .option("-d,--debug" ,"调试模式",{ default:true,prompt:true })      
+        //.option("-d,--debug" ,"调试模式",{ default:true,prompt:true })      
         .option("-h,--host <host>","指定主机名",{default:"localhost",prompt:true})                            // 自动提示（没有输入且无默认值时）
         // 始终不进行提示取，取决env是可选还是必选
         .option("-e,--env [value]","环境变量",{ prompt:false })                                   

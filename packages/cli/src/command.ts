@@ -102,7 +102,7 @@ export class MixedCommand extends Command{
                 this._actions.splice(Number(actionOpts.at),0,actionItem)
             }
         }else{
-            console.log("action params error")               
+            console.log("[mixed-cli] action params error")               
         }
         return super.action(this.getWrapperedAction())
     } 
