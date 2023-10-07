@@ -9,7 +9,14 @@ module.exports = (cli)=>{
     command
         .name('init')
         .description('初始化应用') 
-        .option("-t,--template <value...>","应用模板")
+        .option("-t,--template <value>","应用模板",{
+            choices:[
+                {title:"Nodejs应用",value:"nodejs"},
+                {title:"Reace/SPA",value:"react"},
+                {title:"全栈应用",value:"web"},
+                {title:"微服务应用",value:"microservice"}                
+            ]
+        })
         .action((options)=>{
             console.log(`--------------init:${path.relative(__dirname,process.cwd())}--------------`)
             console.log("init",options)

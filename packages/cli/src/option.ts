@@ -57,13 +57,15 @@ export class MixedOption extends Option implements IPromptable{
     }
     // @ts-ignore
     choices(values:(PromptChoice | string)[]){
-        this.promptChoices = values.map(choice=>{
-            if(typeof(choice)=='object'){
-                return choice
-            }else{
-                return {title:choice,value:choice}                    
-            }
-        })
+        if(!this.promptChoices){
+            this.promptChoices = values.map(choice=>{
+                if(typeof(choice)=='object'){
+                    return choice
+                }else{
+                    return {title:choice,value:choice}                    
+                }
+            })
+        }        
         super.choices(this.promptChoices.map((item:any)=>item.value))    
     }    
 
