@@ -135,8 +135,7 @@ export class MixedCommand extends Command{
         return async function(this:any){
             const args = Array.from(arguments) // 原始输入的参数
             let preValue:any           // 保存上一个action的返回值
-            for(let action of self._actions){
-                
+            for(let action of self._actions){                
                 try{
                     if(action.enhance){// 增强模式
                         let actionOpts:Record<string,any>={},actionArgs:any[] =[],cmd:any
@@ -154,11 +153,11 @@ export class MixedCommand extends Command{
                         })
                     }else{   // 原始模式
                         preValue = await action.fn.apply(this,args)                        
-                    }
-                    
+                    }                    
                     if(preValue===BREAK) break
                 }catch(e){
                     outputDebug("命令{}的Action({})执行出错:{}",[self.name,action.id,e])
+                    throw e
                 }
             }            
         }

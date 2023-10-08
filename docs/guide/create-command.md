@@ -165,7 +165,7 @@ module.exports = (cli)=>{
 
 - **增强模式**
 
-除了`.action(async (arg1,arg2,options)=>{...})`的常规签名方式外，当也可以采用增强模式。
+除了`.action(async (arg1,arg2,options)=>{...})`的常规签名方式外，当也可以采用`增强模式`。
 
 ```ts
 const { MixedCommand,BREAK } = require("mixed-cli");
