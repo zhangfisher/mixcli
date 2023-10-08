@@ -24,15 +24,11 @@ export class MixedOption extends Option implements IPromptable{
         super(flags, description)
         let params:MixedOptionParams = {}
         if(arguments.length==3 && typeof arguments[2] == "object"){
-            params = Object.assign({
-                prompt : 'auto'
-            },arguments[2])  
+            params = Object.assign({ },arguments[2])  
         }else if(arguments.length==3){
             params.default = arguments[2]
-            params.prompt = 'auto'
-        }else{
-            params.prompt = 'auto'
-        }        
+        }
+        if(!params.prompt) params.prompt = 'auto'
         if(params.default) this.default(params.default,params.defaultDescription)
         if(params.choices) this.choices(params.choices)
         if(params.conflicts) this.conflicts(params.conflicts)

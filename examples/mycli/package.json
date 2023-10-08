@@ -1,12 +1,12 @@
 {
   "name": "mycli",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build":"tsup",
+    "build": "tsup",
     "dev": "turbo build cli && node ./src/index.js",
-    "cli":"node ./src/index.js"
+    "cli": "node ./src/index.js"
   },
   "bin": {
     "mycli": "./node_modules/mixed-cli/dist/index.js"

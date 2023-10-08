@@ -131,6 +131,10 @@ export class PromptManager{
         // 指定了验证函数，用来验证输入值是否有效
         prompt.validate = validate?.bind(this._promptable)
         if(promptType=='multiselect') prompt.instructions=false
+        if(['select','multiselect'].includes(promptType)){
+            let index = promptChoices?.findIndex(item=>item.value==input)
+            prompt.initial = index==-1 ? undefined : index
+        } 
         // 选项值的可选值
         if(Array.isArray(promptChoices)) {
             prompt.choices =promptChoices

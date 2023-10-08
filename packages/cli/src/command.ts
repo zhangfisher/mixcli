@@ -257,7 +257,6 @@ export class MixedCommand extends Command{
             await listener(...arguments)
         }
     }
-
     option(flags: string, description?: string | undefined,defaultValue?:any ): this
     option(flags: string, description?: string | undefined,options?:MixedOptionParams ): this{
         // @ts-ignore
