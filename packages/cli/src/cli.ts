@@ -180,19 +180,24 @@ export class MixedCli extends LiteEvent<any,MixedCliEvents>{
      * @returns 
      */
     find(name:string):Promise<MixedCommand | undefined>{
-        const signal = asyncSignal()
-        this.findSignals.push(signal)
-        return new Promise<MixedCommand | undefined>((resolve)=>{
-            let listener:LiteEventSubscriber
-            listener = this.on("register",(fullname:string)=>{
-                if(fullname==`${this.name}.${name}`){
-                    listener.off()
-                    signal.resolve()
-                    this.findSignals = this.findSignals.filter(s=>s!=signal)
-                    resolve(this.get(name))
-                }
-            },{objectify:true}) as LiteEventSubscriber
-        })
+        const cmd = this.get(name)
+        if(cmd){
+            return Promise.resolve(cmd)        
+        }else{
+            const signal = asyncSignal()
+            this.findSignals.push(signal)
+            return new Promise<MixedCommand | undefined>((resolve)=>{
+                let listener:LiteEventSubscriber
+                listener = this.on("register",(fullname:string)=>{
+                    if(fullname==`${this.name}.${name}`){
+                        listener.off()
+                        signal.resolve()
+                        this.findSignals = this.findSignals.filter(s=>s!=signal)
+                        resolve(this.get(name))
+                    }
+                },{objectify:true}) as LiteEventSubscriber
+            })
+        }        
     }
     /**
      * 判断命令是否存在
