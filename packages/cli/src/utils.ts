@@ -65,8 +65,8 @@ export function addBuiltInOptions(command:any){
 export function isDebug(){
     return process.argv.includes("--debug-cli")
 }
-export function isDisabledPrompts(){
-    return process.argv.includes("--disable-prompts")
+export function isEnablePrompts(){    
+    return !process.argv.includes("--disable-prompts")
 }
 
 /**

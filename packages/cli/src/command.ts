@@ -1,7 +1,7 @@
 import { Command,Option } from "commander";
 import prompts, { PromptObject }  from  "prompts"
 import { MixedOption,type MixedOptionParams } from "./option";  
-import { addBuiltInOptions,  isDisabledPrompts,  outputDebug } from "./utils";
+import { addBuiltInOptions, isEnablePrompts, outputDebug } from './utils';
 import path from "node:path"
 import fs from "node:fs"
 import type { AsyncFunction } from "flex-tools";
@@ -32,8 +32,9 @@ export class MixedCommand extends Command{
     private _beforeHooks:Function[] = []
     private _afterHooks:Function[] = []
     private _customPrompts:PromptObject[] = [] 
-    private _optionValues:Record<string,any> = {}   // 命令行输入的选项值
-    private _actions:ActionRegistry[] =[]                 // 允许多个action
+    private _optionValues:Record<string,any> = {}           // 命令行输入的选项值
+    private _actions:ActionRegistry[] =[]                   // 允许多个action
+    private _enable_prompts:boolean = true                  // 是否启用交互提示
     constructor(name?:string){
         super(name)
         const self = this
@@ -216,8 +217,7 @@ export class MixedCommand extends Command{
         for(let listener of this._beforeHooks){ 
             await listener(...arguments)
         }
-        const noPrompts =isDisabledPrompts() 
-        if(!noPrompts){
+        if(this.isEnablePrompts()){
             // 自动生成提示
             const questions:PromptObject[] = [
                 ...this.generateAutoPrompts(),
@@ -233,6 +233,13 @@ export class MixedCommand extends Command{
         }        
     }
 
+    private isEnablePrompts(){
+        if(isEnablePrompts()===false){        // 命令行参数禁用了提示，优先级最高
+            return false
+        }else{
+            return this._enable_prompts
+        }
+    }
 
     /**
      * 生成选项自动提示
@@ -263,7 +270,7 @@ export class MixedCommand extends Command{
     option(flags: string, description?: string | undefined,options?:MixedOptionParams ): this{
         // @ts-ignore
         const option =new MixedOption(...arguments)
-        if(option.required && isDisabledPrompts()) option.mandatory = true
+        if(option.required && !this.isEnablePrompts()) option.mandatory = true
         return this.addOption(option as unknown as Option)         
     }  
    
@@ -307,6 +314,17 @@ export class MixedCommand extends Command{
         const command = this.commands.find(command=>command.name() === result.command)        
         await command?.parseAsync([result.command],{from:'user'})
 
+    }
+    /**
+     * 禁用/启用所有提示
+     */
+    disablePrompts(){
+        this._enable_prompts = false
+        return this
+    }
+    enablePrompts(){
+        this._enable_prompts = true
+        return this
     }
 }
  
