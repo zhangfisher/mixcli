@@ -100,6 +100,8 @@ export class MixedCommand extends Command{
                 this._actions.splice(0,0,actionItem)
             }else if(typeof(actionOpts.at)=='number'){
                 this._actions.splice(Number(actionOpts.at),0,actionItem)
+            }else{
+                this._actions.push(actionItem)
             }
         }else{
             console.log("[mixed-cli] action params error")               
@@ -248,7 +250,7 @@ export class MixedCommand extends Command{
                     .filter(option=>!option.hidden && (option instanceof MixedOption))
                     .map(option=>option.getPrompt(this._optionValues[option.name()]))
                     .filter(prompt=>prompt) as PromptObject[] 
-        outputDebug("[MixedCli] 命令<{}>自动生成{}个选项提示:{}",[this.name(),optionPromports.length,optionPromports.map(prompt=>`${prompt.name}(${prompt.type})`).join(",")])        
+        outputDebug("命令<{}>自动生成{}个选项提示:{}",[this.name(),optionPromports.length,optionPromports.map(prompt=>`${prompt.name}(${prompt.type})`).join(",")])        
         return optionPromports
     }
 

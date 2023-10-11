@@ -66,20 +66,20 @@ export function findCliPaths(this:MixedCli,packageName?:string ,entry?:string):s
             return  isMatched(name,includeMacher) && !isMatched(name,excludeMacher) 
         })
         .forEach(name=>{
-            outputDebug("匹配包:{}",`${packageName ? packageName+"->"+name : name}`)
+            outputDebug("匹配包:{}",`${packageName ? name+" <- "+packageName  : name}`)
             try{
                 const packageEntry = path.dirname(require.resolve(name,{paths:packagePath ? [packagePath] : [process.cwd()]}))
-                const packageCliDir =path.join(packageEntry,this.options.cliDir!)
-                if(fs.existsSync(packageCliDir)){
-                    cliDirs.push(packageCliDir)
-                }
+                const packageCliDir =path.join(packageEntry,this.options.cliDir!)                
                 // 查找当前包的所属工程的依赖
                 let dependencies = getMatchedDependencies.call(this,packageEntry)
                 cliDirs.push(...dependencies.reduce<string[]>((result,dependencie)=>{
-                    outputDebug("匹配包:{}",`${name}->${dependencie}`)
+                    outputDebug("匹配包:{}",`${dependencie} <- ${name}`)
                     result.push(...findCliPaths.call(this,dependencie,packageEntry))
                     return result
                 },[])) 
+                if(fs.existsSync(packageCliDir)){
+                    cliDirs.push(packageCliDir)
+                }
             }catch(e:any){
                 outputDebug("解析包<{}>路径出错：{}",[name,e.stack])
             }    
@@ -101,10 +101,8 @@ export function findCommands(cli:MixedCli){
         globSync("*",{
             cwd:dir,
             absolute :true 
-        }).forEach((file:string)=>{
-            
+        }).forEach((file:string)=>{            
             if(!(file.endsWith(".js") || fs.statSync(file).isDirectory())) return 
-
             try{
                 outputDebug("导入命令:{}",file)
                 commands.push(require(file))
