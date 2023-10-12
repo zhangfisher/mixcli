@@ -1,5 +1,11 @@
 # mixed-cli
 
+## 2.0.7
+
+### Patch Changes
+
+- b33c7d7: 更新示例包名
+
 ## 2.0.6
 
 ### Patch Changes
