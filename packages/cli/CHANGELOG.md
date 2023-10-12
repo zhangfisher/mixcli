@@ -1,5 +1,11 @@
 # mixed-cli
 
+## 2.0.6
+
+### Patch Changes
+
+- 修复当指定`prompt=false`时无法禁用交互提示的问题
+
 ## 2.0.5
 
 ### Patch Changes
