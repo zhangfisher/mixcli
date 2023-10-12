@@ -10,11 +10,13 @@ module.exports = (cli)=>{
     command
         .name('init')
         .description('初始化应用') 
-        .option("-p, --provider <value>",`数据库类型,取值${DbProviders.join()}`,{default:'sqlite',choices:DbProviders})  
-        .option("--url <value>","数据库连接字符串,默认为当前目录","file:./voerka.db")  
-        .option("--skip","跳过安装检查",{prompt:false,default:false})
-        .option("-o, --output [value]","指定PrismaClient输出目录")   
-        .option("--silent","不显示提示信息")       
+        // .option(`-p, --provider <value>`,`数据库类型,取值${DbProviders.join()}`,{default:'sqlite',choices:DbProviders})  
+        // .option("--url <value>","数据库连接字符串,默认为当前目录","file:./voerka.db")  
+        // .option("--skip","跳过安装检查",{prompt:false,default:false})
+        // .option("--db-path [value]","指定数据库目录","./data/db")  
+        // .option("--prisma-client-location [value]","PrismaClient的输出位置",{prompt:false})  
+        // .option("--silent","不显示提示信息",{prompt:false})       
+        .option("--entry","指定入口",{prompt:false})       // 指定
         .option("-t,--template <value>","应用模板",{
             default:"nodejs",
             choices:[

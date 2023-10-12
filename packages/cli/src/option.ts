@@ -28,7 +28,7 @@ export class MixedOption extends Option implements IPromptable{
         }else if(arguments.length==3){
             params.default = arguments[2]
         }
-        if(!params.prompt) params.prompt = 'auto'
+        if(params.prompt===undefined) params.prompt = 'auto'
         if(params.default) this.default(params.default,params.defaultDescription)
         if(params.choices) this.choices(params.choices)
         if(params.conflicts) this.conflicts(params.conflicts)
