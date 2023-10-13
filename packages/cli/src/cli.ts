@@ -34,7 +34,10 @@ export interface MixedCliOptions{
     // / pattern默认值是cli，即会在当前工程的以prefix/开头的包下查找cli目录下的命令
     // 指定cli所在的目录,默认值是cli,要遍历该目录下的所有js文件作为命令导出
     cliDir?:string            
-    context?:Record<string,any>             // 传递给命令的共享上下文，所有命令均可要使用        
+    context?:Record<string,any>             // 传递给命令的共享上下文，所有命令均可要使用     
+    // 默认是否启用交互提示, auto当没有值时，会根据当前是否在终端中运行来决定是否启用交互提示
+    // 为false时，禁用所有交互提示,为true时，启用所有交互提示    
+    prompt?:'auto' | boolean   
 }
 
  
