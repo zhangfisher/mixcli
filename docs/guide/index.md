@@ -5,6 +5,7 @@
 - [自动推断提示类型](./infer-prompt)
 - [定制提示类型](./custom-prompt)
 - [修改选项](./change-option)
+- [命令钩子](./command_hooks)
 - [禁用交互提示](./disable-prompts)
 - [国际化](./i18n)
 - [内置选项](./builtin-options)

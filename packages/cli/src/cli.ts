@@ -59,6 +59,7 @@ export class MixedCli extends LiteEvent<any,MixedCliEvents>{
             name:"mixed-cli",
             package:null,
             cliDir:"cli",
+            prompt:'auto'
         },options)   
         this.createRootCommand() 
         this.installExtendCommands()        

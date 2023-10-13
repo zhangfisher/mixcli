@@ -27,15 +27,22 @@ module.exports = (cli)=>{
             ],
             prompt:true
         })
+        .before(async function (options){
+            console.log("before init",options)
+            options.count = 1
+        })
         .action((options)=>{
             console.log(`--------------init:${path.relative(__dirname,process.cwd())}--------------`)
             console.log("init",options)
             return 0
         })
     const initVueCommand = new MixedCommand('vue');
-    initVueCommand.action((options)=>{
-        console.log("Run command: init vue",options)
-    })
+    initVueCommand
+        .before(async function (options){
+            console.log("before init vue",options)
+        }).action((options)=>{
+            console.log("Run command: init vue",options)
+        })
 
     command.addCommand(initVueCommand)
     return command

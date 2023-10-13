@@ -317,7 +317,7 @@ module.exports = (cli)=>{
     cli.find("dev").then((devCommand)=>{   
        devCommand
         .option("-p,--port <port>","指定端口号",3000)   
-        .before(()=>{
+        .before((options)=>{
             // ...
         })
         .after(()=>{
