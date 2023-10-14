@@ -165,32 +165,31 @@ export class MixedCommand extends Command{
                 cmd=args[args.length-1]     // 最后一个command
                 actionOpts = args[args.length-2]
                 actionArgs = args.slice(0,args.length-2)                            
-            }
-                        
+            }                        
             await self.executeBeforeHooks({args:actionArgs,options:actionOpts,command:cmd})
-
-            for(let action of self._actions){                
-                try{
-                    if(action.enhance){// 增强模式                        
-                        outputDebug("执行<{}>: args={}, options={}",()=>([self.name(),actionArgs,actionOpts]))
-                        preValue = await action.fn.call(this,{
-                            command:cmd,
-                            value:preValue,
-                            args:actionArgs,
-                            options:actionOpts
-                        })
-                    }else{   // 原始模式
-                        preValue = await action.fn.apply(this,args)                        
-                    }                    
-                    if(preValue===BREAK) break
-                }catch(e){
-                    outputDebug("命令{}的Action({})执行出错:{}",[self.name,action.id,e])
-                    throw e
-                }
-            }     
-            
-            await self.executeAfterHooks({value:preValue,args:actionArgs,options:actionOpts,command:cmd})
-
+            try{
+                for(let action of self._actions){                
+                    try{
+                        if(action.enhance){// 增强模式                        
+                            outputDebug("执行<{}>: args={}, options={}",()=>([self.name(),actionArgs,actionOpts]))
+                            preValue = await action.fn.call(this,{
+                                command:cmd,
+                                value:preValue,
+                                args:actionArgs,
+                                options:actionOpts
+                            })
+                        }else{   // 原始模式
+                            preValue = await action.fn.apply(this,args)                        
+                        }                    
+                        if(preValue===BREAK) break
+                    }catch(e){
+                        outputDebug("命令{}的Action({})执行出错:{}",[self.name,action.id,e])
+                        throw e
+                    }
+                }     
+            }finally{
+                await self.executeAfterHooks({value:preValue,args:actionArgs,options:actionOpts,command:cmd})
+            }
         }
     }
     /**
