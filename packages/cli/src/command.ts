@@ -7,8 +7,11 @@ import fs from "node:fs"
 import type { AsyncFunction } from "flex-tools";
 
 
-export type AfterCommandHookListener = (thisCommand:MixedCommand,actionComand:MixedCommand)=>void | Promise<void>
-export type BeforeCommandHookListener = (...args:any[])=>void | Promise<void>
+export type ICommandHookListener = ({args,options,command}:{args:any[],options:Record<string,any>,command:MixedCommand})=>void | Promise<void>
+
+export type BeforeCommandHookListener = ({args,options,command}:{args:any[],options:Record<string,any>,command:MixedCommand})=>void | Promise<void>
+export type AfterCommandHookListener = ({value,args,options,command}:{value:any,args:any[],options:Record<string,any>,command:MixedCommand})=>void | Promise<void>
+
 
 export interface ActionOptions{
     id:string
@@ -134,31 +137,6 @@ export class MixedCommand extends Command{
         return this.wrapperWorkDirsAction(this.wrapperChainActions())
     }
 
-    private async executeBeforeHooks(...args:any[]){
-        const hooks:([BeforeCommandHookListener,boolean,MixedCommand])[] = this.beforeHooks.map(([hook,scope])=>([hook,scope,this]))   
-        this.getAncestorCommands().forEach((cmd:MixedCommand)=>{
-            hooks.unshift(...cmd.beforeHooks.map(([hook,scope])=>{                
-                return [hook,scope,cmd] as [BeforeCommandHookListener,boolean,MixedCommand]
-            }) )
-        }) 
-        for(let [hook,scope,cmd] of hooks){
-            if(!scope) continue
-            await hook.call(cmd,...args,cmd,this)
-        }
-    }    
-
-    private async executeAfterHooks(...args:any[]){
-        const hooks:([BeforeCommandHookListener,boolean,MixedCommand])[] = this.beforeHooks.map(([hook,scope])=>([hook,scope,this]))   
-        this.getAncestorCommands().forEach((cmd:MixedCommand)=>{
-            hooks.unshift(...cmd.beforeHooks.map(([hook,scope])=>{
-                return [hook,scope,cmd] as [BeforeCommandHookListener,boolean,MixedCommand]
-            }) )
-        })
-        // 抛行
-        for(let hook of hooks){ 
-            await hook[0].call(hook[1],...args,hook[1],this)
-        }
-    }
     /**
      * 向上查找所有祖先命令
      */
@@ -181,18 +159,19 @@ export class MixedCommand extends Command{
         return async function(this:any){
             const args = Array.from(arguments) // 原始输入的参数
             let preValue:any           // 保存上一个action的返回值
-            
-            await self.executeBeforeHooks(...args)
+            //解析参数, 0-1个参数为options,最后一个参数为command
+            let actionOpts:Record<string,any>={},actionArgs:any[] =[],cmd:any
+            if(args.length>=2){
+                cmd=args[args.length-1]     // 最后一个command
+                actionOpts = args[args.length-2]
+                actionArgs = args.slice(0,args.length-2)                            
+            }
+                        
+            await self.executeBeforeHooks({args:actionArgs,options:actionOpts,command:cmd})
 
             for(let action of self._actions){                
                 try{
-                    if(action.enhance){// 增强模式
-                        let actionOpts:Record<string,any>={},actionArgs:any[] =[],cmd:any
-                        if(args.length>=2){
-                            cmd=args[args.length-1]
-                            actionOpts = args[args.length-2]
-                            actionArgs = args.slice(0,args.length-2)                            
-                        }
+                    if(action.enhance){// 增强模式                        
                         outputDebug("执行<{}>: args={}, options={}",()=>([self.name(),actionArgs,actionOpts]))
                         preValue = await action.fn.call(this,{
                             command:cmd,
@@ -210,7 +189,7 @@ export class MixedCommand extends Command{
                 }
             }     
             
-            await self.executeAfterHooks(preValue)
+            await self.executeAfterHooks({value:preValue,args:actionArgs,options:actionOpts,command:cmd})
 
         }
     }
@@ -252,17 +231,50 @@ export class MixedCommand extends Command{
     getOption(name:string):MixedOption{
         return this.options.find(option => option.name() == name) as unknown as MixedOption
     }
-
+    /**
+     * 添加一个Before钩子
+     * @param listener 
+     * @param scope     =false时代表只在本命令执行，=true时代表在本命令及其子命令执行
+     * @returns 
+     */
     before(listener:BeforeCommandHookListener,scope:boolean=true){        
         this._beforeHooks.push([listener,scope])
         return this
     } 
-
+    private async executeBeforeHooks(args:any){
+        const hooks:([BeforeCommandHookListener,boolean,MixedCommand])[] = this.beforeHooks.map(([hook,scope])=>([hook,scope,this]))   
+        this.getAncestorCommands().forEach((cmd:MixedCommand)=>{
+            hooks.unshift(...cmd.beforeHooks.map(([hook,scope])=>{                
+                return [hook,scope,cmd] as [BeforeCommandHookListener,boolean,MixedCommand]
+            }) )
+        }) 
+        for(let [hook,scope,cmd] of hooks){
+            if(!scope) continue
+            await hook.call(cmd,args)
+        }
+    }    
+    /**
+     * 添加一个After钩子
+     * @param listener 
+     * @param scope     =false时代表只在本命令执行，=true时代表在本命令及其子命令执行
+     * @returns 
+     */
     after(listener:AfterCommandHookListener,scope:boolean=true){
-        this._afterHooks.push([listener,false])
+        this._afterHooks.push([listener,scope])
         return this
     } 
-
+    private async executeAfterHooks(args:any){
+        const hooks:([AfterCommandHookListener,boolean,MixedCommand])[] = this.afterHooks.map(([hook,scope])=>([hook,scope,this]))   
+        this.getAncestorCommands().forEach((cmd:MixedCommand)=>{
+            hooks.push(...cmd.afterHooks.map(([hook,scope])=>{
+                return [hook,scope,cmd] as [BeforeCommandHookListener,boolean,MixedCommand]
+            }) )
+        })
+        for(let [hook,scope,cmd] of hooks){
+            if(!scope) continue //=false时不执行
+            await hook.call(cmd,args)
+        }
+    }
     private async preActionHook(thisCommand:Command, actionCommand:Command){             
         if(this.isEnablePrompts()){
             // 自动生成提示
