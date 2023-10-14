@@ -36,6 +36,10 @@ export default defineConfig({
         items: [          
           { text: '关于', link: '/about' },
           { text: '快速入门', link: '/get-started' },
+          {
+            text:"变更历史",
+            link:"/CHANGELOG"
+          },
           { 
             text: '指南', 
             link: '/guide/',
@@ -53,9 +57,8 @@ export default defineConfig({
               { text: '共享上下文', link: '/guide/context' }, 
               { text: '国际化', link: '/guide/i18n' },                            
               { text: '实用工具函数', link: '/guide/utils' }              
-            ]
-        
-          },
+            ]        
+          }
         ]
       }
     ],
