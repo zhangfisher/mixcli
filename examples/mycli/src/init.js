@@ -10,6 +10,7 @@ module.exports = (cli)=>{
     command
         .name('init')
         .description('初始化应用') 
+        .argument("[services...]","要运行的服务名称列表",[])        
         // .option(`-p, --provider <value>`,`数据库类型,取值${DbProviders.join()}`,{default:'sqlite',choices:DbProviders})  
         // .option("--url <value>","数据库连接字符串,默认为当前目录","file:./voerka.db")  
         // .option("--skip","跳过安装检查",{prompt:false,default:false})
