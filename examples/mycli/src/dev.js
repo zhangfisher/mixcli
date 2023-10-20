@@ -34,7 +34,8 @@ module.exports = (cli)=>{
         // })
         // 未指定默认值,自动使用text类型提供
         .option("-t,--title <value>","标题",{
-            validate:(value)=>value.length>=5,
+            // validate:(value)=>value.length>=5,
+            required:true,
             prompt:{
                 type:'text',  
                 warn: "不少于5个字符"

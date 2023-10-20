@@ -1,6 +1,6 @@
 import { PromptObject } from "prompts" 
 import { outputDebug } from "./utils"
-
+ 
 
 export type PromptType = "text" | "password" | "invisible" | "number"| "confirm"| "list"| "toggle"| "select" | "multiselect" | "autocomplete" | "date" | "autocompleteMultiselect"
 
