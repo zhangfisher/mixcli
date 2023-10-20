@@ -1,5 +1,11 @@
 # mixed-cli
 
+## 2.0.10
+
+### Patch Changes
+
+- 27df7b2: 修复当 required=true 时不生效的问题
+
 ## 2.0.9
 
 ### Patch Changes
