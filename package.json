@@ -13,7 +13,7 @@
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs",
     "sync": "cnpm sync mixed-cli",
-    "changelog":"changeset && npx changeset version && copy packages\\cli\\CHANGELOG.md docs\\CHANGELOG.md && git add . && git commit -m 'chore: update changelog'"
+    "changelog":"changeset && npx changeset version && copy packages\\cli\\CHANGELOG.md docs\\CHANGELOG.md"
   },
   "keywords": [],
   "author": "",

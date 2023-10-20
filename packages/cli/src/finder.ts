@@ -84,7 +84,8 @@ export function findCliPaths(this:MixedCli,packageName?:string ,entry?:string):s
                 outputDebug("解析包<{}>路径出错：{}",[name,e.stack])
             }    
         })
-    return cliDirs 
+    // 由于一些包可能存在循环依赖，所以需要去重
+    return [...new Set(cliDirs)]
 }
 
 /**
