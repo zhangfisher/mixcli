@@ -1,31 +1,23 @@
-name: Generate Release
 on:
   push:
     tags:
-      - 'v*' # 当以 'v' 开头的标签推送时触发
+      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+
+name: Create Release
 
 jobs:
-  release:
+  build:
+    name: Create Release
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v2
+        uses: actions/checkout@master
+      - name: Create Release for Tag
+        id: release_tag
+        uses: yyx990803/release-tag@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          node-version: 14
-      
-      - name: Install pnpm
-        run:
-          npm install -g pnpm
-
-      - name: Install dependencies
-        run: pnpm install
-
-      - name: Generate release
-        run: |
-          # 在此处生成您的 Release 版本，例如：
-          pnpm run build
-          git tag -a ${{ github.ref }} -m "Release ${{ github.ref }}"
-          git push origin ${{ github.ref }}
+          tag_name: ${{ github.ref }}
+          body: |
+            Please refer to [CHANGELOG.md](https://github.com/zhangfisher/mixed-cli/blob/master/docs/CHANGELOG.md) for details.
