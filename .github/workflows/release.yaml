@@ -1,0 +1,31 @@
+name: Generate Release
+on:
+  push:
+    tags:
+      - 'v*' # 当以 'v' 开头的标签推送时触发
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14
+      
+      - name: Install pnpm
+        run:
+          npm install -g pnpm
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Generate release
+        run: |
+          # 在此处生成您的 Release 版本，例如：
+          pnpm run build
+          git tag -a ${{ github.ref }} -m "Release ${{ github.ref }}"
+          git push origin ${{ github.ref }}
