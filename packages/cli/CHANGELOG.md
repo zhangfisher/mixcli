@@ -1,5 +1,11 @@
 # mixed-cli
 
+## 2.0.12
+
+### Patch Changes
+
+- 60bb80b: 新增加对 type:module 的包支持
+
 ## 2.0.11
 
 ### Patch Changes
