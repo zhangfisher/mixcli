@@ -1,5 +1,11 @@
 # mixcli
 
+## 3.0.2
+
+### Patch Changes
+
+- cc8803c: 更新发布
+
 ## 3.0.1
 
 ### Patch Changes
