@@ -1,5 +1,11 @@
 # mixed-cli
 
+## 3.0.0
+
+### Major Changes
+
+- f5c09db: rename package name
+
 ## 2.0.12
 
 ### Patch Changes
