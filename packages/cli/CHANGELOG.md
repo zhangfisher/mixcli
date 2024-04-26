@@ -1,5 +1,11 @@
 # mixcli
 
+## 3.0.3
+
+### Patch Changes
+
+- 4505f11: 优化命令导入机制,解决当 type:module 时的导入问题
+
 ## 3.0.2
 
 ### Patch Changes
