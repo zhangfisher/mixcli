@@ -1,0 +1,20 @@
+{
+    "json.schemas": [
+        {
+            "fileMatch": ["/package.json"],
+            "schema": {
+              "type": "object",
+              "properties": {
+                "scripts": {
+                  "type": "object",
+                  "properties": {
+                    "build": {
+                      "description": "我的构建项目111"
+                    }
+                  }
+                }
+              }
+            }
+          }
+    ]
+}

@@ -1,0 +1,36 @@
+/**
+
+    本文件在执行命令`voerka migrate --name` 时自动执行，用于填充数据库初始数据。
+
+*/
+
+import { PrismaClient } from '{{if output}}{{output}}{{else}}@prisma/client{{/if}}'
+const prisma = new PrismaClient()
+
+async function main() {
+    console.log("导入初始化数据")
+    // 在此处使用@prisma/client填充初始数据
+    // const alice = await prisma.user.upsert({
+    //     where: { email: 'alice@prisma.io' },
+    //     update: {},
+    //     create: {
+    //          email: 'alice@prisma.io',
+    //          name: 'Alice',
+    //          posts: {
+    //          create: {
+    //              title: 'Check out Prisma with Next.js',
+    //              content: 'https://www.prisma.io/nextjs',
+    //              published: true,
+    //          },
+    //     },
+    //  }
+    //})
+}
+
+main()
+  .catch((e) => {
+    console.error(e)
+    process.exit(1)
+  }).finally(async () => {
+    await prisma.$disconnect()
+  })

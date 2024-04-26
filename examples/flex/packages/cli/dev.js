@@ -4,7 +4,7 @@ const logsets = require('logsets');
 
 const delay = (ms)=>new Promise(resolve=>setTimeout(resolve,ms))
 /**
- * @param {import('mixcli').MixedCli} cli
+ * @param {import('mixcli').mixcli} cli
  */
 module.exports = (cli)=>{                
     const devCommand = new MixCommand("dev");

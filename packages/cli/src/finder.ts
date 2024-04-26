@@ -1,11 +1,12 @@
-import { getPackageRootPath } from 'flex-tools';
+import { getPackageJson } from  "flex-tools/package/getPackageJson"
+import { getPackageRootPath } from 'flex-tools/package/getPackageRootPath';
 import type { MixCli } from './cli';
 import {  globSync } from 'glob'
 import { MixCliCommand } from './cli';
-import { isDebug, outputDebug } from './utils';
+import { importModule, isDebug, outputDebug } from './utils';
 import fs from "node:fs"
 import path from "node:path"
-import { getPackageJson } from  "flex-tools/package/getPackageJson"
+
 
 /**
  * 
@@ -89,15 +90,6 @@ export function findCliPaths(this:MixCli,packageName?:string ,entry?:string):str
 }
 
 
-function showError(e:any){
-    if(isDebug()){
-        outputDebug("导入命令<>出错:{}",e.stack)
-    }else{
-        console.error(e)
-    }  
-
-}
-
 /**
  * 
  *  扫描当前工程中所有符合条件的命令
@@ -110,31 +102,32 @@ export async function findCommands(cli:MixCli){
     const commands:MixCliCommand[] = []
     const files = [] as string[]
     cliDirs.forEach(dir=>{
-        files.push(...globSync("*",{
+        globSync("*",{
             cwd:dir,
             absolute :true 
-        }).filter((file:string)=>(file.endsWith(".js") || file.endsWith(".cjs") || file.endsWith(".mjs")) && !fs.statSync(file).isDirectory()))
+        }).forEach((file:string)=>{
+            const ext = path.extname(file).toLowerCase()
+            if([".js",".cjs",".mjs"].includes(ext)){
+                files.push(file)
+            }else if(fs.statSync(file).isDirectory()){
+                files.push(path.join(file,"index.js"))
+                files.push(path.join(file,"index.cjs"))
+                files.push(path.join(file,"index.mjs"))
+            }
+        })
     })
     for(let file of files){    
+       if(!fs.existsSync(file)) continue
         try{
             outputDebug("导入命令:{}",file)
             if(file.endsWith(".cjs") || file.endsWith(".js")){
-                commands.push(require(file))
+                commands.push(await importModule(file))
             }else if(file.endsWith(".mjs")){
                 const cmd = await import(`file://${file}`)
                 commands.push(cmd.default)
             }            
         }catch(e:any){
-            if(e.code==="ERR_REQUIRE_ESM"){                                
-                try{
-                    const cmd = await import(`file://${file.replace(".js",".mjs")}`)
-                    commands.push(cmd.default)
-                }catch(err){
-                    showError(err)
-                }
-            }else{
-                showError(e) 
-            }
+            outputDebug(e) 
         }
     }
     return commands

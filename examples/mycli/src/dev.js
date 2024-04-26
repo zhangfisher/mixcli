@@ -2,7 +2,7 @@ const { MixCommand } = require('mixcli');
 
 
 /**
- * @param {import('mixcli').MixedCli} cli
+ * @param {import('mixcli').MixCli} cli
  */
 module.exports = (cli)=>{        
     

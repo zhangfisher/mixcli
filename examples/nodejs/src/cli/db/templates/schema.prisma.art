@@ -1,0 +1,24 @@
+generator client {
+  provider = "prisma-client-js"
+  {{if output }}output = "{{output}}"{{/if}}
+}
+
+datasource db {
+  provider = "{{provider}}"
+  url      = {{@ url }}
+}
+
+// 示例模型
+model User {
+  id      Int      @id @default(autoincrement())
+  email   String   @unique
+  name    String?
+  profile Profile?
+}
+
+model Profile {
+  id     Int    @id @default(autoincrement())
+  bio    String
+  user   User   @relation(fields: [userId], references: [id])
+  userId Int @unique
+}

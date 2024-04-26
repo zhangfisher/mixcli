@@ -3,7 +3,7 @@ const path = require("node:path")
 const DbProviders = ["sqlite","mysql","sqlserver","postgresql"]
 
 /**
- * @param {import('mixcli').MixedCli} cli
+ * @param {import('mixcli').MixCli} cli
  */
 module.exports = (cli)=>{    
     const command = new MixCommand();

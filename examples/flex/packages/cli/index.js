@@ -1,7 +1,7 @@
-const { MixedCli } = require("mixcli") 
+const { mixcli } = require("mixcli") 
 const initCommand = require("./init") 
 const devCommand = require("./dev")
-const cli = new MixedCli({
+const cli = new mixcli({
     name: "flex",
     version: "1.0.0",
     include: /^\@flex\//,  //  [!code ++]

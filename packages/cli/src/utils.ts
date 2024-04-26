@@ -126,3 +126,33 @@ export async function mkDirs(dirs:string[],{callback,base}:{callback?:Function,b
         await mkdir(dir,{recursive:true})
     }
 }
+
+export function showError(e:any){
+    if(isDebug()){
+        outputDebug("导入命令<>出错:{}",e.stack)
+    }else{
+        console.error(e)
+    }  
+
+}
+
+
+export function getId(){
+    return Math.random().toString(36).substr(2)
+}
+
+
+export async function importModule(file:string){
+    let module 
+    try{
+        module = require(file)
+    }catch(e:any){
+        try{
+            const cmd = await import(`file://${file}`)
+            module = cmd.default
+        }catch(e:any){
+            throw e
+        }        
+    }
+    return module
+}
