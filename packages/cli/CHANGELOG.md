@@ -1,5 +1,11 @@
 # mixcli
 
+## 3.0.1
+
+### Patch Changes
+
+- 46c9833: update dependencies
+
 ## 3.0.0
 
 ### Major Changes
