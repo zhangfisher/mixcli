@@ -1,21 +1,21 @@
 # 创建命令
 
-`MixedCli`基于`commander`，因此可以使用`commander`的所有功能，在`commander`的基础上作了增强，提供了更加友好的命令行开发体验。
+`MixCli`基于`commander`，因此可以使用`commander`的所有功能，在`commander`的基础上作了增强，提供了更加友好的命令行开发体验。
 
 
 ## 创建命令
 
-每一个`MixedCli`命令原则上建议一个命令对应一个`js`文件,且该`js`文件导出一个返回`MixedCommand`或`MixedCommand[]`的函数，如下所示：
+每一个`MixCli`命令原则上建议一个命令对应一个`js`文件,且该`js`文件导出一个返回`MixCommand`或`MixCommand[]`的函数，如下所示：
 
 ```js
 
-const {MixedCommand} = require("mixed-cli");
+const {MixCommand} = require("mixcli");
 
 /**
- * @param {import('mixed-cli').MixedCli} cli
+ * @param {import('mixcli').MixCli} cli
  */
 module.exports = (cli)=>{
-    const devCommand = new MixedCommand();
+    const devCommand = new MixCommand();
     devCommand
         .name("dev")
         .arguments("<name>","项目名称")
@@ -32,12 +32,12 @@ module.exports = (cli)=>{
 
 ```
 
-- **注意:** `MixedCommand`继承自`commander.Command`，因此可以使用`commander`的所有功能,`MixedCommand.option`用来声明命令选项，其参数与`commander.Command.option`基本一致，并做了少量扩展。
+- **注意:** `MixCommand`继承自`commander.Command`，因此可以使用`commander`的所有功能,`MixCommand.option`用来声明命令选项，其参数与`commander.Command.option`基本一致，并做了少量扩展。
 
 
 ## 命令选项
 
-`MixedCommand`继承自`commander.Command`，声明命令选项的方式与`commander`一致。
+`MixCommand`继承自`commander.Command`，声明命令选项的方式与`commander`一致。
 
 为命令增加选项的方法，在`commander`中提供了两种方式：
 
@@ -51,18 +51,18 @@ program
 
 以上两种方式同样支持，详见[commander](https://github.com/tj/commander.js)介绍。
 
-而在`MixedCli`中，可以简化为直接这样定义：
+而在`MixCli`中，可以简化为直接这样定义：
 
 ```js
-const { MixedCommand } = require("mixed-cli");
-const devCommand = new MixedCommand();
+const { MixCommand } = require("mixcli");
+const devCommand = new MixCommand();
     devCommand.option("-m,--mode <mode>","指定模式",{choices:["development","production","test","debug"]})
 ```
 
-`MixedCommand`继承自`commander.Command`，因此可以使用`commander`的所有功能,`MixedCommand.option`用来声明命令选项，其参数与`commander.Command.option`一致，但是`MixedCommand.option`提供了更加友好的方式来定义命令选项。
+`MixCommand`继承自`commander.Command`，因此可以使用`commander`的所有功能,`MixCommand.option`用来声明命令选项，其参数与`commander.Command.option`一致，但是`MixCommand.option`提供了更加友好的方式来定义命令选项。
 
 ```ts
-class MixedCommand extends Command{
+class MixCommand extends Command{
     option(flags: string, description?: string | undefined,defaultValue?:any ): this
     option(flags: string, description?: string | undefined,options?:FlexOptionParams ): this{
 }
@@ -91,7 +91,7 @@ export interface FlexOptionParams extends IPromptableOptions{
 
 ```
 
-**`MixedCommand`的增强体现在：**
+**`MixCommand`的增强体现在：**
 
 - 增加了参数`prompt`，用来**控制命令选项使用哪一种交互提示信息。**
 - 重载了`Command`的`option`方法，通过`FlexOptionParams`参数来声明所有命令选项的配置参数。
@@ -99,7 +99,7 @@ export interface FlexOptionParams extends IPromptableOptions{
 
 ## 命令函数
 
-`MixedCommand`继承自`commander.Command`，因此可以使用`commander`的所有功能,`MixedCommand.action`用来声明命令函数，其参数与`commander.Command.action`一致，但是`MixedCommand.action`扩展支持多个命令函数。
+`MixCommand`继承自`commander.Command`，因此可以使用`commander`的所有功能,`MixCommand.action`用来声明命令函数，其参数与`commander.Command.action`一致，但是`MixCommand.action`扩展支持多个命令函数。
 
 ### 基本使用
 
@@ -107,9 +107,9 @@ export interface FlexOptionParams extends IPromptableOptions{
 
 ```ts
 
-const {MixedCommand} = require("mixed-cli");
+const {MixCommand} = require("mixcli");
 module.exports = (cli)=>{    
-    const myCommand = new MixedCommand("init");
+    const myCommand = new MixCommand("init");
     myCommand
         .option("-t,--template <value>","指定模板",
             {choices:["react","vue","angular"]}
@@ -128,28 +128,28 @@ module.exports = (cli)=>{
 
 ### 命令链路
 
-`MixedCommand.action`最大的增强在于，支持**声明多个命令函数**，形成执行链。
+`MixCommand.action`最大的增强在于，支持**声明多个命令函数**，形成执行链。
 
 - **命令列表**
 
-**`MixedCommand`内部维护了一个`action`函数数组(通过`MixedCommand.actions`可以访问)。**
+**`MixCommand`内部维护了一个`action`函数数组(通过`MixCommand.actions`可以访问)。**
 
-当每次执行`MixedCommand.action`时，会将`action`函数添加到数组中。然后当运行命令时，会按照数组中的顺序依次执行。
+当每次执行`MixCommand.action`时，会将`action`函数添加到数组中。然后当运行命令时，会按照数组中的顺序依次执行。
 
-这是`MixedCommand`与`commander.Command`最大的不同。
+这是`MixCommand`与`commander.Command`最大的不同。
 
 因此基于此特性，在上面的`init`命令中，事实上是定义了两个`action`函数，当执行`mycli init`时分别执行了两个`action`函数。
  
 - **中断执行命令**
 
-多次执行`MixedCommand.action`时，会创建一个`action`函数数组,这些`action`会依次顺序执行。
+多次执行`MixCommand.action`时，会创建一个`action`函数数组,这些`action`会依次顺序执行。
 
 `action`函数可以显式返回`BREAK`来中断后续`action`的执行。
 
 ```ts
-const {MixedCommand,BREAK} = require("mixed-cli");
+const {MixCommand,BREAK} = require("mixcli");
 module.exports = (cli)=>{    
-    const myCommand = new MixedCommand("init");
+    const myCommand = new MixCommand("init");
     myCommand
         .option("-t,--template <value>","指定模板",
             {choices:["react","vue","angular"]
@@ -168,9 +168,9 @@ module.exports = (cli)=>{
 除了`.action(async (arg1,arg2,options)=>{...})`的常规签名方式外，当也可以采用`增强模式`。
 
 ```ts
-const { MixedCommand,BREAK } = require("mixed-cli");
+const { MixCommand,BREAK } = require("mixcli");
 module.exports = (cli)=>{    
-    const myCommand = new MixedCommand("init");
+    const myCommand = new MixCommand("init");
     myCommand
         .option("-t,--template <value>","指定模板",
             {choices:["react","vue","angular"]
@@ -203,17 +203,17 @@ module.exports = (cli)=>{
 
 ### 查找命令
 
-在进行命令扩展时，道德需要查找存在的命令，`MixedCli`提供了两种方式来查找命令：
+在进行命令扩展时，道德需要查找存在的命令，`MixCli`提供了两种方式来查找命令：
 
-- `MixedCli.find(命令名称)`：以异步的方式来获取命令。
-- `MixedCli.get(命令名称)`：以同步命令名称来获取命令，如果命令不存在，则抛出`undefined`。
+- `MixCli.find(命令名称)`：以异步的方式来获取命令。
+- `MixCli.get(命令名称)`：以同步命令名称来获取命令，如果命令不存在，则抛出`undefined`。
 
-`MixedCli.find(命令名称)`或`MixedCli.get(命令名称)`中的支持获取到子命令。
+`MixCli.find(命令名称)`或`MixCli.get(命令名称)`中的支持获取到子命令。
 
 比如，有如下命令：
 
 ```js
-const {MixedCommand} = require("mixed-cli");
+const {MixCommand} = require("mixcli");
 module.exports = (cli)=>{    
     cli.get("dev")      // 获取dev命令对象
     cli.get("dev.app")  // 获取dev命令的子命令app对象
@@ -223,7 +223,7 @@ module.exports = (cli)=>{
 `find`和`get`方法的区别在于：
 
 - `find`是异步方法，返回一个`Promise`,而`get`是同步方法
-- 当`MixedCli`在检索`include`参数指定的扩展包并加裁时，由于扩展包加载顺序的问题，`get`方法获取命令时要求命令必须是已经前置加载的。而`find`方法则不受此限制。所以大部份情况下，建议采用`find`方法来获取命令。
+- 当`MixCli`在检索`include`参数指定的扩展包并加裁时，由于扩展包加载顺序的问题，`get`方法获取命令时要求命令必须是已经前置加载的。而`find`方法则不受此限制。所以大部份情况下，建议采用`find`方法来获取命令。
 
 
 
@@ -232,7 +232,7 @@ module.exports = (cli)=>{
 可以修改已存在的命令选项。
 
 ```js{5}
-const {MixedCommand} = require("mixed-cli");
+const {MixCommand} = require("mixcli");
 module.exports = (cli)=>{    
     cli.find("dev").then((devCommand)=>{   
         // 获取到当前命令的选项
@@ -261,7 +261,7 @@ module.exports = (cli)=>{
 为已存在的命令增加命令选项。
 
 ```js{4}
-const {MixedCommand} = require("mixed-cli");
+const {MixCommand} = require("mixcli");
 module.exports = (cli)=>{    
     cli.find("dev").then((devCommand)=>{   
        devCommand.option("-p,--port <port>","指定端口号",3000)         
@@ -276,11 +276,11 @@ module.exports = (cli)=>{
 
 ```js
 
-const {MixedCommand} = require("mixed-cli");
+const {MixCommand} = require("mixcli");
 module.exports = (cli)=>{    
     // 1. 获取已经存在的命令
     cli.find("dev").then((devCommand)=>{ 
-        const appCommand = new MixedCommand();
+        const appCommand = new MixCommand();
         appCommand
             .name("app")
             .arguments("<name>","项目名称")
@@ -312,7 +312,7 @@ module.exports = (cli)=>{
 在`dev`命令中增加`before`和`after`两个`hook`函数，分别在执行`dev`的`action`函数之前和之后执行。
 
 ```js
-const {MixedCommand} = require("mixed-cli");
+const {MixCommand} = require("mixcli");
 module.exports = (cli)=>{    
     cli.find("dev").then((devCommand)=>{   
        devCommand

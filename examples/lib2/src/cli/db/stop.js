@@ -1,11 +1,11 @@
 
-const { MixedCommand } = require('mixed-cli');
+const { MixCommand } = require('mixcli');
 
 /**
- * @param {import('mixed-cli').MixedCli} cli
+ * @param {import('mixcli').MixedCli} cli
  */
  module.exports = (cli)=>{        
-    const stopCommand = new MixedCommand();
+    const stopCommand = new MixCommand();
     stopCommand
         .name("stop")
         .description("停止应用")

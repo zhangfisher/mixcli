@@ -1,12 +1,12 @@
-const { MixedCommand } = require('mixed-cli');
+const { MixCommand } = require('mixcli');
 const path = require("node:path")
 const DbProviders = ["sqlite","mysql","sqlserver","postgresql"]
 
 /**
- * @param {import('mixed-cli').MixedCli} cli
+ * @param {import('mixcli').MixedCli} cli
  */
 module.exports = (cli)=>{    
-    const command = new MixedCommand();
+    const command = new MixCommand();
     command
         .name('init')
         .description('初始化应用') 
@@ -40,7 +40,7 @@ module.exports = (cli)=>{
         .after(async function ({value,options,command,args}){
             console.log("after init :",value,options)
         })
-    const initVueCommand = new MixedCommand('vue');
+    const initVueCommand = new MixCommand('vue');
     initVueCommand
         .before(async function ({options,command,args}){
             console.log("before init vue",options)

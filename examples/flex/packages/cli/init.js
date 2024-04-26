@@ -1,11 +1,11 @@
 
-const { MixedCommand } = require('mixed-cli');
+const { MixCommand } = require('mixcli');
 
 /**
- * @param {import('mixed-cli').MixedCli} cli
+ * @param {import('mixcli').MixedCli} cli
  */
 module.exports = (cli)=>{                
-    const initCommand = new MixedCommand("init");
+    const initCommand = new MixCommand("init");
     initCommand
         .description("创建应用")         
         .option("-t, --type <type>", "应用类型",{choices:["vue","react","angular"]})

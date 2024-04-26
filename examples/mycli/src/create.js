@@ -2,7 +2,7 @@ const { Command } = require('commander');
 
 
 /**
- * @param {import('mixed-cli').MixedCli} cli
+ * @param {import('mixcli').MixedCli} cli
  */
 module.exports = (cli)=>{    
     const devCommand = cli.get("create")

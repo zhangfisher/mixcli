@@ -1,11 +1,11 @@
-const { MixedCommand } = require('mixed-cli');
+const { MixCommand } = require('mixcli');
 
 /**
- * @param {import('mixed-cli').MixedCli} cli
+ * @param {import('mixcli').MixedCli} cli
  */
 module.exports = (cli)=>{           
     cli.find("init").then((initCommand)=>{
-      const initVueCommand = new MixedCommand("vue");
+      const initVueCommand = new MixCommand("vue");
         initVueCommand
           .description("创建Vue应用")  
           .option("-a, --app <value>", "应用名称",{validate:(value)=>value.length>0})                           

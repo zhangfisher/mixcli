@@ -1,4 +1,4 @@
-const { outputStr,MixedCli } = require("mixed-cli")
+const { outputStr,MixedCli } = require("mixcli")
 const devCommand = require("./dev")
 const initCommand = require("./init")
 const startCommand = require("./start")
@@ -6,10 +6,10 @@ const startCommand = require("./start")
  
 
 const cli = new MixedCli({
-    name: "mixed-cli",
+    name: "mixcli",
     title: ["MixedCli commandline tool      Version: {}","1.0.1"],
     version: "1.0.0",
-    description: "mixed-cli is a cli tool for creating cli tools",
+    description: "mixcli is a cli tool for creating cli tools",
     include: /^\@flex\//, 
     // 显示logo
     logo: String.raw`

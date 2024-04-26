@@ -3,10 +3,10 @@
  * 动态更新已经存在的命令
  * 
  */
-const { MixedCommand } = require('mixed-cli');
+const { MixCommand } = require('mixcli');
 
 /**
- * @param {import('mixed-cli').MixedCli} cli
+ * @param {import('mixcli').MixedCli} cli
  */
 module.exports = (cli)=>{    
     cli.find("init").then(initCommand=>{

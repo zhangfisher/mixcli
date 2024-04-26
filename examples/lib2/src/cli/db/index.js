@@ -1,11 +1,11 @@
 
-const { MixedCommand } = require('mixed-cli');
+const { MixCommand } = require('mixcli');
 
 /**
- * @param {import('mixed-cli').MixedCli} cli
+ * @param {import('mixcli').MixedCli} cli
  */
  module.exports = (cli)=>{        
-    const dbCommand = new MixedCommand();
+    const dbCommand = new MixCommand();
     dbCommand
         .name("db")
         .description("数据库")

@@ -4,10 +4,10 @@
 
 ```js
 
-const { MixedCommand } = require('mixed-cli');
+const { MixCommand } = require('mixcli');
 
 /**
- * @param {import('mixed-cli').MixedCli} cli
+ * @param {import('mixcli').MixCli} cli
  */
 module.exports = (cli)=>{    
     cli.find("init").then(initCommand=>{

@@ -2,10 +2,10 @@ import { defineConfig } from 'vitepress'
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
-  title: "MixedCli",
+  title: "MixCli",
   description: "Create CommandLine Application with Interactive prompts",
   // outDir: '../website',
-  base: '/mixed-cli/',
+  base: '/mixcli/',
   markdown: {
     toc: { level: [1, 2,3,4,5] }
   }, 
@@ -63,7 +63,7 @@ export default defineConfig({
       }
     ],
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/zhangfisher/mixed-cli' }
+      { icon: 'github', link: 'https://github.com/zhangfisher/mixcli' }
     ]
   }
 })

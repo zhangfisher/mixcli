@@ -1,4 +1,4 @@
-const { MixedCli } = require("mixed-cli") 
+const { MixedCli } = require("mixcli") 
 const initCommand = require("./init") 
 const devCommand = require("./dev")
 const cli = new MixedCli({

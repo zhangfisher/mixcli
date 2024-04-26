@@ -15,6 +15,6 @@
     "@flex/angular": "workspace:^",
     "@flex/react": "workspace:^",
     "@flex/vue": "workspace:^",
-    "mixed-cli": "workspace:^"
+    "mixcli": "workspace:^"
   }
 }

@@ -1,8 +1,8 @@
 # 快速入门
 
-`MixedCli`是一个命令行应用开发框架，其主要是对`commander`和`prompts`的封装，提供了更加友好的命令行开发体验。
+`MixCli`是一个命令行应用开发框架，其主要是对`commander`和`prompts`的封装，提供了更加友好的命令行开发体验。
 
-以下我们将通过一个典型的`monorepo`工程，来介绍如何使用`MixedCli`开发命令行应用。
+以下我们将通过一个典型的`monorepo`工程，来介绍如何使用`MixCli`开发命令行应用。
 
 拟开发一个名为`flex`应用，该应用提供了`@flex/cli`，需要达成以下效果：
 
@@ -41,15 +41,15 @@ flex
 ::: code-group
 
 ```bash [npm]
-npm install mixed-cli
+npm install mixcli
 ```
 
 ```bash [pnpm]
-pnpm add mixed-cli
+pnpm add mixcli
 ```
 
 ```bash [yarn]
-yarn add mixed-cli
+yarn add mixcli
 ```
 :::
 
@@ -72,9 +72,9 @@ flex
 ::: code-group
 
 ```ts [cli.js]
-const { MixedCli } = require("mixed-cli") 
+const { MixCli } = require("mixcli") 
 
-const cli = new MixedCli({
+const cli = new MixCli({
     name: "flex",
     version: "1.0.0",
     include: /^\@flex\//,  //  [!code ++]
@@ -104,7 +104,7 @@ cli.run()
 
 `@flex/cli`仅仅是一个命令行的入口：
 
-- **重点：**`include: /^\@flex\// `的意思是告诉`mixed-cli`,当执行`flex`命令时，会在当前工程中搜索以`@flex/`开头的包，然后包中声明在`cli`文件夹下的所有命令被合并到`flex`命令中。
+- **重点：**`include: /^\@flex\// `的意思是告诉`mixcli`,当执行`flex`命令时，会在当前工程中搜索以`@flex/`开头的包，然后包中声明在`cli`文件夹下的所有命令被合并到`flex`命令中。
 - 上面所说的`当前工程`指的是安装了`@flex/cli`的工程，而不是我们的示例工程。
 - `@flex/cli`中使用`cli.register(initCommand)`，注册一个通用的`init`命令，该命令的实现在`init.js`中。 一般可以在此工程提供一些通用命令,而其他的命令声明逻辑在分别在`@flex/*/cli/*.js`等包中实现。
 
@@ -129,13 +129,13 @@ flex
  
 ```js 
 
-const { MixedCommand } = require('mixed-cli');
+const { MixCommand } = require('mixcli');
 
 /**
- * @param {import('mixed-cli').MixedCli} cli
+ * @param {import('mixcli').MixCli} cli
  */
 module.exports = (cli)=>{                
-    const initCommand = new MixedCommand("init");
+    const initCommand = new MixCommand("init");
     initCommand
         .description("创建应用")         
         .option("-t, --type <type>", "应用类型",{choices:["vue","react","angular"]})
@@ -151,9 +151,9 @@ module.exports = (cli)=>{
 然后，我们在`packages/cli/index.js`中注册`init`命令。
 
 ```js
-const { MixedCli } = require("mixed-cli") 
+const { MixCli } = require("mixcli") 
 const initCommand = require("./init")  // [!code ++]
-const cli = new MixedCli({
+const cli = new MixCli({
     name: "flex",
     include: /^\@flex\//,  //  [!code ++] 
     //...
@@ -182,9 +182,9 @@ cli.run()
 
 ```js{9-15}
 // packages/cli/init.js
-const { MixedCommand } = require('mixed-cli');
+const { MixCommand } = require('mixcli');
 module.exports = (cli)=>{                
-    const initCommand = new MixedCommand("init");
+    const initCommand = new MixCommand("init");
     initCommand
         .description("创建应用")         
         .option("-t, --type <type>", "应用类型",{choices:["vue","react","angular"]})
@@ -207,14 +207,14 @@ module.exports = (cli)=>{
 
 - **分布式处理方式**
 
-**`MixedCli`提供了这样的分布式处理命令选择的能力。**
+**`MixCli`提供了这样的分布式处理命令选择的能力。**
 
 我们分别在`@flex/vue/cli/init.js`、`@flex/react/cli/init.js`、`@flex/angular/cli/init.js`中实现`init`命令的处理逻辑。
 
 ::: code-group
 
 ```js [packages/vue/cli/init.js]
-const { MixedCommand,BREAK } = require('mixed-cli');
+const { MixCommand,BREAK } = require('mixcli');
 module.exports = (cli)=>{                
     cli.find("init").then(initCommand=>{
       initCommand
@@ -229,7 +229,7 @@ module.exports = (cli)=>{
 ```
 
 ```js [packages/react/cli/init.js]
-const { MixedCommand,BREAK } = require('mixed-cli');
+const { MixCommand,BREAK } = require('mixcli');
 module.exports = (cli)=>{                
     cli.find("init").then(initCommand=>{
       initCommand
@@ -244,7 +244,7 @@ module.exports = (cli)=>{
 ```
 
 ```js [packages/angular/cli/init.js]
-const { MixedCommand,BREAK } = require('mixed-cli');
+const { MixCommand,BREAK } = require('mixcli');
 module.exports = (cli)=>{                
     cli.find("init").then(initCommand=>{
       initCommand
@@ -259,27 +259,27 @@ module.exports = (cli)=>{
 ```
 :::
 
-- 在`src/cli`目录下创建`init.js`文件，用于声明`init`命令。`cli`目录下的所有`js`文件会被自动加载,每个文件均导出一个函数，该函数需要返回一个或多个`MixedCommand`实例。`cli`目录是一个默认的约定目录，可以通过`cli.cliDir`参数修改。
-- 创建`MixedCommand`实例，用于声明命令。`MixedCommand`继承自`commander`的`Command`类，因此可以使用`commander`的所有特性。
-- `package.json`只需要将`mixed-cli`添加为依赖即可。
+- 在`src/cli`目录下创建`init.js`文件，用于声明`init`命令。`cli`目录下的所有`js`文件会被自动加载,每个文件均导出一个函数，该函数需要返回一个或多个`MixCommand`实例。`cli`目录是一个默认的约定目录，可以通过`cli.cliDir`参数修改。
+- 创建`MixCommand`实例，用于声明命令。`MixCommand`继承自`commander`的`Command`类，因此可以使用`commander`的所有特性。
+- `package.json`只需要将`mixcli`添加为依赖即可。
 
 
 ![](./public/get-started/init_types.png)
 
 ## 第5步: 开发子命令
 
-以上是分布式处理命令选项的方式，`MixedCli`也支持创建子命令。
+以上是分布式处理命令选项的方式，`MixCli`也支持创建子命令。
 
 以下在`@flex/vue`中创建`init vue`子命令。
 
  
 ```js
 // @flex/vue/cli/create_vue.js
-const { MixedCommand } = require('mixed-cli'); 
+const { MixCommand } = require('mixcli'); 
 module.exports = (cli)=>{                
 
     cli.find("init").then((initCommand)=>{
-      const initVueCommand = new MixedCommand("vue");
+      const initVueCommand = new MixCommand("vue");
         initVueCommand
           .description("创建Vue应用")  
           .option("-a, --app <value>", "应用名称",{validate:(value)=>value.length>5})})                           
@@ -309,13 +309,13 @@ module.exports = (cli)=>{
 ::: code-group
 
 ```js [packages/cli/dev.js]
-const { MixedCommand } = require('mixed-cli');
+const { MixCommand } = require('mixcli');
 
 /**
- * @param {import('mixed-cli').MixedCli} cli
+ * @param {import('mixcli').MixCli} cli
  */
 module.exports = (cli)=>{                
-    const devCommand = new MixedCommand("dev");
+    const devCommand = new MixCommand("dev");
     devCommand
         .description("开发模式")          
         // 指定了默认值且强制提示
@@ -352,10 +352,10 @@ module.exports = (cli)=>{
 ```
 
 ```js [packages/cli/index.js]
-const { MixedCli } = require("mixed-cli") 
+const { MixCli } = require("mixcli") 
 const initCommand = require("./init") 
 const devCommand = require("./dev")
-const cli = new MixedCli({
+const cli = new MixCli({
     name: "flex",
     version: "1.0.0",
     include: /^\@flex\//,  
@@ -373,7 +373,7 @@ cli.run()
 
 - 命令行的交互体验与使用`commander`时完全一样
 - 仅当选项未指定默认值或满足一定条件时，才会根据一定的规则自动推断交互提示类型。详见[自动推断交互提示](./guide/infer-prompt.md)
-- `MixedCli`使用`prompts`来实现交互提示，因此支持`prompts`的所有交互类型特性。详见[prompts](https://github.com/terkelg/prompts)
+- `MixCli`使用`prompts`来实现交互提示，因此支持`prompts`的所有交互类型特性。详见[prompts](https://github.com/terkelg/prompts)
 
 ## 第7步: 开发命令
 
@@ -384,11 +384,11 @@ cli.run()
 以下是`logsets`的使用示例：
 
 ```js
-const { MixedCommand } = require('mixed-cli');
+const { MixCommand } = require('mixcli');
 
  
 module.exports = (cli)=>{                
-    const devCommand = new MixedCommand("dev");
+    const devCommand = new MixCommand("dev");
     devCommand
         .description("开发模式")          
         .action(async ()=>{
@@ -484,9 +484,9 @@ module.exports = (cli)=>{
 
 ## 小结
 
-- `MixedCli`是一个基于`commander`的命令行工具开发框架，提供了一套命令行开发的最佳实践。
-- `MixedCli`能对所有命令行选项自动推断交互提示类型，当用户没有输入选项时，会自动引导用户输入选项，提供友好的用户体验。
-- `MixedCli`可以在当前工程自动搜索满足条件的包下声明的命令进行合并，从而实现扩展命令的目的。此特性可以保持@flex/cli包的精简和稳定，给用户一致的体验。
+- `MixCli`是一个基于`commander`的命令行工具开发框架，提供了一套命令行开发的最佳实践。
+- `MixCli`能对所有命令行选项自动推断交互提示类型，当用户没有输入选项时，会自动引导用户输入选项，提供友好的用户体验。
+- `MixCli`可以在当前工程自动搜索满足条件的包下声明的命令进行合并，从而实现扩展命令的目的。此特性可以保持@flex/cli包的精简和稳定，给用户一致的体验。
 
 
 

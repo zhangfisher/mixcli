@@ -1,14 +1,14 @@
 
-const { MixedCommand } = require('mixed-cli');
+const { MixCommand } = require('mixcli');
 
 /**
- * @param {import('mixed-cli').MixedCli} cli
+ * @param {import('mixcli').MixedCli} cli
  */
  module.exports = (cli)=>{        
-    const pauseCommand = new MixedCommand();
+    const pauseCommand = new MixCommand();
     pauseCommand
         .name("pause")
-        .description("暂停应用")
+        .description("暂停应用1")
         .option("-t, -time <time>","暂停时间")
         .action(()=>{
             console.log("pause app")

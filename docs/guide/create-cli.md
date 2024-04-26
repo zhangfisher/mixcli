@@ -1,12 +1,12 @@
 # 创建命令行应用
 
-创建命令行应用，需要安装 `mixed-cli` 
+创建命令行应用，需要安装 `mixcli` 
 
 ## 创建命令行实例
 
 ```js{6}
-const { MixedCli } = require("mixed-cli");
-const cli = new MixedCli({
+const { MixCli } = require("mixcli");
+const cli = new MixCli({
     // 此处是配置参数
 });
 
@@ -16,10 +16,10 @@ cli.run();      // 执行命令行应用
 
 ## 配置参数
 
-`MixedCli`支持以下配置参数：
+`MixCli`支持以下配置参数：
 
 ```ts
-export interface MixedCliOptions{
+export interface MixCliOptions{
     // 命令行应用的名称,一般应该与package.json中的bin:{<name>:"...."}中的名称一致
     name:string,
     // 命令行应用的标题，在help中显示，支持logsets风格的着色显示
@@ -48,16 +48,16 @@ export interface MixedCliOptions{
 
 ## 注册命令
 
-在创建`MixedCli`实例时，通过`register`方法注册命令。
+在创建`MixCli`实例时，通过`register`方法注册命令。
 
 ::: code-group
 
 
 ```js [cli.js]
 
-const { MixedCli } = require("mixed-cli");
+const { MixCli } = require("mixcli");
 const myCommand = require("./myCommand");   // [!code ++]
-const cli = new MixedCli({
+const cli = new MixCli({
     // 此处是配置参数
 });
 cli.register(myCommand)               // [!code ++]
@@ -69,10 +69,10 @@ cli.run();      // 执行命令行应用
 ```js [myCommand.js]
 
 
-const {MixedCommand} = require("mixed-cli");
+const {MixCommand} = require("mixcli");
 
 /**
- * @param {import('mixed-cli').MixedCli} cli
+ * @param {import('mixcli').MixCli} cli
  */
 module.exports = (cli)=>{
     // 在此创建FlexCommand实例并返回
@@ -87,17 +87,17 @@ module.exports = (cli)=>{
 
 ## 动态注册命令
 
-除了在创建`MixedCli`实例时显式注册命令外，还可以将命令声明在其他包中，这些包中声明的命令被安装后会自动合并到命令行应用。
+除了在创建`MixCli`实例时显式注册命令外，还可以将命令声明在其他包中，这些包中声明的命令被安装后会自动合并到命令行应用。
 
 - **第1步：声明搜索命令的规则**
 
-在创建`MixedCli`实例时通过`include`和`exclude`参数指定命令搜索规则。
+在创建`MixCli`实例时通过`include`和`exclude`参数指定命令搜索规则。
 
 ```js{4,5}
-const { MixedCli } = require("mixed-cli");
+const { MixCli } = require("mixcli");
 const myCommand = require("./myCommand");   // [!code ++]
-const cli = new MixedCli({
-    name:"mixed-cli",
+const cli = new MixCli({
+    name:"mixcli",
     include: /^\@flex\//,           
     cliDir:"cli"           // 此为默认值，可以不写
 });
@@ -105,7 +105,7 @@ cli.register(myCommand)               // [!code ++]
 cli.run();      // 执行命令行应用
 
 ```
-- 以上`include: /^\@flex\// `的意思是，运行`mixed-cli`时，会在当前所在的工程的依赖中查找包名以`@flex/`开头的包，然后自动加载其`cli`目录下的命令并进行合并注册。
+- 以上`include: /^\@flex\// `的意思是，运行`mixcli`时，会在当前所在的工程的依赖中查找包名以`@flex/`开头的包，然后自动加载其`cli`目录下的命令并进行合并注册。
 
 - **第2步：声明命令**
 
@@ -126,7 +126,7 @@ myapp
 
 ```
 
-按照配置，应在`core/cli`下创建命令`dev.js`和`test.js`，当运行`mixed-cli`时，这两个命令会自动合并到命令行应用中。
+按照配置，应在`core/cli`下创建命令`dev.js`和`test.js`，当运行`mixcli`时，这两个命令会自动合并到命令行应用中。
 
 
 ## 示例
@@ -134,13 +134,13 @@ myapp
 ::: code-group
 
 ```js [cli.js]
-const { MixedCli } = require("mixed-cli") 
+const { MixCli } = require("mixcli") 
 
-const cli = new MixedCli({
-    name: "mixed-cli",
-    title: ["MixedCli commandline tool      Version: {}","1.0.1"],
+const cli = new MixCli({
+    name: "mixcli",
+    title: ["MixCli commandline tool      Version: {}","1.0.1"],
     version: "1.0.0",
-    description: "mixed-cli is a cli tool for creating cli tools",
+    description: "mixcli is a cli tool for creating cli tools",
     include: /^\@flex\//, 
     // 显示logo
     logo: String.raw`
@@ -155,16 +155,16 @@ const cli = new MixedCli({
 
 ```json [package.json]
 {
-    "name":"mixed-cli",
+    "name":"mixcli",
     "main":"src/cli.js",
     "bin":{
-        "mixed-cli":"src/cli.js"
+        "mixcli":"src/cli.js"
     }
 
 }
 ```
 :::
 
-执行`mixed-cli`命令，显示如下：
+执行`mixcli`命令，显示如下：
  
 ![图片](/images/cli_demo.png)

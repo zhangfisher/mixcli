@@ -1,7 +1,7 @@
 
 开发命令行应用的工具包，基于`commander`、`prompts`和`logsets`，提供命令行解析、自动交互提示以及终端界面增强等功能。
 
-[文档]( https://zhangfisher.github.io/mixed-cli/)
+[文档]( https://zhangfisher.github.io/mixcli/)
 
 # 主要特性：
 

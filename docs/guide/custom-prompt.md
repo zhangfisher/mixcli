@@ -4,14 +4,14 @@
 
 
 ```js
-const { MixedCommand } = require('mixed-cli');
+const { MixCommand } = require('mixcli');
 
 /**
- * @param {import('mixed-cli').MixedCli} cli
+ * @param {import('mixcli').MixCli} cli
  */
  module.exports = (cli)=>{    
     
-  const restartCommand = new MixedCommand();
+  const restartCommand = new MixCommand();
     restartCommand
         .name("restart")
         .prompt([

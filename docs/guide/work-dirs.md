@@ -2,7 +2,7 @@
 
 一般执行命令时均是以`当前目录`作为执行起点。
 
-`MixedCli`允许在命令行通过`--work-dirs`来指定命令的执行时的工作目录，即当前目录。
+`MixCli`允许在命令行通过`--work-dirs`来指定命令的执行时的工作目录，即当前目录。
 
 **示例:**
 
@@ -12,8 +12,8 @@
 
 ```js [cli.js]
 
-const { MixedCli } = require("mixed-cli");
-const cli = new MixedCli({
+const { MixCli } = require("mixcli");
+const cli = new MixCli({
     name:"mycli"
     // ...其他配置参数
 });
@@ -24,9 +24,9 @@ cli.run();      // 执行命令行应用
 
 ```js [init.js]
 
-const {MixedCommand} = require("mixed-cli");
+const {MixCommand} = require("mixcli");
 module.exports = (cli)=>{    
-    const initCommand = new MixedCommand({
+    const initCommand = new MixCommand({
         name:"init",
         description:"初始化项目", 
         action:async (options)=>{

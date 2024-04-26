@@ -5,7 +5,7 @@
 可以通过指定`{prompt:false}`来禁用指定选项的交互提示。
 
 ```js{5}
-    const devCommand = new MixedCommand();
+    const devCommand = new MixCommand();
     devCommand
         .name('dev')
         .description('在开发模式下运行应用')
@@ -23,7 +23,7 @@
 ## 禁用命令的所有提示
 
 ```js{5}
-    const devCommand = new MixedCommand();
+    const devCommand = new MixCommand();
     devCommand
         .name('dev')
         .description('在开发模式下运行应用')

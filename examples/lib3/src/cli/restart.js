@@ -1,8 +1,8 @@
 
-const { MixedCommand } = require('mixed-cli');
+const { MixCommand } = require('mixcli');
 
 /**
- * @param {import('mixed-cli').MixedCli} cli
+ * @param {import('mixcli').MixedCli} cli
  */
  module.exports = (cli)=>{        
 
@@ -14,7 +14,7 @@ const { MixedCommand } = require('mixed-cli');
     })
   
 
-    const restartCommand = new MixedCommand();
+    const restartCommand = new MixCommand();
     restartCommand
         .name("restart")
         .description("重启应用")

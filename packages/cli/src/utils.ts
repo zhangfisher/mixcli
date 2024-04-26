@@ -76,7 +76,7 @@ export function isEnablePrompts(){
  */
 export function outputDebug(message:string,...args:any[]){    
     let vars = (args.length == 1 && typeof(args[0])=='function') ? args[0]() : args
-    if(isDebug()) logsets.log(`[MixedCli] ${message}`,...vars)
+    if(isDebug()) logsets.log(`[MixCli] ${message}`,...vars)
 }
 
 export const fileExists = promisify(fs.exists,{

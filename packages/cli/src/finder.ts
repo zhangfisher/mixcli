@@ -1,7 +1,7 @@
 import { getPackageRootPath } from 'flex-tools';
-import type { MixedCli } from './cli';
+import type { MixCli } from './cli';
 import {  globSync } from 'glob'
-import { MixedCliCommand } from './cli';
+import { MixCliCommand } from './cli';
 import { isDebug, outputDebug } from './utils';
 import fs from "node:fs"
 import path from "node:path"
@@ -19,7 +19,7 @@ import { getPackageJson } from  "flex-tools/package/getPackageJson"
  */
  
 
-export function getMatchedDependencies(this:MixedCli,entry:string):string[]{
+export function getMatchedDependencies(this:MixCli,entry:string):string[]{
     const pacakgeMacher = this.options.include
     if(!(pacakgeMacher instanceof RegExp)) return  []
     
@@ -49,7 +49,7 @@ function isMatched(str:string,reg?:string | RegExp | string[] | RegExp[]):boolea
     })
 }
 
-export function findCliPaths(this:MixedCli,packageName?:string ,entry?:string):string[]{
+export function findCliPaths(this:MixCli,packageName?:string ,entry?:string):string[]{
     const includeMacher = this.options.include
     const excludeMacher = this.options.exclude
     if(!includeMacher) return []
@@ -88,6 +88,16 @@ export function findCliPaths(this:MixedCli,packageName?:string ,entry?:string):s
     return [...new Set(cliDirs)]
 }
 
+
+function showError(e:any){
+    if(isDebug()){
+        outputDebug("导入命令<>出错:{}",e.stack)
+    }else{
+        console.error(e)
+    }  
+
+}
+
 /**
  * 
  *  扫描当前工程中所有符合条件的命令
@@ -95,27 +105,38 @@ export function findCliPaths(this:MixedCli,packageName?:string ,entry?:string):s
  * @param cli 
  * 
  */
-export function findCommands(cli:MixedCli){ 
+export async function findCommands(cli:MixCli){ 
     const cliDirs =  findCliPaths.call(cli)
-    const commands:MixedCliCommand[] = []
+    const commands:MixCliCommand[] = []
+    const files = [] as string[]
     cliDirs.forEach(dir=>{
-        globSync("*",{
+        files.push(...globSync("*",{
             cwd:dir,
             absolute :true 
-        }).forEach((file:string)=>{            
-            if(!(file.endsWith(".js") || fs.statSync(file).isDirectory())) return 
-            try{
-                outputDebug("导入命令:{}",file)
-                commands.push(require(file))
-            }catch(e:any){
-                if(isDebug()){
-                    outputDebug("导入命令<>出错:{}",e.stack)
-                }else{
-                    console.error(e)
-                }                
-            }
-        })        
+        }).filter((file:string)=>(file.endsWith(".js") || file.endsWith(".cjs") || file.endsWith(".mjs")) && !fs.statSync(file).isDirectory()))
     })
+    for(let file of files){    
+        try{
+            outputDebug("导入命令:{}",file)
+            if(file.endsWith(".cjs") || file.endsWith(".js")){
+                commands.push(require(file))
+            }else if(file.endsWith(".mjs")){
+                const cmd = await import(`file://${file}`)
+                commands.push(cmd.default)
+            }            
+        }catch(e:any){
+            if(e.code==="ERR_REQUIRE_ESM"){                                
+                try{
+                    const cmd = await import(`file://${file.replace(".js",".mjs")}`)
+                    commands.push(cmd.default)
+                }catch(err){
+                    showError(err)
+                }
+            }else{
+                showError(e) 
+            }
+        }
+    }
     return commands
 }
 

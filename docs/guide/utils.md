@@ -1,6 +1,6 @@
 # 实用工具函数
 
-`MixedCli`提供了一个实用的工具函数.
+`MixCli`提供了一个实用的工具函数.
 
 ## createFileByTemplate
 

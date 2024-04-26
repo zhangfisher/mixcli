@@ -5,7 +5,7 @@ import { Command } from "commander"
 import logsets  from "logsets"
 
 import { assignObject } from "flex-tools/object/assignObject"
-import { MixedCommand } from "./command"
+import { MixCommand } from "./command"
 import { addBuiltInOptions, fixIndent } from './utils';
 import { findCommands } from "./finder"
 import { asyncSignal } from "flex-tools/async/asyncSignal"
@@ -13,7 +13,7 @@ import { asyncSignal } from "flex-tools/async/asyncSignal"
 import replaceAll  from 'string.prototype.replaceall'
 replaceAll.shim() 
 
-export interface MixedCliOptions{
+export interface MixCliOptions{
     name:string,
     title?:string | (string | boolean | number)[],
     description?:string,
@@ -43,26 +43,25 @@ export interface MixedCliOptions{
  
   
 
-export type MixedCliCommand = (cli:MixedCli)=>MixedCommand | MixedCommand[] | void
+export type MixCliCommand = (cli:MixCli)=>MixCommand | MixCommand[] | void
 
 
-export type MixedCliEvents = 
+export type MixCliEvents = 
     "register"              // 当命令注册时触发
 
-export class MixedCli extends LiteEvent<any,MixedCliEvents>{
-    options:Required<MixedCliOptions> 
+export class MixCli extends LiteEvent<any,MixCliEvents>{
+    options:Required<MixCliOptions> 
     root!:Command           
     private findSignals:any[]=[]
-    constructor(options?:MixedCliOptions){
+    constructor(options?:MixCliOptions){
         super()
         this.options= assignObject({
-            name:"mixed-cli",
+            name:"mixcli",
             package:null,
             cliDir:"cli",
             prompt:'auto'
         },options)   
-        this.createRootCommand() 
-        this.installExtendCommands()        
+        this.createRootCommand()      
     } 
     get context(){return this.options.context}
     get name(){return this.options.name}
@@ -75,8 +74,8 @@ export class MixedCli extends LiteEvent<any,MixedCliEvents>{
     /**
      * 扫描当前工程的依赖，加载匹配include的依赖下的命令
      */
-    private installExtendCommands(){
-        const cmders = findCommands(this)
+    private async installCommands(){
+        const cmders = await findCommands(this)
         for(let cmder of cmders){
             try{
                 if(typeof(cmder)==="function"){
@@ -93,7 +92,7 @@ export class MixedCli extends LiteEvent<any,MixedCliEvents>{
      * 
      */
     private createRootCommand(){
-        this.root = new MixedCommand(this.name);
+        this.root = new MixCommand(this.name);
         this.root 
             .helpOption('-h, --help')     
             .version(require("../package.json").version,"-v, --version") 
@@ -133,21 +132,30 @@ export class MixedCli extends LiteEvent<any,MixedCliEvents>{
      * 注册一个命令
      * @param cmd 
      */
-    register(cmd:MixedCliCommand){
+    register(cmd:MixCliCommand){
         if(typeof(cmd)=="function"){
             let result = cmd(this)
             let cmds = result instanceof Array ? result : (result==undefined ? [] :  [result])
             for(let cmd of cmds){
-                if(cmd instanceof MixedCommand){
-                    this.root.addCommand(cmd) ;
-                    (cmd as any)._cli = this
-                    this.emit("register",cmd.fullname,true)
+                if(cmd instanceof MixCommand){
+                    if(this.hasCommand(cmd.name())){
+                        logsets.error(`Command <${cmd.name()}> has been registered!`)
+                    }else{
+                        this.root.addCommand(cmd) ;
+                        (cmd as any)._cli = this
+                        this.emit("register",cmd.fullname,true)
+                    }                    
                 }
             }                        
         }else{
             logsets.error("Invalid command")
         }        
     }
+
+    hasCommand(name:string):boolean{
+        return this.root.commands.some(c=>c.name()==name)
+    }
+
     /**
      * 根据命令名称查找命令
      * 
@@ -159,13 +167,13 @@ export class MixedCli extends LiteEvent<any,MixedCliEvents>{
      * 
      * @param name 
      */
-    get(name:string):MixedCommand | undefined{
+    get(name:string):MixCommand | undefined{
         const names=name.split(".")
         let curCmd:Command = this.root
-        let resultCmd:MixedCommand | undefined
+        let resultCmd:MixCommand | undefined
         while(names.length>0){
             const topName = names.shift()
-            const r = curCmd.commands.find(c=>c.name()==topName)  as MixedCommand
+            const r = curCmd.commands.find(c=>c.name()==topName)  as MixCommand
             if(r && names.length==0){
                 resultCmd = r
             }
@@ -183,14 +191,14 @@ export class MixedCli extends LiteEvent<any,MixedCliEvents>{
      * @param name 
      * @returns 
      */
-    find(name:string):Promise<MixedCommand | undefined>{
+    find(name:string):Promise<MixCommand | undefined>{
         const cmd = this.get(name)
         if(cmd){
             return Promise.resolve(cmd)        
         }else{
             const signal = asyncSignal()
             this.findSignals.push(signal)
-            return new Promise<MixedCommand | undefined>((resolve)=>{
+            return new Promise<MixCommand | undefined>((resolve)=>{
                 let listener:LiteEventSubscriber
                 listener = this.on("register",(fullname:string)=>{
                     if(fullname==`${this.name}.${name}`){
@@ -228,9 +236,11 @@ export class MixedCli extends LiteEvent<any,MixedCliEvents>{
         // 所以引入find("命令名称")来获取命令，该方法可以获取到后注册的命令
         // 其副作用是，在run时，可能find还没有运行到，从而导致在帮助信息里面看不到扩展的信息(实际上是已经生效的)
         // 所以我们在find里面注入一个异步信号来解决此问题
-        return Promise.all(this.findSignals.map(signal=>signal(10000))).then(()=>{
-            this.root.parseAsync(process.argv);              
-        })
+        this.installCommands().then(()=>{
+            return Promise.all(this.findSignals.map(signal=>signal(10000))).then(()=>{
+                this.root.parseAsync(process.argv);              
+            })
+        })        
     }
     /**
      * 创建一个命令

@@ -3,7 +3,7 @@
 layout: home
 
 hero:
-  name: "MixedCli"
+  name: "MixCli"
   text: "创建交互式命令行应用"
   tagline: 自动生成交互提示 / 多包命令合成 / 终端增强
   actions:
@@ -12,7 +12,7 @@ hero:
       link: /get-started
     - theme: alt
       text: Github
-      link: https://github.com/zhangfisher/mixed-cli.git
+      link: https://github.com/zhangfisher/mixcli.git
 
 features:
   - title: 自动创建提示

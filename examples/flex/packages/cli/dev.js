@@ -1,13 +1,13 @@
 
-const { MixedCommand } = require('mixed-cli');
+const { MixCommand } = require('mixcli');
 const logsets = require('logsets');
 
 const delay = (ms)=>new Promise(resolve=>setTimeout(resolve,ms))
 /**
- * @param {import('mixed-cli').MixedCli} cli
+ * @param {import('mixcli').MixedCli} cli
  */
 module.exports = (cli)=>{                
-    const devCommand = new MixedCommand("dev");
+    const devCommand = new MixCommand("dev");
     devCommand
         .description("开发模式")          
         // 指定了默认值且强制提示

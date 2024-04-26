@@ -1,8 +1,8 @@
 # 命令钩子
 
-`MixedCommand`继承自`Commander`的`Command`对象,其提供了`preAction`和`postAction`两个钩子函数，用来在执行命令前后执行一些操作。
+`MixCommand`继承自`Commander`的`Command`对象,其提供了`preAction`和`postAction`两个钩子函数，用来在执行命令前后执行一些操作。
 
-在其基础上,`MixedCli`增加了`before`和`after`两个钩子,用来实现在`action`命令函数前后执行一些操作。
+在其基础上,`MixCli`增加了`before`和`after`两个钩子,用来实现在`action`命令函数前后执行一些操作。
 
 其与`preAction`和`postAction`两个钩子函数的差别在于执行时机的不同和功能的不同,主要区别在于:
 
@@ -14,15 +14,15 @@
 
 ```ts
 
-const { MixedCommand } = require('mixed-cli');
+const { MixCommand } = require('mixcli');
 const path = require("node:path")
 const DbProviders = ["sqlite","mysql","sqlserver","postgresql"]
 
 /**
- * @param {import('mixed-cli').MixedCli} cli
+ * @param {import('mixcli').MixCli} cli
  */
 module.exports = (cli)=>{    
-    const command = new MixedCommand();
+    const command = new MixCommand();
     command
         .name('init')
         .description('初始化应用') 
@@ -52,7 +52,7 @@ module.exports = (cli)=>{
 利用此特性,我们就可以在父命令中执行一些所有子命令都需要执行的公共操作和公共配置.
 
 ```ts
-    const command = new MixedCommand();
+    const command = new MixCommand();
     command
         .name('init')  
         // 适用于本命令和所有子命令的选项
@@ -69,7 +69,7 @@ module.exports = (cli)=>{
             console.log("after init:",value)
         })
     // 定义子命令
-    const initVueCommand = new MixedCommand();
+    const initVueCommand = new MixCommand();
     initVueCommand
         .name('vue')  
         .option("--port","端口")
@@ -101,7 +101,7 @@ after init
 
 
 ```ts{9,15}
-    const command = new MixedCommand();
+    const command = new MixCommand();
     command
         .name('init')  
         // 适用于本命令和所有子命令的选项

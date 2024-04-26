@@ -1,4 +1,4 @@
-const { BREAK } = require('mixed-cli');
+const { BREAK } = require('mixcli');
 module.exports = (cli)=>{                
     cli.find("init").then(initCommand=>{
       initCommand

@@ -1,4 +1,4 @@
-# mixed-cli
+# mixcli
 
 ## 3.0.0
 

@@ -1,14 +1,14 @@
-const { MixedCommand } = require('mixed-cli');
+const { MixCommand } = require('mixcli');
 
 
 /**
- * @param {import('mixed-cli').MixedCli} cli
+ * @param {import('mixcli').MixedCli} cli
  */
 module.exports = (cli)=>{        
     
     
 
-    const devCommand = new MixedCommand();
+    const devCommand = new MixCommand();
 
     devCommand
         .name('dev')
@@ -23,7 +23,7 @@ module.exports = (cli)=>{
             }
         })
 
-    const appCommand = new MixedCommand();
+    const appCommand = new MixCommand();
     appCommand.name("app")
         .description("以开发模式启动应用")      // 未指定默认值,自动使用text类型提供
         // .before(()=>{
@@ -77,7 +77,7 @@ module.exports = (cli)=>{
 
     devCommand.addCommand(appCommand)
 
-    const libCommand = new MixedCommand();
+    const libCommand = new MixCommand();
     libCommand
         .name("lib")
         .description("以开发模式启动库")      // 未指定默认值,自动使用text类型提供
