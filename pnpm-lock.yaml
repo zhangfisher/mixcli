@@ -15,8 +15,8 @@ importers:
         specifier: ^11.1.0
         version: 11.1.0
       flex-tools:
-        specifier: ^1.3.27
-        version: 1.3.27
+        specifier: ^1.3.71
+        version: 1.3.71
       fs-extra:
         specifier: ^11.1.1
         version: 11.1.1
@@ -132,8 +132,8 @@ importers:
         specifier: ^12.0.0
         version: 12.0.0
       flex-tools:
-        specifier: ^1.3.60
-        version: 1.3.60
+        specifier: ^1.3.71
+        version: 1.3.71
       fs-extra:
         specifier: ^11.1.1
         version: 11.1.1
@@ -962,7 +962,7 @@ packages:
   /@voerkai18n/runtime@2.0.8:
     resolution: {integrity: sha512-FXdd13O7hHQW+Ii6sX7I5GMRj197eLICnHdYwa9ehWg/U5T6sSGECcAa/M3UKa+wF9wOYZuC8vx75RJtg1azYA==}
     dependencies:
-      flex-tools: 1.3.60
+      flex-tools: 1.3.71
     dev: false
 
   /@vue/compiler-core@3.3.4:
@@ -1812,15 +1812,8 @@ packages:
       pkg-dir: 4.2.0
     dev: true
 
-  /flex-tools@1.3.27:
-    resolution: {integrity: sha512-ezgzb+fw3/UmeHDF1CugS1C8yjqsj3SX0WkpJ3kRvTAgbKtk5gVB+Q0mxR2hNA+lDlCmNB648NgYW3I/KFHTOw==}
-    dependencies:
-      art-template: 4.13.2
-      glob: 10.3.12
-    dev: false
-
-  /flex-tools@1.3.60:
-    resolution: {integrity: sha512-w25lF/kQ14/+WcJ+eYoaxAKtH1okeOR0XYKPMfzvDXruEURyC3o02LSMferCl+U1u5NOCih62wdSk5OfD5a6HQ==}
+  /flex-tools@1.3.71:
+    resolution: {integrity: sha512-3q7KFhNHPFi+MN5t+/kbdPYIWSQlkTE5lGk9SBvf9FOI8PSyCE6uUKbHbxysbbq9Auet+y6JHOoea0GvsYI+bw==}
     dependencies:
       art-template: 4.13.2
       glob: 10.3.12
@@ -2374,7 +2367,7 @@ packages:
       '@babel/runtime-corejs3': 7.22.11
       ansicolor: 1.1.100
       core-js: 3.32.1
-      flex-tools: 1.3.60
+      flex-tools: 1.3.71
     dev: false
 
   /logsets@1.3.8:
@@ -2383,7 +2376,7 @@ packages:
       '@babel/runtime-corejs3': 7.22.11
       ansicolor: 1.1.100
       core-js: 3.32.1
-      flex-tools: 1.3.60
+      flex-tools: 1.3.71
     dev: false
 
   /lower-case@1.1.4:

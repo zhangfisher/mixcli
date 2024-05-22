@@ -6,7 +6,7 @@ import logsets  from "logsets"
 
 import { assignObject } from "flex-tools/object/assignObject"
 import { MixCommand } from "./command"
-import { addBuiltInOptions, fixIndent } from './utils';
+import { addBuiltInOptions, fixIndent, isDebug } from './utils';
 import { findCommands } from "./finder"
 import { asyncSignal } from "flex-tools/async/asyncSignal"
 // @ts-ignore
@@ -248,6 +248,6 @@ export class MixCli extends LiteEvent<any,MixCliEvents>{
      * 
      */
     create(){
-    }
+    } 
 }
  

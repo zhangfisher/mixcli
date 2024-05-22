@@ -57,6 +57,11 @@ export function findCliPaths(this:MixCli,packageName?:string ,entry?:string):str
     const packageRoot = getPackageRootPath(entry || process.cwd())
     const packagePath = packageName ? path.dirname(require.resolve(packageName,{paths:[packageRoot as string]})) : packageName!
 
+    if(!packagePath) {
+        outputDebug("运行在非node包环境:{}",entry )
+        return []
+    }
+
     // 找出当前包的所有依赖
     const packageNames = getMatchedDependencies.call(this,packagePath)
 
