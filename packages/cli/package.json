@@ -1,6 +1,6 @@
 {
   "name": "mixcli",
-  "version": "3.0.5",
+  "version": "3.0.6",
   "description": "Develop command line tool scaffolding for monorepo",
   "repository": "https://github.com/zhangfisher/mixcli.git",
   "homepage": "https://zhangfisher.github.io/mixcli/",
