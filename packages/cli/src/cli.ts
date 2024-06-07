@@ -91,7 +91,7 @@ export class MixCli extends LiteEvent<any,MixCliEvents>{
     } 
     private getVersion(){
         const packageInfo = getPackageJson()
-        return packageInfo.version
+        return packageInfo.version  || '1.0.0';
     }
     /**
      * 创建根命令

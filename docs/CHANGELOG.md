@@ -1,5 +1,11 @@
 # mixcli
 
+## 3.0.6
+
+### Patch Changes
+
+- f38e1ec: 修复在某此情况下显示`只能在nodejs环境下运行`的错误提示
+
 ## 3.0.5
 
 ### Patch Changes

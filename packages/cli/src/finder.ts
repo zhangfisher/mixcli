@@ -55,7 +55,7 @@ export function findCliPaths(this:MixCli,packageName?:string ,entry?:string):str
     const excludeMacher = this.options.exclude
     if(!includeMacher) return []
     const packageRoot = getPackageRootPath(entry || process.cwd())
-    const packagePath = packageName ? path.dirname(require.resolve(packageName,{paths:[packageRoot as string]})) : packageName!
+    const packagePath = packageName ? path.dirname(require.resolve(packageName,{paths:[packageRoot as string]})) : packageRoot
 
     if(!packagePath) {
         outputDebug("MixCli只能运行在Nodejs环境" )
