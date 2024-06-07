@@ -11,6 +11,8 @@ import { findCommands } from "./finder"
 import { asyncSignal } from "flex-tools/async/asyncSignal"
 // @ts-ignore
 import replaceAll  from 'string.prototype.replaceall'
+import { getPackageEntry, getPackageRootPath } from "flex-tools"
+import { getPackageJson } from 'flex-tools/package/getPackageJson';
 replaceAll.shim() 
 
 export interface MixCliOptions{
@@ -87,6 +89,10 @@ export class MixCli extends LiteEvent<any,MixCliEvents>{
             }
         }
     } 
+    private getVersion(){
+        const packageInfo = getPackageJson()
+        return packageInfo.version
+    }
     /**
      * 创建根命令
      * 
@@ -95,7 +101,7 @@ export class MixCli extends LiteEvent<any,MixCliEvents>{
         this.root = new MixCommand(this.name);
         this.root 
             .helpOption('-h, --help')     
-            .version(require("../package.json").version,"-v, --version") 
+            .version(this.getVersion(),"-v, --version") 
             .action(()=>{                
                 if(this.options.logo) logsets.log(fixIndent(this.options.logo,2))
                 console.log()

@@ -1,5 +1,17 @@
 # mixcli
 
+## 3.0.5
+
+### Patch Changes
+
+- 1369cff: 修复在某些情况下扫描不到命令的问题
+
+## 3.0.4
+
+### Patch Changes
+
+- 67e94b1: 修复当运行在非 node 包下时出错的 path undefined 错误
+
 ## 3.0.3
 
 ### Patch Changes
