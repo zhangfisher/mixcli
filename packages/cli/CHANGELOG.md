@@ -1,5 +1,11 @@
 # mixcli
 
+## 3.0.5
+
+### Patch Changes
+
+- 1369cff: 修复在某些情况下扫描不到命令的问题
+
 ## 3.0.4
 
 ### Patch Changes
