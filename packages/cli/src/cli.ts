@@ -88,11 +88,7 @@ export class MixCli extends LiteEvent<any,MixCliEvents>{
             }catch(e:any){
             }
         }
-    } 
-    private getVersion(){
-        const packageInfo = getPackageJson()
-        return packageInfo.version  || '1.0.0';
-    }
+    }  
     /**
      * 创建根命令
      * 
@@ -100,8 +96,7 @@ export class MixCli extends LiteEvent<any,MixCliEvents>{
     private createRootCommand(){
         this.root = new MixCommand(this.name);
         this.root 
-            .helpOption('-h, --help')     
-            .version(this.getVersion(),"-v, --version") 
+            .helpOption('-h, --help')      
             .action(()=>{                
                 if(this.options.logo) logsets.log(fixIndent(this.options.logo,2))
                 console.log()
