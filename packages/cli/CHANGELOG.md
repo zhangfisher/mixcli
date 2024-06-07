@@ -1,5 +1,11 @@
 # mixcli
 
+## 3.0.7
+
+### Patch Changes
+
+- e81f34a: 移除内置的 version 命令
+
 ## 3.0.6
 
 ### Patch Changes
