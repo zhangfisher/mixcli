@@ -110,7 +110,9 @@ export async function findCommands(cli:MixCli){
         globSync("*",{
             cwd:dir,
             absolute :true 
-        }).forEach((file:string)=>{
+        }).forEach((file:string)=>{  
+            const baseName = path.basename(file)       
+            if(baseName.startsWith("_")) return
             const ext = path.extname(file).toLowerCase()
             if([".js",".cjs",".mjs"].includes(ext)){
                 files.push(file)

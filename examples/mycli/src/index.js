@@ -25,9 +25,9 @@ const cli = new MixCli({
 })
 
 // cli.register(devCommand)
-cli.register(devCommand)
-cli.register(initCommand)
-// cli.register(startCommand)
+// cli.register(devCommand)
+// cli.register(initCommand)
+cli.register(startCommand)
 
 
 cli.run()

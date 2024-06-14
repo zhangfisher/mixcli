@@ -96,7 +96,7 @@ export class MixCli extends LiteEvent<any,MixCliEvents>{
     private createRootCommand(){
         this.root = new MixCommand(this.name);
         this.root 
-            .helpOption('-h, --help')      
+            .helpOption('-h, --help')
             .action(()=>{                
                 if(this.options.logo) logsets.log(fixIndent(this.options.logo,2))
                 console.log()
