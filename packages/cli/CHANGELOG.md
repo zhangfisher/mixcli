@@ -1,5 +1,11 @@
 # mixcli
 
+## 3.0.10
+
+### Patch Changes
+
+- a503bcf: 更新依赖
+
 ## 3.0.9
 
 ### Patch Changes
