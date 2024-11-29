@@ -1,5 +1,11 @@
 # mixcli
 
+## 3.0.9
+
+### Patch Changes
+
+- 9c75876: 升级依赖
+
 ## 3.0.8
 
 ### Patch Changes
