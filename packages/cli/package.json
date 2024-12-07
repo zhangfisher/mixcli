@@ -19,7 +19,7 @@
     "readme.md",
     "package.json"
   ],
-  "keywords": [],
+  "keywords": ["commander","prompts","cli"],  
   "author": "",
   "license": "ISC",
   "dependencies": {

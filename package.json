@@ -15,7 +15,8 @@
     "sync": "cnpm sync mixcli",
     "changeset": "changeset && npx changeset version && copy packages\\cli\\CHANGELOG.md docs\\CHANGELOG.md"
   },
-  "keywords": [],
+  "keywords": ["commander","prompts","cli"],  
+  "packageManager": "pnpm@9.0.0",
   "author": "",
   "license": "ISC",
   "dependencies": {
