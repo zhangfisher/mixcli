@@ -1,5 +1,11 @@
 # mixcli
 
+## 3.1.0
+
+### Minor Changes
+
+- c7e78c0: 改进命令注册时的识别逻辑
+
 ## 3.0.10
 
 ### Patch Changes
