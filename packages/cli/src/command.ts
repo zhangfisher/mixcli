@@ -67,6 +67,7 @@ export type EnhanceAction = ({
 export const BREAK = Symbol("BREAK_ACTION"); // 中止后续的action执行
 
 export class MixCommand extends Command {
+	__MIX_COMMAND__ = true;
 	private _beforeHooks: [BeforeCommandHookListener, boolean][] = [];
 	private _afterHooks: [AfterCommandHookListener, boolean][] = [];
 	private _customPrompts: PromptObject[] = [];
@@ -379,7 +380,7 @@ export class MixCommand extends Command {
 	private generateAutoPrompts(): PromptObject[] {
 		const options = this.options as unknown as MixOption[];
 		const optionPromports = options
-			.filter((option) => !option.hidden && option instanceof MixOption)
+			.filter((option) => !option.hidden && option.__MIX_OPTION__)
 			.map((option) => option.getPrompt(this._optionValues[option.name()]))
 			.filter((prompt) => prompt) as PromptObject[];
 		outputDebug("命令<{}>自动生成{}个选项提示:{}", [

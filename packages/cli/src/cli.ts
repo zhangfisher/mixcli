@@ -6,13 +6,11 @@ import logsets  from "logsets"
 
 import { assignObject } from "flex-tools/object/assignObject"
 import { MixCommand } from "./command"
-import { addBuiltInOptions, fixIndent, isDebug } from './utils';
+import { addBuiltInOptions, fixIndent, outputDebug } from './utils';
 import { findCommands } from "./finder"
 import { asyncSignal } from "flex-tools/async/asyncSignal"
 // @ts-ignore
-import replaceAll  from 'string.prototype.replaceall'
-import { getPackageEntry, getPackageRootPath } from "flex-tools"
-import { getPackageJson } from 'flex-tools/package/getPackageJson';
+import replaceAll  from 'string.prototype.replaceall' 
 replaceAll.shim() 
 
 export interface MixCliOptions{
@@ -40,6 +38,7 @@ export interface MixCliOptions{
     // 默认是否启用交互提示, auto当没有值时，会根据当前是否在终端中运行来决定是否启用交互提示
     // 为false时，禁用所有交互提示,为true时，启用所有交互提示    
     prompt?:'auto' | boolean   
+    ignoreError?:boolean
 }
 
  
@@ -61,8 +60,9 @@ export class MixCli extends LiteEvent<any,MixCliEvents>{
             name:"mixcli",
             package:null,
             cliDir:"cli",
-            prompt:'auto'
-        },options)   
+            prompt:'auto',
+            ignoreError:false
+        },options)    as Required<MixCliOptions> 
         this.createRootCommand()      
     } 
     get context(){return this.options.context}
@@ -82,10 +82,11 @@ export class MixCli extends LiteEvent<any,MixCliEvents>{
             try{
                 if(typeof(cmder)==="function"){
                     let cmds = cmder(this)
-                    cmds =cmds ?  (Array.isArray(cmds) ? cmds : [cmds]) : []
+                    cmds = cmds ?  (Array.isArray(cmds) ? cmds : [cmds]) : []
                     this.register(()=>cmds) 
                 }
             }catch(e:any){
+                outputDebug("注册命令失败:{}",e.stack)
             }
         }
     }  
@@ -138,14 +139,20 @@ export class MixCli extends LiteEvent<any,MixCliEvents>{
             let result = cmd(this)
             let cmds = result instanceof Array ? result : (result==undefined ? [] :  [result])
             for(let cmd of cmds){
-                if(cmd instanceof MixCommand){
+                // 为什么不用cmd instanceof MixCommand来判断是否是一个有效的命令?
+                // 因为当不同的包引用了与主包不一样版本的mixcli时，判断会失效，导致不能识别
+                // 所以我们通过cmd.__MIX_COMMAND__来判断是否是一个有效的命令
+                if(cmd.__MIX_COMMAND__){                    
                     if(this.hasCommand(cmd.name())){
                         logsets.error(`Command <${cmd.name()}> has been registered!`)
                     }else{
+                        outputDebug("注册命令:{}",cmd.fullname)
                         this.root.addCommand(cmd) ;
                         (cmd as any)._cli = this
                         this.emit("register",cmd.fullname,true)
                     }                    
+                }else{
+                    logsets.error(`Command <${cmd.toString()}> is not a valid command!`)
                 }
             }                        
         }else{

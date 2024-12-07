@@ -16,6 +16,7 @@ export interface MixedOptionParams extends IPromptableOptions{
 
 
 export class MixOption extends Option implements IPromptable{
+    __MIX_OPTION__ = true
     // 是否提示用户输入
     prompt?: PromptManager     
     promptChoices?:PromptChoice[]
