@@ -4,24 +4,23 @@ import { IPromptable, IPromptableOptions, PromptChoice, PromptManager } from './
 
 
 export interface MixedOptionParams extends IPromptableOptions{
-    hidden?:boolean
-    defaultDescription?:string          // 默认值的描述    
-    conflicts?:string | string[]
-    env?:string
-    argParser?:<T>(value: string, previous: T) => T 
-    hideHelp?:boolean
-    mandatory?: boolean 
-    implies?:{[key:string]:any}  
+    hidden?            : boolean
+    defaultDescription?: string          // 默认值的描述    
+    conflicts?         : string | string[]
+    env?               : string
+    hideHelp?          : boolean
+    mandatory?         : boolean 
+    implies?           : { [key:string]:any }
+    argParser?         : <T>(value: string, previous: T) => T 
 }
 
 
 export class MixOption extends Option implements IPromptable{
     __MIX_OPTION__ = true
-    // 是否提示用户输入
-    prompt?: PromptManager     
-    promptChoices?:PromptChoice[]
+    prompt?       : PromptManager     
+    promptChoices?: PromptChoice[]
     private _validate?: (value: any) => boolean       
-    constructor(flags: string, description?: string | undefined,optsOrDefault?:any) {
+    constructor(flags: string, description?: string | undefined) {
         super(flags, description)
         let params:MixedOptionParams = {}
         if(arguments.length==3 && typeof arguments[2] == "object"){
@@ -45,8 +44,14 @@ export class MixOption extends Option implements IPromptable{
             this.required = params.required
             if(!this._validate ) this._validate  = (value:any)=>String(value).length>0
         }
-        this.prompt = new PromptManager(this as IPromptable,params.prompt)
+        this._createPromptObject()
+        
     } 
+
+    private _createPromptObject(){
+        this.prompt = new PromptManager(this as IPromptable,params.prompt)
+    }
+
     validate(value: any): boolean {
         if(typeof(this._validate)=='function'){
             return this._validate(value)
@@ -61,7 +66,7 @@ export class MixOption extends Option implements IPromptable{
                 if(typeof(choice)=='object'){
                     return choice
                 }else{
-                    return {title:choice,value:choice}                    
+                    return { title:choice, value:choice }                    
                 }
             })
         }        
@@ -84,16 +89,11 @@ export class MixOption extends Option implements IPromptable{
     clearChoice(){
         this.promptChoices = []
         this.resetChoices()
-    }
-
-        
+    }   
     /**
      * 返回选项的提示对象
      * 
-     * @remarks
-     * 
-     *
-     * 
+     * @remarks 
      * @param inputValue 
      * @returns 
      */

@@ -9,18 +9,31 @@ export type InputPromptParam = PromptParam | ((value:any)=>PromptParam) | boolea
 export type PromptParamDefaultValue = string | boolean | string[]  
 
 export const promptTypeMap:Record<string,string> = {
-    boolean:"confirm",
-    string:"text",
-    number:"number",                        
-    array:"list",                        
+    boolean: "confirm",
+    string : "text",
+    number : "number",                        
+    array  : "list",                        
 } 
 
-export const supportedPromptTypes = ["text","password","invisible", "number", "confirm" , "list", "toggle" , "select" , "multiselect" , "autocomplete" , "date" , "autocompleteMultiselect"]
+export const supportedPromptTypes = [
+    "text",
+    "password",
+    "invisible", 
+    "number", 
+    "confirm" , 
+    "list", 
+    "toggle" , 
+    "select" , 
+    "multiselect" , 
+    "autocomplete" , 
+    "date" , 
+    "autocompleteMultiselect"
+]
 export interface PromptChoice {
-    title: string;
-    value?: any;
-    disabled?: boolean | undefined;
-    selected?: boolean | undefined;
+    title       : string;
+    value?      : any;
+    disabled?   : boolean | undefined;
+    selected?   : boolean | undefined;
     description?: string | undefined;
 }
 
@@ -29,10 +42,10 @@ export interface PromptChoice {
 export interface IPromptableOptions{
     required?: boolean;                         // A value must be supplied when the option is specified.
     optional?: boolean;                         // A value is optional when the option is specified.
-    default?:PromptParamDefaultValue
-    choices?:(PromptChoice | any)[] | ((preAnswer:any,answers:Record<string,any>,prompt:PromptObject)=>PromptChoice[])                          // 选项值的可选值
-    prompt?:InputPromptParam
-    validate?:(value: any) => boolean
+    default? : PromptParamDefaultValue
+    choices? : (PromptChoice | any)[] 
+    prompt?  : PromptObject
+    validate?: (value: any) => boolean
 }
 
 
@@ -40,14 +53,14 @@ export interface IPromptable{
     name():string 
     description?  : string
     flags         : string
-    promptChoices?: PromptChoice[] | ((preAnswer:any,answers:Record<string,any>,prompt:PromptObject)=>PromptChoice[])
+    promptChoices?: PromptChoice[] //| ((preAnswer:any,answers:Record<string,any>,prompt:PromptObject)=>PromptChoice[])
     argChoices?   : string[]
     variadic?     : boolean
     defaultValue? : PromptParamDefaultValue
     input?        : any        
     required?     : boolean
     validate?     : (value: any) => boolean  
-    getPrompt(inputValue?:any):PromptObject | undefined 
+    getPrompt     : (inputValue?:any)=>PromptObject | undefined 
 }
 
 /**
@@ -115,7 +128,7 @@ export class PromptManager{
      * @param inputValue   从命令行输入的值
      */
     get(inputValue?:any){
-        const {description,promptChoices,validate,defaultValue} = this._promptable
+        const { description, promptChoices, validate, defaultValue } = this._promptable
         let input = inputValue || defaultValue
         // 判断是否需要输入提示
         if(!this.isNeed(input,defaultValue)) return
@@ -147,7 +160,7 @@ export class PromptManager{
      * @param inputValue   从命令行输入的值
      */
     infer(inputValue?:any){
-        const {argChoices,variadic,defaultValue} = this._promptable
+        const { argChoices, variadic, defaultValue } = this._promptable
         let input = inputValue || defaultValue
         // 如果选择指定了"-p [value]或[value...]"，则使用text类型，如果没有要求输入值，则使用confirm类型
         let promptType = /(\<[\w\.]+\>)|(\[[\w\.]+\])/.test(this._promptable.flags) ? 'text' : 'confirm'

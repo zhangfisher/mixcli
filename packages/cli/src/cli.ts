@@ -250,12 +250,5 @@ export class MixCli extends LiteEvent<any,MixCliEvents>{
             })
         })        
     }
-    /**
-     * 创建一个命令
-     * 
-     * 
-     */
-    create(){
-    } 
 }
  

@@ -39,9 +39,8 @@ export type AfterCommandHookListener = ({
 
 export interface ActionOptions {
 	id: string;
-	at: "replace" | "before" | "after" | "preappend" | "append" | number;
-	// 函数签名类型，即采用原始的commander的action函数签名，还是mixcli的action函数签名
-	enhance: boolean;
+	at: "replace" | "before" | "after" | "preappend" | "append" | number;	
+	enhance: boolean;														// 函数签名类型，即采用原始的commander的action函数签名，还是mixcli的action函数签名
 }
 
 export interface ActionRegistry extends Omit<ActionOptions, "at"> {
@@ -68,12 +67,12 @@ export const BREAK = Symbol("BREAK_ACTION"); // 中止后续的action执行
 
 export class MixCommand extends Command {
 	__MIX_COMMAND__ = true;
-	private _beforeHooks: [BeforeCommandHookListener, boolean][] = [];
-	private _afterHooks: [AfterCommandHookListener, boolean][] = [];
-	private _customPrompts: PromptObject[] = [];
-	private _optionValues: Record<string, any> = {}; // 命令行输入的选项值
-	private _actions: ActionRegistry[] = []; // 允许多个action
-	private _enable_prompts: boolean = true; // 是否启用交互提示
+	private _beforeHooks   : [BeforeCommandHookListener, boolean][] = [];
+	private _afterHooks    : [AfterCommandHookListener, boolean][] = [];
+	private _customPrompts : PromptObject[] = [];
+	private _optionValues  : Record<string, any> = {}; 							// 命令行输入的选项值
+	private _actions       : ActionRegistry[] = []; 							// 允许多个action
+	private _enable_prompts: boolean = true; 									// 是否启用交互提示
 	constructor(name?: string) {
 		super(name);
 		const self = this;
@@ -383,6 +382,7 @@ export class MixCommand extends Command {
 			.filter((option) => !option.hidden && option.__MIX_OPTION__)
 			.map((option) => option.getPrompt(this._optionValues[option.name()]))
 			.filter((prompt) => prompt) as PromptObject[];
+			
 		outputDebug("命令<{}>自动生成{}个选项提示:{}", [
 			this.name(),
 			optionPromports.length,
@@ -390,6 +390,7 @@ export class MixCommand extends Command {
 		]);
 		return optionPromports;
 	}
+
 	option(flags: string, description?: string | undefined, defaultValue?: any): this;
 	option(flags: string, description?: string | undefined, options?: MixedOptionParams): this {
 		// @ts-ignore
@@ -429,8 +430,8 @@ export class MixCommand extends Command {
 			value: command.name(),
 		}));
 		const result = await prompts({
-			type: "select",
-			name: "command",
+			type   : "select",
+			name   : "command",
 			message: "请选择命令:",
 			choices,
 		});
