@@ -30,7 +30,7 @@ export interface IPromptableOptions{
     required?: boolean;                         // A value must be supplied when the option is specified.
     optional?: boolean;                         // A value is optional when the option is specified.
     default?:PromptParamDefaultValue
-    choices?:(PromptChoice | any)[]                           // 选项值的可选值
+    choices?:(PromptChoice | any)[] | ((preAnswer:any,answers:Record<string,any>,prompt:PromptObject)=>PromptChoice[])                          // 选项值的可选值
     prompt?:InputPromptParam
     validate?:(value: any) => boolean
 }
@@ -38,15 +38,15 @@ export interface IPromptableOptions{
 
 export interface IPromptable{
     name():string 
-    description?:string
-    flags:string
-    promptChoices?:PromptChoice[]
-    argChoices?:string[]
-    variadic?:boolean
-    defaultValue?:PromptParamDefaultValue
-    input?:any        
-    required?:boolean
-    validate?: (value: any) => boolean  
+    description?  : string
+    flags         : string
+    promptChoices?: PromptChoice[] | ((preAnswer:any,answers:Record<string,any>,prompt:PromptObject)=>PromptChoice[])
+    argChoices?   : string[]
+    variadic?     : boolean
+    defaultValue? : PromptParamDefaultValue
+    input?        : any        
+    required?     : boolean
+    validate?     : (value: any) => boolean  
     getPrompt(inputValue?:any):PromptObject | undefined 
 }
 
@@ -131,10 +131,10 @@ export class PromptManager{
         // 指定了验证函数，用来验证输入值是否有效
         prompt.validate = validate?.bind(this._promptable)
         if(promptType=='multiselect') prompt.instructions=false
-        if(['select','multiselect'].includes(promptType)){
-            let index = promptChoices?.findIndex(item=>item.value==input)
-            prompt.initial = index==-1 ? undefined : index
-        } 
+        // if(['select','multiselect'].includes(promptType)){
+        //     let index = promptChoices?.findIndex(item=>item.value==input)
+        //     prompt.initial = index==-1 ? undefined : index
+        // } 
         // 选项值的可选值
         if(Array.isArray(promptChoices)) {
             prompt.choices =promptChoices
