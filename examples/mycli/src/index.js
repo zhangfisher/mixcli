@@ -1,4 +1,4 @@
-const { outputStr,MixCli } = require("../../../packages/cli")
+const { MixCli } = require("../../../src")
 const devCommand = require("./dev")
 const initCommand = require("./init")
 const startCommand = require("./start")

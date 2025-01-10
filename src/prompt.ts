@@ -64,23 +64,16 @@ export interface IPromptable{
     getPrompt     : (inputValue?:any)=>PromptObject | undefined 
 }
 
-/**
- * 供command.option()使用的参数对象
- */
-export interface PromptableObject{
-   
-
-}
-
+ 
 
 /**
  * 负责生成prompt对象
  * 
  */
-export class OptionPromptObject{
-    args?:PromptObject                           
+export class MixOptionPrompt{
+    params?: PromptObject | PromptType | boolean                          
     constructor(public cliOption:MixOption,promptArgs?:PromptObject){ 
-        this.args = promptArgs
+        this.params = promptArgs
     }
 
     /**
@@ -97,21 +90,21 @@ export class OptionPromptObject{
      */
     isNeed(input:any,defaultValue?:any){
     
-        const promptArg = this.args
+        const promptArgs = this.params
         const inputValue = input || defaultValue
         // 是否有输入值，即在命令行输入了值
         const hasInput = !(inputValue === undefined)
         // 1. 显式指定了_prompt为true，则需要提示，后续进行提示类型的推断，可能不会准确
-        if(promptArg===true) return true
-        if(promptArg===false) return false        
+        if(promptArgs===true) return true
+        if(promptArgs===false) return false        
 
         // 2. 提供了一个prompt对象，并且没有在命令行输入值，则需要提示
-        if(typeof(promptArg)=='object'){
+        if(typeof(promptArgs)=='object'){
             return !hasInput
         }
 
         // 3. 指定了内置的prompt类型，如prompt='password'，则使用password类型提示输入
-        if(typeof(promptArg) == 'string' && supportedPromptTypes.includes(promptArg)){
+        if(typeof(promptArgs) == 'string' && supportedPromptTypes.includes(promptArgs)){
             return  !hasInput
         }
         
@@ -138,7 +131,7 @@ export class OptionPromptObject{
             name:this._cliOption.name(),
             message:description,
             initial: input,
-            ...typeof(this.args) == 'object' ? this.args : {}
+            ...typeof(this.params) == 'object' ? this.params : {}
         } as PromptObject
         // 指定了验证函数，用来验证输入值是否有效
         prompt.validate = validate?.bind(this._cliOption)
@@ -163,7 +156,7 @@ export class OptionPromptObject{
         let input = inputValue || defaultValue
         // 如果选择指定了"-p [value]或[value...]"，则使用text类型，如果没有要求输入值，则使用confirm类型
         let promptType = /(\<[\w\.]+\>)|(\[[\w\.]+\])/.test(this._cliOption.flags) ? 'text' : 'confirm'
-        let promptArg = this.args
+        let promptArg = this.params
         if(this.isValid(promptArg)){   // 显式指定了prompt类型
             promptType = promptArg as string
         }else{          // 未显式指定prompt类型，需要按一定规则推断类型

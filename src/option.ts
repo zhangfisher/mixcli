@@ -1,6 +1,6 @@
 import { Option, OptionValues } from 'commander'
 import { PromptObject } from 'prompts'
-import { IPromptable, IPromptableOptions, PromptChoice, OptionPromptObject, PromptType } from './prompt'
+import { IPromptable, PromptChoice, OptionPromptObject, MixOptionPrompt'./prompt'
 
 
 export interface MixedOptionParams {
@@ -10,7 +10,7 @@ export interface MixedOptionParams {
     mandatory?              : boolean; // The option must have a value after parsing, which usually means it must be specified on command line.
     negate?                 : boolean;
     defaultValue?           : any;
-    defaultDescription?: string;
+    defaultDescription?     : string;
     conflicts?              : string | string[];
     argParser?              : unknown;
     implies?                : OptionValues
@@ -26,7 +26,7 @@ export interface MixedOptionParams {
 
 export class MixOption extends Option implements IPromptable{
     __MIX_OPTION__ = true
-    prompt?       : OptionPromptObject     
+    prompt?       : MixOptionPrompt     
     promptChoices?: PromptChoice[]
     private _validate?: (value: any) => boolean       
     constructor(flags: string, description: string, params?: MixedOptionParams) {
@@ -57,6 +57,7 @@ export class MixOption extends Option implements IPromptable{
     }
 
     private _createPromptObject(params:MixedOptionParams){
+        
         const promptParams:PromptObject = {
             type: 'text',
             name: this.name(),
@@ -66,7 +67,7 @@ export class MixOption extends Option implements IPromptable{
             promptParams.choices = params.choices.map(choice=>typeof(choice)=='string' ? { title:choice, value:choice } : choice)
         }        
         if(params.defaultValue) promptParams.initial = params.defaultValue
-
+MixOptionPrompt
         this.prompt = new OptionPromptObject(this,promptParams)
     }
 

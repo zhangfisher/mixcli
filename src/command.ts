@@ -2,9 +2,12 @@ import { Command, Option } from "commander";
 import prompts, { PromptObject } from "prompts";
 import { MixOption, type MixedOptionParams } from "./option";
 import { addBuiltInOptions, isEnablePrompts, outputDebug } from "./utils";
+import type { AsyncFunction } from "flex-tools";
+import { isPlainObject } from "flex-tools/object/isPlainObject";
 import path from "node:path";
 import fs from "node:fs";
-import type { AsyncFunction } from "flex-tools";
+
+
 
 export type ICommandHookListener = ({
 	args,
@@ -48,9 +51,9 @@ export interface ActionRegistry extends Omit<ActionOptions, "at"> {
 }
 
 // 原始的Action动作函数
-export type OriginalAction = (...args: any[]) => void | Promise<void>;
+export type MixOriginalAction = (...args: any[]) => any | Promise<void>;
 // 增强的Action函数签名
-export type EnhanceAction = ({
+export type MixEnhanceAction = ({
 	args,
 	options,
 	value,
@@ -60,7 +63,7 @@ export type EnhanceAction = ({
 	options: Record<string, any>;
 	value: any;
 	command: MixCommand;
-}) => void | Promise<any>;
+}) => any | Promise<any>;
 
 // 执行action的返回结果
 export const BREAK = Symbol("BREAK_ACTION"); // 中止后续的action执行
@@ -116,15 +119,16 @@ export class MixCommand extends Command {
 	 * 返回根命令
 	 */
 	root() {
+// eslint-disable-next-line no-this-alias
 		let root: MixCommand | null | undefined = this;
 		while (root && root.parent != null) {
 			root = root.parent as unknown as MixCommand;
 		}
 		return root;
 	}
-	action(fn: EnhanceAction, options: ActionOptions): this;
-	action(fn: OriginalAction): this;
-	action(fn: OriginalAction): this {
+	action(fn: MixEnhanceAction, options: ActionOptions): this;
+	action(fn: MixOriginalAction): this;
+	action(fn: MixOriginalAction): this {
 		const actionFunc = arguments[0];
 		if (arguments.length == 1 && typeof actionFunc == "function") {
 			// 原始方式
@@ -187,6 +191,7 @@ export class MixCommand extends Command {
 	 */
 	private getAncestorCommands(): MixCommand[] {
 		let cmds: MixCommand[] = [];
+// eslint-disable-next-line no-this-alias
 		let cmd: MixCommand | null = this;
 		while (cmd) {
 			cmd = cmd.parent as MixCommand;
@@ -276,9 +281,7 @@ export class MixCommand extends Command {
 						await fn.apply(this, Array.from(arguments));
 					} else {
 						outputDebug("无效的工作目录:{}", workDir);
-					}
-				} catch (e) {
-					throw e;
+					} 
 				} finally {
 					process.chdir(cwd);
 				}
@@ -391,10 +394,10 @@ export class MixCommand extends Command {
 		return optionPromports;
 	}
 
-	option(flags: string, description?: string | undefined, defaultValue?: any): this;
-	option(flags: string, description?: string | undefined, options?: MixedOptionParams): this {
-		// @ts-ignore
-		const option = new MixOption(...arguments);
+	option(flags: string, description: string , defaultValue?: any): this;
+	option(flags: string, description: string , options?: MixedOptionParams): this {
+		const opts = isPlainObject(arguments[2]) ? arguments[2] : { defaultValue: arguments[2] };
+ 		const option = new MixOption(flags, description, opts);
 		if (option.required && !this.isEnablePrompts()) option.mandatory = true;
 		return this.addOption(option as unknown as Option);
 	}
