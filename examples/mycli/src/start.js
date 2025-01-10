@@ -1,4 +1,4 @@
-const { MixCommand } = require("../../../packages/cli")
+const { MixCommand } = require("../../../src")
 
 
 

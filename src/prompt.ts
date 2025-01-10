@@ -1,5 +1,6 @@
 import { PromptObject } from "prompts" 
 import { outputDebug } from "./utils"
+import { MixOption } from "./option"
  
 
 export type PromptType = "text" | "password" | "invisible" | "number"| "confirm"| "list"| "toggle"| "select" | "multiselect" | "autocomplete" | "date" | "autocompleteMultiselect"
@@ -76,12 +77,10 @@ export interface PromptableObject{
  * 负责生成prompt对象
  * 
  */
-export class PromptManager{
-    args:InputPromptParam                           
-    private _promptable:IPromptable                 // 对应的FlexOption或FlexArgument
-    constructor(promptable:IPromptable,promptArgs?:InputPromptParam){ 
-        this._promptable = promptable
-        this.args= promptArgs===undefined ? 'auto' : promptArgs
+export class OptionPromptObject{
+    args?:PromptObject                           
+    constructor(public cliOption:MixOption,promptArgs?:PromptObject){ 
+        this.args = promptArgs
     }
 
     /**
@@ -117,7 +116,7 @@ export class PromptManager{
         }
         
         // 4. 判断输入是否有效，则显示提示
-        if(this._promptable.argChoices && this._promptable.argChoices.indexOf(inputValue) == -1){
+        if(this._cliOption.argChoices && this._cliOption.argChoices.indexOf(inputValue) == -1){
             return true
         } 
         return !hasInput
@@ -128,7 +127,7 @@ export class PromptManager{
      * @param inputValue   从命令行输入的值
      */
     get(inputValue?:any){
-        const { description, promptChoices, validate, defaultValue } = this._promptable
+        const { description, promptChoices, validate, defaultValue } = this._cliOption
         let input = inputValue || defaultValue
         // 判断是否需要输入提示
         if(!this.isNeed(input,defaultValue)) return
@@ -136,13 +135,13 @@ export class PromptManager{
         let promptType = this.infer(inputValue)
         const prompt = {
             type:promptType,                        
-            name:this._promptable.name(),
+            name:this._cliOption.name(),
             message:description,
             initial: input,
             ...typeof(this.args) == 'object' ? this.args : {}
         } as PromptObject
         // 指定了验证函数，用来验证输入值是否有效
-        prompt.validate = validate?.bind(this._promptable)
+        prompt.validate = validate?.bind(this._cliOption)
         if(promptType=='multiselect') prompt.instructions=false
         // if(['select','multiselect'].includes(promptType)){
         //     let index = promptChoices?.findIndex(item=>item.value==input)
@@ -160,10 +159,10 @@ export class PromptManager{
      * @param inputValue   从命令行输入的值
      */
     infer(inputValue?:any){
-        const { argChoices, variadic, defaultValue } = this._promptable
+        const { argChoices, variadic, defaultValue } = this._cliOption
         let input = inputValue || defaultValue
         // 如果选择指定了"-p [value]或[value...]"，则使用text类型，如果没有要求输入值，则使用confirm类型
-        let promptType = /(\<[\w\.]+\>)|(\[[\w\.]+\])/.test(this._promptable.flags) ? 'text' : 'confirm'
+        let promptType = /(\<[\w\.]+\>)|(\[[\w\.]+\])/.test(this._cliOption.flags) ? 'text' : 'confirm'
         let promptArg = this.args
         if(this.isValid(promptArg)){   // 显式指定了prompt类型
             promptType = promptArg as string
@@ -186,7 +185,7 @@ export class PromptManager{
                 }
             }
         }
-        outputDebug("选项<{}> -> 提示类型<{}>",[this._promptable.name(),promptType])
+        outputDebug("选项<{}> -> 提示类型<{}>",[this._cliOption.name(),promptType])
         return promptType
     }
 

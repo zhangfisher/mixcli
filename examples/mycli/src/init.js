@@ -1,4 +1,4 @@
-const { MixCommand } = require("../../../packages/cli")
+const { MixCommand } = require("../../../src")
 const path = require("node:path")
 const DbProviders = ["sqlite","mysql","sqlserver","postgresql"]
 

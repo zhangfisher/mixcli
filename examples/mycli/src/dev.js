@@ -1,12 +1,10 @@
-const { MixCommand } = require("../../../packages/cli")
+const { MixCommand } = require("../../../src")
 
 
 /**
  * @param {import('mixcli').MixCli} cli
  */
 module.exports = (cli)=>{        
-    
-    
 
     const devCommand = new MixCommand();
 
