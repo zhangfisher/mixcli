@@ -27,13 +27,21 @@ export default ()=>{
         // })
         // 4. 自动推断为select
         .option('-d, --color4 [color]', '颜色', {
-            default: 'red',
-            choices: [ 'red', 'green', 'blue' ]
+            default: 'green',
+            choices: [ 'red', 'green', 'blue' ],
+            prompt:true
         })
         // 5. 自动推断为multiselect
         .option('-e, --color5 [color...]', '颜色', {
             default: 'red',
-            choices: [ 'red', 'green', 'blue' ]
+            prompt:{
+                type:'multiselect',
+                choices: [
+                    { title: 'Red', value: 'red' },
+                    { title: 'Green', value: 'green', selected: true },
+                    { title: 'Blue', value: 'blue' }
+                ]
+            }
         })
         .action(async function (options:Options){
             console.log('options: ',JSON.stringify(options))
