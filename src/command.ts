@@ -1,15 +1,15 @@
 import { Command, Option } from "commander";
 import prompts, { PromptObject } from "prompts";
 import { MixOption, type MixedOptionParams } from "./option";
-import { addBuiltInOptions, isEnablePrompts, outputDebug } from "./utils";
-import type { AsyncFunction } from "flex-tools";
-import { isPlainObject } from "flex-tools/object/isPlainObject";
+import { addBuiltInOptions, isDisablePrompts, outputDebug } from "./utils";
+import type { AsyncFunction } from "flex-tools/types";
+import { isPlainObject } from "flex-tools/typecheck/isPlainObject";
 import path from "node:path";
 import fs from "node:fs";
 
 
 
-export type ICommandHookListener = ({
+export type IMixCommandHookListener = ({
 	args,
 	options,
 	command,
@@ -19,7 +19,7 @@ export type ICommandHookListener = ({
 	command: MixCommand;
 }) => void | Promise<void>;
 
-export type BeforeCommandHookListener = ({
+export type BeforeMixCommandHookListener = ({
 	args,
 	options,
 	command,
@@ -28,7 +28,8 @@ export type BeforeCommandHookListener = ({
 	options: Record<string, any>;
 	command: MixCommand;
 }) => void | Promise<void>;
-export type AfterCommandHookListener = ({
+
+export type AfterMixCommandHookListener = ({
 	value,
 	args,
 	options,
@@ -40,18 +41,19 @@ export type AfterCommandHookListener = ({
 	command: MixCommand;
 }) => void | Promise<void>;
 
-export interface ActionOptions {
+export interface MixActionOptions {
 	id: string;
 	at: "replace" | "before" | "after" | "preappend" | "append" | number;	
 	enhance: boolean;														// 函数签名类型，即采用原始的commander的action函数签名，还是mixcli的action函数签名
 }
 
-export interface ActionRegistry extends Omit<ActionOptions, "at"> {
+export interface MixActionRegistry extends Omit<MixActionOptions, "at"> {
 	fn: Function;
 }
 
 // 原始的Action动作函数
 export type MixOriginalAction = (...args: any[]) => any | Promise<void>;
+
 // 增强的Action函数签名
 export type MixEnhanceAction = ({
 	args,
@@ -70,39 +72,28 @@ export const BREAK = Symbol("BREAK_ACTION"); // 中止后续的action执行
 
 export class MixCommand extends Command {
 	__MIX_COMMAND__ = true;
-	private _beforeHooks   : [BeforeCommandHookListener, boolean][] = [];
-	private _afterHooks    : [AfterCommandHookListener, boolean][] = [];
+	private _beforeHooks   : [ BeforeMixCommandHookListener, boolean ][] = [];
+	private _afterHooks    : [ AfterMixCommandHookListener, boolean ][] = [];
 	private _customPrompts : PromptObject[] = [];
 	private _optionValues  : Record<string, any> = {}; 							// 命令行输入的选项值
-	private _actions       : ActionRegistry[] = []; 							// 允许多个action
+	private _actions       : MixActionRegistry[] = []; 							// 允许多个action
 	private _enable_prompts: boolean = true; 									// 是否启用交互提示
 	constructor(name?: string) {
-		super(name);
-		const self = this;
-		if (!this.isRoot) addBuiltInOptions(this);
+		super(name);		
+		// eslint-disable-next-line no-this-alias
+		const self = this
+		// if (!this.isRoot) addBuiltInOptions(this); 
 		this.hook("preAction", async function (this: any) {
-			self._optionValues = self.getOptionValues(this.hookedCommand);
-			try {
-				// @ts-ignore
-				await self.preActionHook.apply(self, arguments);
-			} catch {}
+			self._optionValues = self.getOptionValues(this.hookedCommand);			
+			// @ts-ignore
+			await self.preActionHook.apply(self, arguments);
 		});
-	}
-	/**
-	 * 是否是根命令
-	 */
-	get isRoot() {
-		return !!!this.parent;
-	}
-	get actions() {
-		return this._actions;
-	}
-	get beforeHooks() {
-		return this._beforeHooks;
-	}
-	get afterHooks() {
-		return this._afterHooks;
-	}
+	} 
+	get isRoot() { return this.parent==undefined;	}
+	get optionValues(){ return this._optionValues }
+	get actions() { return this._actions; }
+	get beforeHooks() {	return this._beforeHooks; }
+	get afterHooks() {return this._afterHooks;}
 	get fullname() {
 		let names = [this.name()];
 		let parent = this.parent;
@@ -118,17 +109,19 @@ export class MixCommand extends Command {
 	/**
 	 * 返回根命令
 	 */
-	root() {
-// eslint-disable-next-line no-this-alias
-		let root: MixCommand | null | undefined = this;
+	root() { 
+		// eslint-disable-next-line no-this-alias
+		let root:any = this;
 		while (root && root.parent != null) {
 			root = root.parent as unknown as MixCommand;
 		}
 		return root;
 	}
-	action(fn: MixEnhanceAction, options: ActionOptions): this;
+
+
+	action(fn: MixEnhanceAction, options: MixActionOptions): this;
 	action(fn: MixOriginalAction): this;
-	action(fn: MixOriginalAction): this {
+	action(): this {
 		const actionFunc = arguments[0];
 		if (arguments.length == 1 && typeof actionFunc == "function") {
 			// 原始方式
@@ -137,14 +130,10 @@ export class MixCommand extends Command {
 				enhance: false,
 				fn: actionFunc,
 			});
-		} else if (
-			arguments.length == 2 &&
-			typeof actionFunc == "function" &&
-			typeof arguments[1] == "object"
-		) {
+		} else if (arguments.length == 2  && typeof actionFunc == "function" && typeof arguments[1] == "object" ) {
 			// 增强模式
 			const actionFn = arguments[0];
-			const actionOpts: ActionOptions = Object.assign({ at: "append" }, arguments[1]);
+			const actionOpts: MixActionOptions = Object.assign({ at: "append" }, arguments[1]);
 			if (actionOpts.at == "replace") this._actions = [];
 			const actionItem = {
 				id: actionOpts.id || Math.random().toString(36).substring(2),
@@ -170,11 +159,12 @@ export class MixCommand extends Command {
 	 * 读取命令配置值，包括父命令提供的配置选项
 	 * @param command
 	 */
-	private getOptionValues(command: Command) {
-		let opts = {};
-		let parent: Command | null = command;
+	private getOptionValues(command: MixCommand) {
+		const opts = {};
+		// eslint-disable-next-line no-this-alias
+		let parent: any = command;
 		while (parent) {
-			Object.assign(opts, (parent as MixCommand)._optionValues);
+			Object.assign(opts, (parent as MixCommand).optionValues);
 			parent = parent.parent;
 		}
 		return opts;
@@ -191,10 +181,10 @@ export class MixCommand extends Command {
 	 */
 	private getAncestorCommands(): MixCommand[] {
 		let cmds: MixCommand[] = [];
-// eslint-disable-next-line no-this-alias
+		// eslint-disable-next-line no-this-alias
 		let cmd: MixCommand | null = this;
 		while (cmd) {
-			cmd = cmd.parent as MixCommand;
+			cmd = cmd.parent as unknown as MixCommand;
 			if (cmd) {
 				cmds.push(cmd);
 			}
@@ -205,6 +195,7 @@ export class MixCommand extends Command {
 	 * 将所有actions包装成一个链式调用的函数
 	 */
 	private wrapperChainActions() {
+		// eslint-disable-next-line no-this-alias
 		const self = this;
 		return async function (this: any) {
 			const args = Array.from(arguments); // 原始输入的参数
@@ -259,6 +250,7 @@ export class MixCommand extends Command {
 	 * 当传入--work-dirs时用来处理工作目录
 	 */
 	private wrapperWorkDirsAction(fn: AsyncFunction) {
+		// eslint-disable-next-line no-this-alias
 		const self = this;
 		return async function (this: any) {
 			let workDirs = self._optionValues.workDirs;
@@ -297,18 +289,18 @@ export class MixCommand extends Command {
 	 * @param scope     =false时代表只在本命令执行，=true时代表在本命令及其子命令执行
 	 * @returns
 	 */
-	before(listener: BeforeCommandHookListener, scope: boolean = true) {
+	before(listener: BeforeMixCommandHookListener, scope: boolean = true) {
 		this._beforeHooks.push([listener, scope]);
 		return this;
 	}
 	private async executeBeforeHooks(args: any) {
-		const hooks: [BeforeCommandHookListener, boolean, MixCommand][] = this.beforeHooks.map(
+		const hooks: [BeforeMixCommandHookListener, boolean, MixCommand][] = this.beforeHooks.map(
 			([hook, scope]) => [hook, scope, this]
 		);
 		this.getAncestorCommands().forEach((cmd: MixCommand) => {
 			hooks.unshift(
 				...cmd.beforeHooks.map(([hook, scope]) => {
-					return [hook, scope, cmd] as [BeforeCommandHookListener, boolean, MixCommand];
+					return [hook, scope, cmd] as [BeforeMixCommandHookListener, boolean, MixCommand];
 				})
 			);
 		});
@@ -323,18 +315,19 @@ export class MixCommand extends Command {
 	 * @param scope     =false时代表只在本命令执行，=true时代表在本命令及其子命令执行
 	 * @returns
 	 */
-	after(listener: AfterCommandHookListener, scope: boolean = true) {
+	after(listener: AfterMixCommandHookListener, scope: boolean = true) {
 		this._afterHooks.push([listener, scope]);
 		return this;
 	}
+
 	private async executeAfterHooks(args: any) {
-		const hooks: [AfterCommandHookListener, boolean, MixCommand][] = this.afterHooks.map(
+		const hooks: [AfterMixCommandHookListener, boolean, MixCommand][] = this.afterHooks.map(
 			([hook, scope]) => [hook, scope, this]
 		);
 		this.getAncestorCommands().forEach((cmd: MixCommand) => {
 			hooks.push(
 				...cmd.afterHooks.map(([hook, scope]) => {
-					return [hook, scope, cmd] as [BeforeCommandHookListener, boolean, MixCommand];
+					return [hook, scope, cmd] as [BeforeMixCommandHookListener, boolean, MixCommand];
 				})
 			);
 		});
@@ -343,7 +336,7 @@ export class MixCommand extends Command {
 			await hook.call(cmd, args);
 		}
 	}
-	private async preActionHook(thisCommand: Command, actionCommand: Command) {
+	private async preActionHook(thisCommand: Command) {
 		if (this.isEnablePrompts()) {
 			// 自动生成提示
 			const questions: PromptObject[] = [
@@ -361,9 +354,8 @@ export class MixCommand extends Command {
 	}
 
 	private isEnablePrompts() {
-		if (isEnablePrompts() === false) {
-			// 命令行参数禁用了提示，优先级最高
-			return false;
+		if (isDisablePrompts()) {			
+			return false;// 命令行参数禁用了提示，优先级最高
 		} else {
 			return this._enable_prompts;
 		}
@@ -373,7 +365,7 @@ export class MixCommand extends Command {
 	 * 生成选项自动提示
 	 *
 	 * @remarks
-	 * FlexCli要求所有未提供默认值的Option自动生成提示
+	 * 要求所有未提供默认值的Option自动生成提示
 	 *
 	 * - 未提供默认值，并且是必选的参数Option
 	 * - 指定了choices但未提供有效值的Option
@@ -392,14 +384,13 @@ export class MixCommand extends Command {
 			optionPromports.map((prompt) => `${prompt.name}(${prompt.type})`).join(","),
 		]);
 		return optionPromports;
-	}
+	} 
 
-	option(flags: string, description: string , defaultValue?: any): this;
-	option(flags: string, description: string , options?: MixedOptionParams): this {
-		const opts = isPlainObject(arguments[2]) ? arguments[2] : { defaultValue: arguments[2] };
- 		const option = new MixOption(flags, description, opts);
-		if (option.required && !this.isEnablePrompts()) option.mandatory = true;
-		return this.addOption(option as unknown as Option);
+	// @ts-ignore
+	option( flags: string, description: string, options?: MixedOptionParams ):this{ 
+ 		const option = new MixOption(flags, description, options);
+		if (option.required && !this.isEnablePrompts()) option.mandatory = true;		
+		return this.addOption(option as unknown as Option)  
 	}
 
 	/**
@@ -407,17 +398,16 @@ export class MixCommand extends Command {
 	 *
 	 * @remarks
 	 *
-	 * 添加一些自定义提示
-	 *
+	 * 添加一些自定义提示 
 	 *
 	 * @param questions
-	 * @param show              是否显示提示信息，auto表示只有在用户没有提供option的值时才显示提示信息,always表示总是显示提示信息，never表示不显示提示信息
 	 * @returns
 	 */
 	prompt(questions: PromptObject | PromptObject[]) {
 		this._customPrompts.push(...(Array.isArray(questions) ? questions : [questions]));
 		return this;
 	}
+
 	/**
 	 *
 	 *  选择命令并执行

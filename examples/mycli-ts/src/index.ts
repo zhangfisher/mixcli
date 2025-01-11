@@ -1,4 +1,4 @@
-import  { MixCli } from "mixcli"
+import  { MixCli } from "../../../src"
 import devCommand from "./dev"
 import initCommand from "./init"
 import startCommand from "./start"

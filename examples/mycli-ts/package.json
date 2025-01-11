@@ -1,5 +1,5 @@
 {
-  "name": "@flex/myclits",
+  "name": "myclits",
   "version": "1.0.2",
   "description": "",
   "main": "src/index.js",

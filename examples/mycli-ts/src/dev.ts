@@ -1,4 +1,4 @@
-import  { MixCommand } from "mixcli"
+import  { MixCommand } from "../../../src"
 
  
 export default ()=>{        

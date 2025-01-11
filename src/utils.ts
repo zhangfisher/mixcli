@@ -3,6 +3,8 @@ import fs from "fs-extra"
 import path  from "node:path"
 import { promisify }   from "flex-tools/func/promisify"
 import logsets from "logsets" 
+
+
 /**
  * 
  * 在控制台输出一个字符串
@@ -65,8 +67,10 @@ export function addBuiltInOptions(command:any){
 export function isDebug(){
     return process.argv.includes("--debug-cli")
 }
-export function isEnablePrompts(){    
-    return !process.argv.includes("--disable-prompts")
+
+
+export function isDisablePrompts(){    
+    return process.argv.includes("--disable-prompts")
 }
 
 /**

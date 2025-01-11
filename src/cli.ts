@@ -57,11 +57,11 @@ export class MixCli extends LiteEvent<any,MixCliEvents>{
     constructor(options?:MixCliOptions){
         super()
         this.options= assignObject({
-            name:"mixcli",
-            package:null,
-            cliDir:"cli",
-            prompt:'auto',
-            ignoreError:false
+            name       : "mixcli",
+            package    : null,
+            cliDir     : "cli",
+            prompt     : 'auto',
+            ignoreError: false
         },options)    as Required<MixCliOptions> 
         this.createRootCommand()      
     } 
@@ -113,7 +113,7 @@ export class MixCli extends LiteEvent<any,MixCliEvents>{
                 console.log()
                 this.root.help()                
             })            
-        addBuiltInOptions(this.root)
+        // addBuiltInOptions(this.root)
         if(this.options.before) this.root.hook('preAction',this.options.before)
         if(this.options.after) this.root.hook('postAction',this.options.after) 
     } 
