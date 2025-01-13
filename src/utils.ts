@@ -140,6 +140,10 @@ export function showError(e:any){
 
 }
 
+// 编写一个函数，用于将使用-分隔的字符串转换为驼峰式
+export function hyphenToCamelCase(str:string){
+    return str.replace(/-([a-z])/g,(_,letter)=>letter.toUpperCase())
+}
 
 export function getId(){
     return Math.random().toString(36).substr(2)

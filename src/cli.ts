@@ -52,7 +52,7 @@ export type MixCliEvents =
 
 export class MixCli extends LiteEvent<any,MixCliEvents>{
     options:Required<MixCliOptions> 
-    root!:Command           
+    root!:MixCommand           
     private findSignals:any[]=[]
     constructor(options?:MixCliOptions){
         super()
@@ -113,7 +113,7 @@ export class MixCli extends LiteEvent<any,MixCliEvents>{
                 console.log()
                 this.root.help()                
             })            
-        // addBuiltInOptions(this.root)
+        addBuiltInOptions(this.root)
         if(this.options.before) this.root.hook('preAction',this.options.before)
         if(this.options.after) this.root.hook('postAction',this.options.after) 
     } 
@@ -147,7 +147,7 @@ export class MixCli extends LiteEvent<any,MixCliEvents>{
                         logsets.error(`Command <${cmd.name()}> has been registered!`)
                     }else{
                         outputDebug("注册命令:{}",cmd.fullname)
-                        this.root.addCommand(cmd) ;
+                        this.root.addCommand(cmd as Command) ;
                         (cmd as any)._cli = this
                         this.emit("register",cmd.fullname,true)
                     }                    
@@ -177,7 +177,7 @@ export class MixCli extends LiteEvent<any,MixCliEvents>{
      */
     get(name:string):MixCommand | undefined{
         const names=name.split(".")
-        let curCmd:Command = this.root
+        let curCmd:MixCommand = this.root
         let resultCmd:MixCommand | undefined
         while(names.length>0){
             const topName = names.shift()

@@ -1,7 +1,7 @@
 import { Command, Option } from "commander";
 import prompts, { PromptObject } from "prompts";
 import { MixOption, type MixedOptionParams } from "./option";
-import { addBuiltInOptions, isDisablePrompts, outputDebug } from "./utils";
+import { addBuiltInOptions, hyphenToCamelCase, isDisablePrompts, outputDebug } from "./utils";
 import type { AsyncFunction } from "flex-tools/types"; 
 import path from "node:path";
 import fs from "node:fs";
@@ -81,7 +81,7 @@ export class MixCommand extends Command {
 		super(name);		
 		// eslint-disable-next-line no-this-alias
 		const self = this
-		// if (!this.isRoot) addBuiltInOptions(this); 
+		if (!this.isRoot) addBuiltInOptions(this); 
 		this.hook("preAction", async function (this: any) {
 			self._optionValues = self.getOptionValues(this.hookedCommand);			
 			// @ts-ignore
@@ -221,8 +221,8 @@ export class MixCommand extends Command {
 							]);
 							preValue = await action.fn.call(this, {
 								command: cmd,
-								value: preValue,
-								args: actionArgs,
+								value  : preValue,
+								args   : actionArgs,
 								options: actionOpts,
 							});
 						} else {
@@ -374,7 +374,7 @@ export class MixCommand extends Command {
 		const options = this.options as unknown as MixOption[];
 		const optionPromports = options
 			.filter((option) => !option.hidden && option.__MIX_OPTION__)
-			.map((option) => option.getPrompt(this._optionValues[option.name()]))
+			.map((option) => option.getPrompt(this._optionValues[option.attributeName()]))
 			.filter((prompt) => prompt) as PromptObject[];
 			
 		outputDebug("命令<{}>自动生成{}个选项提示:{}", [
@@ -438,8 +438,15 @@ export class MixCommand extends Command {
 		this._enable_prompts = false;
 		return this;
 	}
+	/**
+	 * 启用所有提示
+	 */
 	enablePrompts() {
 		this._enable_prompts = true;
 		return this;
 	}
 }
+
+
+
+// 编写一个类型号用来表示Commander的Option flags字面量类型
