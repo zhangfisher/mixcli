@@ -6,7 +6,17 @@
   "private": true,
   "scripts": {
     "build": "tsup",
-    "dev": "tsx ./src/index.ts"
+    "dev": "tsx ./src/index.ts",
+    "dev:multiselect": "tsx ./src/index.ts multiselect",
+    "dev:text": "tsx ./src/index.ts text",
+    "dev:confirm": "tsx ./src/index.ts confirm",
+    "dev:password": "tsx ./src/index.ts password",
+    "dev:date": "tsx ./src/index.ts date",
+    "dev:toggle": "tsx ./src/index.ts toggle",
+    "dev:select": "tsx ./src/index.ts select",
+    "dev:autocomplete": "tsx ./src/index.ts autocomplete",
+    "dev:number": "tsx ./src/index.ts number",
+    "dev:invisible": "tsx ./src/index.ts invisible"
   },
   "keywords": [],
   "author": "",

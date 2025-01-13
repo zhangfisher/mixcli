@@ -45,23 +45,11 @@ export class MixOption extends Option{
         if(params.variadic) this.variadic = params.variadic
         if(params.negate) this.negate = params.negate
         if(params.preset) this.preset(params.preset)
-        if(Array.isArray(params.choices)) {
-            this.choices(params.choices.map(choice=>typeof(choice)=='string' ? choice : choice.value))
-        }
+        if(params.required) this.required = params.required    
+        if(Array.isArray(params.choices)) this.choices(params.choices.map(choice=>typeof(choice)=='string' ? choice : choice.value))
         if(typeof(params.validate)=='function') this._validate = params.validate.bind(this)
-        if(params.required) {
-            this.required = params.required
-            if(!this._validate ) this._validate  = (value:any)=>String(value).length > 0
-        }
-    } 
+    }  
     
-    validate(value: any): boolean {
-        if(typeof(this._validate)=='function'){
-            return this._validate(value)
-        }else{
-            return true
-        }
-    }
     /**
      * 返回选项的提示对象
      * 

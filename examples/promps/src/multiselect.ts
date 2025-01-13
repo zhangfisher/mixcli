@@ -30,24 +30,29 @@ export default ()=>{
         //     prompt : "select"
         // })       
         .option('-g, --color7 [color]', '颜色4', {   
-            choices: (pre,answers)=>{
+            choices: ()=>{
                 return [
                     { title: 'Red', value: 'red' },
                     { title: 'Green', value: 'green', selected: true },
-                    { title: 'Blue', value: 'blue' }
+                    { title: 'Blue', value: 'blue',description:'蓝色' }
                 ]
             },
-            prompt : {
-                type: "select"
-            }
+            prompt : "multiselect"
         })
         .option('-h, --color8 [color]', '颜色5', {   
-            choices: (pre,answers)=>{
+            required:true,
+            choices: ()=>{
                 return ['red', 'green', 'blue']
             },
             prompt : {
-                type: "select"
+                type: "multiselect",
+                min:1,
             }
+        })        
+        .option('-i, --color9 [color]', '颜色6', {   
+            default: ['green', 'blue'],
+            choices: ['red', 'green', 'blue'],
+            prompt :"multiselect"
         })
         .action(async function (options){
             console.log('options: ',JSON.stringify(options))

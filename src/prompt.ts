@@ -207,7 +207,7 @@ export class MixOptionPrompt{
         // 指定了验证函数，用来验证输入值是否有效
         prompt.validate = validate?.bind(this.cliOption)
 
-        // if(promptType=='multiselect') prompt.instructions=false
+        if(promptType=='multiselect') prompt.instructions=false
         prompt.choices = prompt.choices || this._getChoices()  as any 
 
         if(['select','multiselect'].includes(promptType)){                  
@@ -219,7 +219,6 @@ export class MixOptionPrompt{
             }
         }
 
-
         if(input && typeof(prompt.initial)!='function'){
             if(prompt.choices && Array.isArray(prompt.choices)){
                 if(promptType=='select'){
@@ -227,8 +226,14 @@ export class MixOptionPrompt{
                     if(index!=-1){
                         prompt.initial = index
                     }
-                }else if(promptType=='multiselect'){
-
+                }else if(promptType=='multiselect'){                
+                    prompt.choices.forEach((item)=>{
+                        if(Array.isArray(input) && input.includes(item.value)){
+                            item.selected = true
+                        }else if(item.value==input){
+                            item.selected = true
+                        }
+                    })
                 }
             }
         }
