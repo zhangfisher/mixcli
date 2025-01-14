@@ -1,5 +1,11 @@
 # mixcli
 
+## 3.2.2
+
+### Patch Changes
+
+- 9414b62: fix type error
+
 ## 3.2.1
 
 ### Patch Changes
