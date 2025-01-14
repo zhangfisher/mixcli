@@ -1,4 +1,3 @@
-import artTemplate from "art-template"
 import fs from "fs-extra"
 import path  from "node:path"
 import { promisify }   from "flex-tools/func/promisify"
@@ -91,28 +90,7 @@ export const fileExists = promisify(fs.exists,{
 export const readFile = promisify(fs.readFile)
 export const writeFile = promisify(fs.writeFile)
 export const mkdir = promisify(fs.mkdir)
-
-/**
- * 基于artTemplate模板生成文件
- * 
- * @param {*} tmplFile 
- * @param {*} vars 
- */
-export async function createFileByTemplate(targetFile:string,tmplFile:string,vars:Record<string,any>={}){
-    tmplFile=path.isAbsolute(tmplFile)? tmplFile : path.join(process.cwd(),tmplFile)
-    if(!fs.existsSync(tmplFile)){
-        throw new Error("模板文件不存在:"+tmplFile)
-    }
-    targetFile=path.isAbsolute(targetFile)? targetFile : path.join(process.cwd(),targetFile)
-    const outPath = path.dirname(targetFile)
-    if(!await fileExists(outPath)){
-        await mkdir(outPath,{recursive:true})
-    }    
-    const template = artTemplate(tmplFile,await readFile(tmplFile,{encoding:"utf-8"}));    
-    await writeFile(targetFile,template(vars),{encoding:"utf-8"})
-    return targetFile
-}
-
+ 
 /**  
  * 创建目录  
  * 

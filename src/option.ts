@@ -27,7 +27,6 @@ export interface MixedOptionParams {
 export class MixOption extends Option{
     __MIX_OPTION__ = true
     prompt?                 : MixOptionPrompt      
-    private _validate?: (value: any) => boolean       
     constructor(flags: string, description: string,public params?: MixedOptionParams) {
         super(flags, description)                
         this._setOption(params || {})        
@@ -45,9 +44,8 @@ export class MixOption extends Option{
         if(params.variadic) this.variadic = params.variadic
         if(params.negate) this.negate = params.negate
         if(params.preset) this.preset(params.preset)
-        if(params.required) this.required = params.required    
+        if(params.required) this.required = params.required   
         if(Array.isArray(params.choices)) this.choices(params.choices.map(choice=>typeof(choice)=='string' ? choice : choice.value))
-        if(typeof(params.validate)=='function') this._validate = params.validate.bind(this)
     }  
     
     /**

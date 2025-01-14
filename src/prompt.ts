@@ -1,4 +1,6 @@
 import { isPlainObject } from "flex-tools/typecheck/isPlainObject"
+import { isNumber  } from "flex-tools/typecheck/isNumber"
+
 import { PromptObject } from "prompts" 
 import { outputDebug } from "./utils"
 import { MixOption } from "./option" 
@@ -150,6 +152,8 @@ export class MixOptionPrompt{
             const isListType = /(\[\s*\w+\.\.\.\s*])|(\<\s*\w+\.\.\.\s*>)/.test(this.cliOption.flags)
             const isTextType = /(\<s*\w+\s*\>)|(\[\w+\])/.test(this.cliOption.flags) 
             const isBooleanType = !/(\[\s*\w+s*])|(\<\s*\w+\s*>)/.test(this.cliOption.flags)
+            const isNumberType = isNumber(defaultValue)
+            const isDate = defaultValue && defaultValue instanceof Date
 
             // 根据默认值的类型推断
             const datatype:string = Array.isArray(input) ? 'array' : 
@@ -167,6 +171,10 @@ export class MixOptionPrompt{
                 }                
             }else if(isListType){   // 提供多个可选值时
                 promptType = 'list'
+            }else if(isDate){
+                promptType = 'date'
+            }else if(isNumberType){
+                promptType = 'number'
             }else if(isTextType){   // 提供一个可选值时
                 promptType = 'text' 
             }else if(isBooleanType || typeof(defaultValue)==='boolean'){
@@ -185,7 +193,7 @@ export class MixOptionPrompt{
      */
     get(inputValue?:any){
 
-        const { description, validate, defaultValue } = this.cliOption
+        const { description, defaultValue } = this.cliOption
         
         let input = inputValue || defaultValue
 
@@ -205,7 +213,7 @@ export class MixOptionPrompt{
 
 
         // 指定了验证函数，用来验证输入值是否有效
-        prompt.validate = validate?.bind(this.cliOption)
+        prompt.validate = this.cliOption.params?.validate
 
         if(promptType=='multiselect') prompt.instructions=false
         prompt.choices = prompt.choices || this._getChoices()  as any 

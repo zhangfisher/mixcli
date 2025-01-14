@@ -5,6 +5,7 @@
   "repository": "https://github.com/zhangfisher/mixcli.git",
   "homepage": "https://zhangfisher.github.io/mixcli/",
   "main": "src/index.ts",
+  "type": "module",
   "publishConfig": {
     "access": "public",
     "main": "./dist/index.js",
@@ -15,12 +16,12 @@
   "scripts": {
     "build": "tsup",
     "build:watch": "tsup --watch",
-    "release": "changeset version && changeset publish",
+    "release": "changeset version && changeset publish && copy CHANGELOG.md docs\\CHANGELOG.md",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs",
     "sync": "cnpm sync mixcli",
-    "changeset": "changeset && npx changeset version && copy CHANGELOG.md docs\\CHANGELOG.md"
+    "changeset": "changeset"
   },
   "files": [
     "dist",
@@ -49,9 +50,12 @@
     "string.prototype.replaceall": "^1.0.7"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.27.11",
     "@types/fs-extra": "^11.0.1",
     "@types/node": "^20.5.7",
+    "tsup": "^8.3.5",
     "type-fest": "^4.32.0",
-    "typescript": "^5.7.3"
+    "typescript": "^5.7.3",
+    "vitepress": "^1.5.0"
   }
 }
