@@ -16,7 +16,7 @@
   "scripts": {
     "build": "tsup",
     "build:watch": "tsup --watch",
-    "release": "changeset version && changeset publish && copy CHANGELOG.md docs\\CHANGELOG.md",
+    "release": "changeset version && changeset publish",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs",
