@@ -1,5 +1,11 @@
 # mixcli
 
+## 3.2.3
+
+### Patch Changes
+
+- a0b8cf5: fix some error
+
 ## 3.2.2
 
 ### Patch Changes
