@@ -1,5 +1,11 @@
 # mixcli
 
+## 3.2.1
+
+### Patch Changes
+
+- c9bf4f5: 优化 Option 传参
+
 ## 3.2.0
 
 ### Minor Changes
