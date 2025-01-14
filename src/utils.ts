@@ -1,7 +1,4 @@
-import fs from "fs-extra"
-import path  from "node:path"
-import { promisify }   from "flex-tools/func/promisify"
-import logsets from "logsets" 
+ import logsets from "logsets" 
 
 
 /**
@@ -81,33 +78,7 @@ export function outputDebug(message:string,...args:any[]){
     let vars = (args.length == 1 && typeof(args[0])=='function') ? args[0]() : args
     if(isDebug()) logsets.log(`[MixCli] ${message}`,...vars)
 }
-
-export const fileExists = promisify(fs.exists,{
-    parseCallback:(results)=>{
-        return results[0]
-    }
-})
-export const readFile = promisify(fs.readFile)
-export const writeFile = promisify(fs.writeFile)
-export const mkdir = promisify(fs.mkdir)
  
-/**  
- * 创建目录  
- * 
- *  
- * 
- * @param {String[]} dirs 要创建的目录列表，类型为字符串数组  
- * @param callback      创建目录过程中的回调函数，类型为异步函数，接收一个参数 dir，表示当前正在创建的目录  
- * @returns 该函数返回一个 Promise 对象，表示创建目录的操作是否完成  
- */
-export async function mkDirs(dirs:string[],{callback,base}:{callback?:Function,base?:string}){
-    if(!Array.isArray(dirs)) throw new Error("dirs参数必须为字符串数组")
-    for(let dir of dirs){
-        if(!path.isAbsolute(dir)) dir = path.join(base || process.cwd(),dir)
-        if(typeof(callback)=='function') callback(dir)
-        await mkdir(dir,{recursive:true})
-    }
-}
 
 export function showError(e:any){
     if(isDebug()){
@@ -132,13 +103,10 @@ export async function importModule(file:string){
     let module 
     try{
         module = require(file)
-    }catch(e:any){
-        try{
-            const cmd = await import(`file://${file}`)
-            module = cmd.default
-        }catch(e:any){
-            throw e
-        }        
+    }catch(e:any){ 
+        const cmd = await import(`file://${file}`)
+        module = cmd.default   
+        throw e
     }
     return module
 }

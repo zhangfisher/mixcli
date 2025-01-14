@@ -1,7 +1,7 @@
 import { Command, Option } from "commander";
 import prompts, { PromptObject } from "prompts";
 import { MixOption, type MixedOptionParams } from "./option";
-import { addBuiltInOptions, hyphenToCamelCase, isDisablePrompts, outputDebug } from "./utils";
+import { addBuiltInOptions, isDisablePrompts, outputDebug } from "./utils";
 import type { AsyncFunction } from "flex-tools/types"; 
 import path from "node:path";
 import fs from "node:fs";
