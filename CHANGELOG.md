@@ -1,5 +1,11 @@
 # mixcli
 
+## 3.2.4
+
+### Patch Changes
+
+- 6fe3d85: fix release enery
+
 ## 3.2.3
 
 ### Patch Changes
