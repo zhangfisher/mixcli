@@ -4,14 +4,9 @@
   "description": "Develop command line tool scaffolding for monorepo",
   "repository": "https://github.com/zhangfisher/mixcli.git",
   "homepage": "https://zhangfisher.github.io/mixcli/",
-  "main": "src/index.ts",
-  "type": "module",
-  "publishConfig": {
-    "access": "public",
-    "main": "./dist/index.js",
-    "module": "./dist/index.mjs",
-    "types": "./dist/index.d.ts"
-  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
   "access": "public",
   "scripts": {
     "build": "tsup",
@@ -32,7 +27,8 @@
   "keywords": [
     "commander",
     "prompts",
-    "cli"
+    "cli",
+    "command line"
   ],
   "packageManager": "pnpm@9.0.0",
   "author": "zhangfisher",
