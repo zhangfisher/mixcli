@@ -1,12 +1,13 @@
-import  { MixCommand } from "../../../src"
-import path from "node:path"
-
+import  { MixCommand } from "../../../src" 
 
 export default ()=>{    
     const command = new MixCommand();
     command
         .name('init')
         .description('初始化应用') 
+        .initial({count:10}) 
+        .option(`-r, --reset`,`重置应用`,{default:false})
+        .option(`-c, --count`,`数量`)
         // .argument("[services...]","要运行的服务名称列表",[])        
         .option(`-p, --provider <value>`,`数据库类型,取值sqlite,mysql,sqlserver,postgresql`,{
             default:'sqlite',
@@ -29,16 +30,16 @@ export default ()=>{
         //     prompt:true
         // })
         .before(async function ({options}){
-            console.log("before init",options)
-            options.count = 1
+            console.log(`--------------init:before--------------`)            
+            console.log("  before init",options)
         },true)
         .action((options)=>{
-            console.log(`--------------init:${path.relative(__dirname,process.cwd())}--------------`)
-            console.log("init",options)
+            console.log(`--------------init--------------`)
+            console.log("  init",options)
             return 99
         })
-        .after(async function ({ value,options }){
-            console.log("after init :",value,options)
+        .after(async function (){
+            console.log(`--------------init:after--------------`)            
         })
 
     // const initVueCommand = new MixCommand('vue');

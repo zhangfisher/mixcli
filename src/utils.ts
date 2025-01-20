@@ -110,3 +110,8 @@ export async function importModule(file:string){
     }
     return module
 }
+
+
+export function isUndefined(value:any){
+    return value==undefined
+}

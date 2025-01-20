@@ -354,7 +354,7 @@ export class MixCommand extends Command {
 
 	private isEnablePrompts() {
 		if (isDisablePrompts()) {			
-			return false;// 命令行参数禁用了提示，优先级最高
+			return false;		// 命令行参数禁用了提示，优先级最高
 		} else {
 			return this._enable_prompts;
 		}
@@ -390,6 +390,11 @@ export class MixCommand extends Command {
  		const option = new MixOption(flags, description, options);
 		if (option.required && !this.isEnablePrompts()) option.mandatory = true;		
 		return this.addOption(option as unknown as Option)  
+	}
+
+	initial(values:Record<string,any>){
+		Object.assign(this._optionValues,values)
+		return this
 	}
 
 	/**
@@ -447,6 +452,4 @@ export class MixCommand extends Command {
 	}
 }
 
-
-
-// 编写一个类型号用来表示Commander的Option flags字面量类型
+ 

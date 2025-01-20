@@ -61,7 +61,7 @@ export class MixOptionPrompt{
      * @returns 
      */
     isValidPromptType(type:any){
-        return  supportedPromptTypes.includes(String(type))
+        return supportedPromptTypes.includes(String(type))
     }
     /**
      * 推断是否需要提示
@@ -80,6 +80,9 @@ export class MixOptionPrompt{
         const hasInput = !(inputValue === undefined)
         
         // 1. 显式指定了_prompt为true，则需要提示，后续进行提示类型的推断，可能不会准确
+
+        
+
         if(params === true) return true
         if(params === false) return false                
         if(params === 'auto') return !hasInput
