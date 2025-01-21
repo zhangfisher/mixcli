@@ -137,18 +137,23 @@ export class MixCli extends LiteEvent<any,MixCliEvents>{
     register(cmd:MixCliCommand){
         if(typeof(cmd)=="function"){
             let result = cmd(this)
-            let cmds = result instanceof Array ? result : (result==undefined ? [] :  [result])
+            let cmds = result instanceof Array ? result : ( result==undefined ? [] :  [result] )
             for(let cmd of cmds){
                 // 为什么不用cmd instanceof MixCommand来判断是否是一个有效的命令?
                 // 因为当不同的包引用了与主包不一样版本的mixcli时，判断会失效，导致不能识别
                 // 所以我们通过cmd.__MIX_COMMAND__来判断是否是一个有效的命令
-                if(cmd.__MIX_COMMAND__){                    
+                if( cmd.__MIX_COMMAND__ ){                    
                     if(this.hasCommand(cmd.name())){
                         logsets.error(`Command <${cmd.name()}> has been registered!`)
                     }else{
                         outputDebug("注册命令:{}",cmd.fullname)
+
                         this.root.addCommand(cmd as Command) ;
+                        
+                        addBuiltInOptions(cmd as any);
+
                         (cmd as any)._cli = this
+                        
                         this.emit("register",cmd.fullname,true)
                     }                    
                 }else{

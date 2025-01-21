@@ -76,12 +76,11 @@ export class MixCommand extends Command {
 	private _customPrompts : PromptObject[] = [];
 	private _optionValues  : Record<string, any> = {}; 							// 命令行输入的选项值
 	private _actions       : MixActionRegistry[] = []; 							// 允许多个action
-	private _enable_prompts: boolean = true; 									// 是否启用交互提示
+	private _enable_prompts: boolean | undefined     						   // 是否启用交互提示
 	constructor(name?: string) {
 		super(name);		
 		// eslint-disable-next-line no-this-alias
 		const self = this
-		if (!this.isRoot) addBuiltInOptions(this); 
 		this.hook("preAction", async function (this: any) {
 			self._optionValues = self.getOptionValues(this.hookedCommand);			
 			// @ts-ignore
@@ -374,7 +373,10 @@ export class MixCommand extends Command {
 		const options = this.options as unknown as MixOption[];
 		const optionPromports = options
 			.filter((option) => !option.hidden && option.__MIX_OPTION__)
-			.map((option) => option.getPrompt(this._optionValues[option.attributeName()]))
+			.map((option) => {
+				const isEnablePrompt = this._enable_prompts;
+				return option.getPrompt(this._optionValues[option.attributeName()],isEnablePrompt)
+			})
 			.filter((prompt) => prompt) as PromptObject[];
 			
 		outputDebug("命令<{}>自动生成{}个选项提示:{}", [
@@ -388,6 +390,12 @@ export class MixCommand extends Command {
 	// @ts-ignore
 	option( flags: string, description: string, options?: MixedOptionParams ):this{ 
  		const option = new MixOption(flags, description, options);
+		
+		const optionName = option.attributeName()
+		if(optionName in this._optionValues){
+			option.default(this._optionValues[optionName]);
+		}
+
 		if (option.required && !this.isEnablePrompts()) option.mandatory = true;		
 		return this.addOption(option as unknown as Option)  
 	}
@@ -447,7 +455,7 @@ export class MixCommand extends Command {
 	 * 启用所有提示
 	 */
 	enablePrompts() {
-		this._enable_prompts = true;
+		this._enable_prompts = true; 
 		return this;
 	}
 }

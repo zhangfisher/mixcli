@@ -70,8 +70,11 @@ export class MixOptionPrompt{
      * 
      * 
      */
-    isNeedPrompt(input:any,defaultValue?:any){
+    isNeedPrompt(input:any,defaultValue?:any,enable?:boolean){
     
+        if(enable === false) return false
+        if(enable === true) return true
+        
         const params = this.params
 
         const inputValue = input || defaultValue
@@ -80,8 +83,6 @@ export class MixOptionPrompt{
         const hasInput = !(inputValue === undefined)
         
         // 1. 显式指定了_prompt为true，则需要提示，后续进行提示类型的推断，可能不会准确
-
-        
 
         if(params === true) return true
         if(params === false) return false                
@@ -194,14 +195,14 @@ export class MixOptionPrompt{
      * 
      * @param inputValue   从命令行输入的值
      */
-    get(inputValue?:any){
+    get(inputValue?:any,enable?:boolean){
 
         const { description, defaultValue } = this.cliOption
         
         let input = inputValue || defaultValue
 
         // 1. 判断是否需要启用提示
-        if(!this.isNeedPrompt(input,defaultValue)) return
+        if(!this.isNeedPrompt(input,defaultValue,enable)) return
 
         // 2. 推断prompt类型
         const promptType = this.infer(inputValue)

@@ -2,14 +2,6 @@
 
 `MixCli`最核心的功能就是基于`prompts`为命令选项提供推断提示类型，自动为命令选项提供合适的提示类型。
 
-## 启用提示
-
-当命令行选项满足以下条件时，启用交互提示:
-
-- 未提供默认值时，并且命令行无该选项输入时
-- 显式指定`FlexOptionParams`参数的`prompt`为`true`时
-- 当提供了无效的choices时
-- 显式指定`FlexOptionParams`参数的`prompt`时
 
 ## 推断提示类型
 
@@ -37,7 +29,6 @@
 ## 指定提示类型
 
 如果自动推断的提示类型不符合预期，可以显式指定`FlexOptionParams`参数的`prompt`来指定提示类型，如下：
-
 
 - **prompt=true**
 
@@ -95,9 +86,15 @@ interface PromptObject<T extends string = string> {
  const appCommand = new MixCommand();
     appCommand.name("app")
         .description("以开发模式启动应用")      // 未指定默认值,自动使用text类型提供
-        .option("--color <value...>","显示颜色",{choices:["red","yellow","blue"],prompt:"multiselect"})  
+        .option("--color <value...>","显示颜色",{ 
+            choices:["red","yellow","blue"],      
+            prompt:"multiselect"
+        })  
         // 未指定默认值,使用自动完成，可以输入任意值
-        .option("--filter <value>","文件过滤",{choices:["src","test","debug"],prompt:"autocomplete"})    
+        .option("--filter <value>","文件过滤",{ 
+            choices:["src","test","debug"],
+            prompt:"autocomplete"
+        })    
         // 未指定默认值,自动使用text类型提供
         .option("-t,--title <value>","标题(不少于5个字符)",{
             validate:(value)=>value.length>=5,

@@ -56,7 +56,7 @@ export class MixOption extends Option{
      * @param inputValue 
      * @returns 
      */
-    getPrompt(inputValue?:any): PromptObject | undefined {
-        return this.prompt?.get(inputValue)
+    getPrompt(inputValue?:any,enable?:boolean): PromptObject | undefined {
+        return this.prompt?.get(inputValue,enable)
     } 
 }

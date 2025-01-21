@@ -39,10 +39,9 @@ export default defineConfig({
             items:[
               { text: '创建命令行', link: '/guide/create-cli' },
               { text: '创建命令', link: '/guide/create-command' },
-              { text: '推断提示类型', link: '/guide/infer-prompt' },
-              { text: '定制提示类型', link: '/guide/custom-prompt' },
               { text: '命令钩子', link: '/guide/command_hooks' },
-              { text: '禁用交互提示', link: '/guide/disable-prompts' },
+              { text: '自动交互提示', link: '/guide/auto-prompts' },
+              { text: '定制提示类型', link: '/guide/custom-prompt' },
               { text: '终端增强组件', link: '/guide/term-ui' },
               { text: '工作目录', link: '/guide/work-dirs' },       
               { text: '内置选项', link: '/guide/builtin-options' },              

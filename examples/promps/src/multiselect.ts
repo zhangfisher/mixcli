@@ -7,6 +7,10 @@ export default ()=>{
     multiselectCommand
         .name('multiselect')
         .description('多选项')
+        .enablePrompts()
+        .initial({
+            color8: ['red', 'blue'],
+        })
         // .option('-d, --color4 [color]', '颜色', {
         //     default: 'green',
         //     choices: [ 'red', 'green', 'blue' ],
@@ -42,7 +46,7 @@ export default ()=>{
         .option('-h, --color8 [color]', '颜色5', {   
             required:true,
             choices: ()=>{
-                return ['red', 'green', 'blue']
+                return ['red', 'green', 'blue', 'yellow', 'black']
             },
             prompt : {
                 type: "multiselect",
