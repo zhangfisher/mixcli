@@ -1,5 +1,11 @@
 # mixcli
 
+## 3.2.6
+
+### Patch Changes
+
+- d526eea: feat: apply initial values
+
 ## 3.2.5
 
 ### Patch Changes
