@@ -1,5 +1,12 @@
 # mixcli
 
+## 3.2.7
+
+### Patch Changes
+
+- b896ee5: update invalidate initial values
+- ef9af6a: update initial values
+
 ## 3.2.6
 
 ### Patch Changes
