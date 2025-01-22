@@ -190,6 +190,22 @@ export class MixOptionPrompt{
         outputDebug("选项<{}> -> 提示类型<{}>",[this.cliOption.name(),promptType])
         return promptType
     }
+
+    private _validateInputValue(inputValue:any){
+        if(this.cliOption.argChoices){
+            const argChoices = this.cliOption.argChoices
+            if(Array.isArray(inputValue)){
+                return inputValue.filter((item:any)=>{
+                    return argChoices.indexOf(item) >= 0
+                })
+            }else{
+                if(argChoices.indexOf(inputValue) != -1) return inputValue
+            }
+        }else{
+            return inputValue
+        }
+    }
+
     /**
      * 返回生成prompt对象
      * 
@@ -199,7 +215,7 @@ export class MixOptionPrompt{
 
         const { description, defaultValue } = this.cliOption
         
-        let input = inputValue || defaultValue
+        let input = this._validateInputValue(inputValue) || defaultValue
 
         // 1. 判断是否需要启用提示
         if(!this.isNeedPrompt(input,defaultValue,enable)) return

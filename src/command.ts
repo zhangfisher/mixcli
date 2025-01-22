@@ -1,7 +1,7 @@
 import { Command, Option } from "commander";
 import prompts, { PromptObject } from "prompts";
 import { MixOption, type MixedOptionParams } from "./option";
-import { addBuiltInOptions, isDisablePrompts, outputDebug } from "./utils";
+import { isDisablePrompts, outputDebug } from "./utils";
 import type { AsyncFunction } from "flex-tools/types"; 
 import path from "node:path";
 import fs from "node:fs";
@@ -393,11 +393,18 @@ export class MixCommand extends Command {
 		
 		const optionName = option.attributeName()
 		if(optionName in this._optionValues){
-			option.default(this._optionValues[optionName]);
+			const val = this._optionValues[optionName]
+			if(option.argChoices){
+				if(option.argChoices.includes(val)){
+					option.default(val)
+				}
+			}else if(val!=undefined){
+				option.default(val)
+			}
 		}
 
-		if (option.required && !this.isEnablePrompts()) option.mandatory = true;		
-		return this.addOption(option as unknown as Option)  
+		if (option.required) option.mandatory = false;
+		return this.addOption(option as unknown as Option) 
 	}
 
 	initial(values:Record<string,any>){
