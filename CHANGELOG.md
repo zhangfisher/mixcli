@@ -1,5 +1,11 @@
 # mixcli
 
+## 3.2.8
+
+### Patch Changes
+
+- 6fb7504: 修复当提供无效 initial 时出错的问题
+
 ## 3.2.7
 
 ### Patch Changes
