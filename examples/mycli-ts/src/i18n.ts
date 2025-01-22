@@ -2,12 +2,24 @@ import  { MixCommand } from "../../../src"
 
 
 const initOptions = {
-    languages: ['zh-CN', 'en-US'],
-    reset:true,
-    languageDir: "src/languages2",
-    moduleType: "umd",
+    namespaces: {
+    },
+    entry: undefined,
+    languages: [
+      "zh-CN",
+      "en-US",
+      "es-ES",
+      "ar-EG",
+      "pt-PT",
+    ],
+    library: false,
+    debug: false,
+    defaultLanguage: "zh-CN",
+    activeLanguage: "en-US",
+    activeLanguage2: ["en-US", "pt-PT"]
 }
-let selectLanguages:any[] = []
+
+let selectLanguages:any[] = initOptions.languages
 
 export default ()=>{    
     const command = new MixCommand("i18n");
@@ -15,10 +27,21 @@ export default ()=>{
         .description("初始化VoerkaI18n支持")
         .enablePrompts()
         .initial(initOptions)        
-        .option("-m, --module-type <type>", "模块类型", {
-            default: "esm",
-            choices: ["esm", "cjs", "umd", "system", "amd"],
-            prompt: "select",
+        // .option("--activeLanguage <tag>", "激活语言", {
+        //     prompt: {
+        //         type    : "select",
+        //         choices : (_, answers) => {
+        //             return selectLanguages as any[]
+        //         },
+        //     },
+        // })
+        .option("--activeLanguage2 <tag...>", "激活语言", {
+            prompt: {
+                type    : "multiselect",
+                choices : (_, answers) => {
+                    return selectLanguages as any[]
+                },
+            },
         })
         // .option("-r, --reset","重新初始化",{default:false,prompt:false})        
         // .option("-d, --language-dir [path]", "语言目录", {
@@ -36,7 +59,9 @@ export default ()=>{
         //             { title: "日文", value: "ja-JP" },
         //             { title: "韩文", value: "ko-KR" },
         //             { title: "法文", value: "fr-FR" },
-        //             { title: "西班牙文", value: "es-ES" }
+        //             { title: "西班牙文", value: "es-ES" },
+        //             { title: "阿拉伯文" , value: "ar-EG" },
+        //             { title: "葡萄牙文", value: "pt-PT" }
         //         ],
         //     },
         // })        
@@ -64,6 +89,11 @@ export default ()=>{
         //     default: true,
         //     prompt: true,
         // }) 
+        // .option("-m, --module-type <type>", "模块类型", {
+        //     default: "esm",
+        //     choices: ["esm", "cjs", "umd", "system", "amd"],
+        //     prompt: "select",
+        // })
         .action(async (options) => {
             const opts = Object.assign({
                 reset          : false,

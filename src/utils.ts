@@ -120,3 +120,15 @@ export async function importModule(file:string){
 export function isUndefined(value:any){
     return value==undefined
 }
+
+
+export function normalizedChoices(items:any[]){
+    items.forEach((item,index)=>{
+        if(typeof(item)==="object" && ('value' in item) && ('title' in item)){
+            items[index] = item
+        }else{
+            items[index] = {title:item,value:item}
+        }
+    })
+    return items
+}

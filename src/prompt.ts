@@ -2,7 +2,7 @@ import { isPlainObject } from "flex-tools/typecheck/isPlainObject"
 import { isNumber  } from "flex-tools/typecheck/isNumber"
 
 import { PromptObject } from "prompts" 
-import { outputDebug } from "./utils"
+import { normalizedChoices, outputDebug } from "./utils"
 import { MixOption } from "./option" 
 
 export type PromptType = "text" | "password" | "invisible" | "number"| "confirm"| "list" 
@@ -44,7 +44,10 @@ export interface PromptChoice {
 }
 
  
+
+
 export type PromptParams = Omit<PromptObject,'name'> | PromptType | boolean | 'auto' | undefined     
+
 
 /**
  * 负责生成prompt对象
@@ -54,6 +57,13 @@ export class MixOptionPrompt{
     params?: PromptParams
     constructor(public cliOption:MixOption,promptParams?:PromptParams){ 
         this.params = promptParams
+        if(promptParams && isPlainObject(promptParams)){
+            // @ts-ignore
+            if(promptParams.choices && Array.isArray(promptParams.choices)){
+                // @ts-ignore
+                promptParams.choices =  normalizedChoices(promptParams.choices)
+            }
+        }
     }
     /**
      * 返回输入的是否是有效的prompt类型
@@ -262,6 +272,40 @@ export class MixOptionPrompt{
                             item.selected = true
                         }
                     })
+                }
+            }else if(prompt.choices && typeof(prompt.choices)=='function'){
+                if(promptType=='select'){
+                    prompt.initial  = (pre,answers)=>{
+                        // @ts-ignore
+                        const items = prompt.choices(pre,answers)
+                        if(Array.isArray(items)){                     
+                            normalizedChoices(items)       
+                            const index = items.findIndex(item=>{
+                                return item.value==input
+                            })
+                            if(index!=-1){
+                                return index
+                            }
+                        }
+                        return 0
+                    }
+                }else if(promptType=='multiselect'){          
+                    // @ts-ignore
+                    prompt.initial  = (pre,answers)=>{
+                        // @ts-ignore
+                        const items = prompt.choices(pre,answers)
+                        if(Array.isArray(items)){
+                            normalizedChoices(items)           
+                            items.forEach((item)=>{
+                                if(Array.isArray(input) && input.includes(item.value)){
+                                    item.selected = true
+                                }else if(item.value==input){
+                                    item.selected = true
+                                }
+                            })
+                        }
+                        return []
+                    }
                 }
             }
         }
