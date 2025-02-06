@@ -16,7 +16,8 @@ const initOptions = {
     debug: false,
     defaultLanguage: "zh-CN",
     activeLanguage: "en-US",
-    activeLanguage2: ["en-US", "pt-PT"]
+    activeLanguage2: ["en-US", "pt-PT"],
+    count:200
 }
 
 let selectLanguages:any[] = initOptions.languages
@@ -26,7 +27,7 @@ export default ()=>{
     command
         .description("初始化VoerkaI18n支持")
         .enablePrompts()
-        .initial(initOptions)        
+        .initial(async ()=>initOptions)        
         // .option("--activeLanguage <tag>", "激活语言", {
         //     prompt: {
         //         type    : "select",
@@ -43,12 +44,14 @@ export default ()=>{
                 },
             },
         })
+        .option("-c, --count <value>","数量")        
+
         // .option("-r, --reset","重新初始化",{default:false,prompt:false})        
         // .option("-d, --language-dir [path]", "语言目录", {
         //     default: "src/languages",
         //     prompt : true,
         // })
-        // .option("--library", "是否开发库工程")
+        .option("--library", "是否开发库工程")
         // .option("-l, --languages <tags...>", "选择支持的语言", {
         //     prompt: {
         //         type   : "multiselect",

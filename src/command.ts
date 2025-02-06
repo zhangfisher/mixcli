@@ -76,13 +76,20 @@ export class MixCommand extends Command {
 	private _customPrompts : PromptObject[] = [];
 	private _optionValues  : Record<string, any> = {}; 							// 命令行输入的选项值
 	private _actions       : MixActionRegistry[] = []; 							// 允许多个action
+	private _initialFn?	   : ()=>Record<string,any>; 							// 初始化函数
 	private _enable_prompts: boolean | undefined     						   // 是否启用交互提示
 	constructor(name?: string) {
 		super(name);		
 		// eslint-disable-next-line no-this-alias
 		const self = this
-		this.hook("preAction", async function (this: any) {
-			self._optionValues = self.getOptionValues(this.hookedCommand);			
+		this.hook("preAction", async function (this: any) {				
+			const initValue = self._optionValues					
+			self._optionValues = self.getOptionValues(this.hookedCommand)
+			if(self._initialFn){
+				const initial = await Promise.resolve(self._initialFn())
+				Object.assign(self._optionValues,initial)
+			}
+			Object.assign(self._optionValues,initValue)
 			// @ts-ignore
 			await self.preActionHook.apply(self, arguments);
 		});
@@ -388,9 +395,8 @@ export class MixCommand extends Command {
 	} 
 
 	// @ts-ignore
-	option( flags: string, description: string, options?: MixedOptionParams ):this{ 
- 		const option = new MixOption(flags, description, options);
-		
+	option( flags: string, description: string, options?: MixedOptionParams ):this{ 		
+ 		const option = new MixOption(flags, description, options);		
 		const optionName = option.attributeName()
 		if(optionName in this._optionValues){
 			const val = this._optionValues[optionName]
@@ -402,13 +408,16 @@ export class MixCommand extends Command {
 				option.default(val)
 			}
 		}
-
 		if (option.required) option.mandatory = false;
 		return this.addOption(option as unknown as Option) 
 	}
 
-	initial(values:Record<string,any>){
-		Object.assign(this._optionValues,values)
+	initial(values:Record<string,any> | (()=>Record<string,any>)){
+		if(typeof(values)=='function'){
+			this._initialFn = values as (()=>Record<string,any>)
+		}else if(typeof(values)=='object'){
+			Object.assign(this._optionValues,values)
+		}
 		return this
 	}
 

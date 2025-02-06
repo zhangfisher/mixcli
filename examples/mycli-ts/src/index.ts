@@ -3,6 +3,7 @@ import devCommand from "./dev"
 import initCommand from "./init"
 import startCommand from "./start"
 import i18nCommand from "./i18n"
+import buildCommand from "./build"
  
 
 const cli = new MixCli({
@@ -28,7 +29,7 @@ const cli = new MixCli({
 // cli.register(initCommand)
 // cli.register(startCommand)
 cli.register(i18nCommand)
-
+cli.register(buildCommand)
 cli.run()
 
 
