@@ -42,11 +42,7 @@ jobs:
         uses: actions/configure-pages@v3
       - name: Install pnpm
         run:
-          npm install -g pnpm
-      - name : pnpm store prune
-        run: |
-          pnpm store prune
-          rm pnpm-lock.yaml          
+          npm install -g pnpm     
       - name: Install dependencies
         run: pnpm install # or npm ci / yarn install / bun install /
       - name: Build with VitePress
@@ -54,7 +50,7 @@ jobs:
           pnpm docs:build # or  npm run docs:build / yarn docs:build / bun run docs:build
           touch docs/.vitepress/dist/.nojekyll
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v2
+        uses: actions/upload-pages-artifact@v3
         with:
           path: docs/.vitepress/dist
 
@@ -69,4 +65,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v2
+        uses: actions/deploy-pages@v4
