@@ -1,5 +1,11 @@
 # mixcli
 
+## 3.2.9
+
+### Patch Changes
+
+- 4897498: feat: add initial(fn) support
+
 ## 3.2.8
 
 ### Patch Changes
