@@ -1,0 +1,5 @@
+---
+"mixcli": patch
+---
+
+update dependencies
