@@ -1,5 +1,11 @@
 # mixcli
 
+## 3.2.10
+
+### Patch Changes
+
+- fbf82d8: update dependencies
+
 ## 3.2.9
 
 ### Patch Changes
