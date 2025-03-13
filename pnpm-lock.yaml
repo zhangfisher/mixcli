@@ -21,8 +21,8 @@ importers:
         specifier: ^13.0.0
         version: 13.0.0
       flex-tools:
-        specifier: ^1.4.18
-        version: 1.4.18
+        specifier: ^1.4.33
+        version: 1.4.33
       fs-extra:
         specifier: ^11.1.1
         version: 11.1.1
@@ -30,8 +30,8 @@ importers:
         specifier: ^10.3.12
         version: 10.3.12
       logsets:
-        specifier: ^1.3.14
-        version: 1.3.14
+        specifier: ^1.3.31
+        version: 1.3.31
       prompts:
         specifier: ^2.4.2
         version: 2.4.2
@@ -1252,6 +1252,9 @@ packages:
   flex-tools@1.4.18:
     resolution: {integrity: sha512-Zu3R7WAnfAjFPiuoTi1XOh6/DGE4z0cvNgG+Enhu5ul4/TMvszcENWdYAVOpOQWIju5nNPkorjvGONvNe1Nq2w==}
 
+  flex-tools@1.4.33:
+    resolution: {integrity: sha512-mpkoAZ/sPlclPr1NJaZNhyPIAVYEjg3/gXChONQ0cZ7p4PRGEjdhL5tmOrKxJa7n2+5O4WD6iGT//XP4d1N/9w==}
+
   focus-trap@7.6.4:
     resolution: {integrity: sha512-xx560wGBk7seZ6y933idtjJQc1l+ck+pI3sKvhKozdBV1dRZoKhkW5xoCaFv9tQiX5RH1xfSxjuNu6g+lmN/gw==}
 
@@ -1515,6 +1518,9 @@ packages:
 
   logsets@1.3.14:
     resolution: {integrity: sha512-Ctl7AVuE14ZPkpcqarsmGw0AcNwxAYXawf4vE7u20ACYjdmqHCvwXG8KWoV9frM8/KhPO/uuRVS79e/PGSYK8w==}
+
+  logsets@1.3.31:
+    resolution: {integrity: sha512-tcouy+fn5r7zrQn14Aj0kHsdWsimN8UUIew+3fW5WwwhAD9HiaQ9DwAto6RIo8JARK1k01qSf3GxbkniEuvNWg==}
 
   lower-case@1.1.4:
     resolution: {integrity: sha512-2Fgx1Ycm599x+WGpIYwJOvsjmXFzTSc34IwDWALRA/8AopUKAVPwfJ+h5+f85BCp0PWmmJcWzEpxOpoXycMpdA==}
@@ -1793,6 +1799,11 @@ packages:
 
   semver@7.6.3:
     resolution: {integrity: sha512-oVekP1cKtI+CTDvHWYFUcMtsK/00wmAEfyqKfNdARm8u1wNVhSgaX7A8d4UuIlUI5e84iEwOhs7ZPYRmzU9U6A==}
+    engines: {node: '>=10'}
+    hasBin: true
+
+  semver@7.7.1:
+    resolution: {integrity: sha512-hlq8tAfn0m/61p4BVRcPzIGr6LKiMwo4VM6dGi6pt4qcRkmNzTcWq6eCEjEh+qXjkMDvPlOFFSGwQjoEa6gyMA==}
     engines: {node: '>=10'}
     hasBin: true
 
@@ -2767,7 +2778,7 @@ snapshots:
 
   '@voerkai18n/runtime@2.1.13':
     dependencies:
-      flex-tools: 1.4.18
+      flex-tools: 1.4.33
 
   '@vue/compiler-core@3.5.13':
     dependencies:
@@ -3232,6 +3243,12 @@ snapshots:
       art-template: 4.13.2
       glob: 10.3.12
 
+  flex-tools@1.4.33:
+    dependencies:
+      art-template: 4.13.2
+      glob: 10.3.12
+      semver: 7.7.1
+
   focus-trap@7.6.4:
     dependencies:
       tabbable: 6.2.0
@@ -3515,6 +3532,13 @@ snapshots:
       core-js: 3.32.1
       flex-tools: 1.4.18
 
+  logsets@1.3.31:
+    dependencies:
+      '@babel/runtime-corejs3': 7.22.11
+      ansicolor: 1.1.100
+      core-js: 3.32.1
+      flex-tools: 1.4.33
+
   lower-case@1.1.4: {}
 
   lru-cache@10.2.1: {}
@@ -3780,6 +3804,8 @@ snapshots:
   search-insights@2.17.3: {}
 
   semver@7.6.3: {}
+
+  semver@7.7.1: {}
 
   shebang-command@2.0.0:
     dependencies:
